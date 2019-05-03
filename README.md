@@ -26,7 +26,7 @@ It is recommended to create a virtual environment in the `back_end` directory. Y
 
 **Activating the virtualenv**: `source venv/bin/activate` (Linux).
 
-**Installing the requirements**: pip install -r requirements.txt
+**Installing the requirements**: `pip install -r requirements.txt`
 
 ### Front-end
 
