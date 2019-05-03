@@ -30,6 +30,12 @@ It is recommended to create a virtual environment in the `back_end` directory. Y
 
 ### Front-end
 
+### Installation
+
+You must install [Node.js](https://nodejs.org/en/download/) for use on the local machine.
+
+### Usage
+
 Please see README.md in `front_end` for information on front-end usage.
 
 ## Extensions
