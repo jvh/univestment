@@ -7,7 +7,6 @@ const HomePage = (props) => {
   return (
 
     <div>
-      Jonathon is a disgrace...
     </div>
 
   );
