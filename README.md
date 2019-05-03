@@ -24,9 +24,11 @@ It is recommended to create a virtual environment in the `back_end` directory. Y
 
 **Creating a virtualenv**: `virtualenv venv`. You may need to add on the parameter `-p python3` if you have multiple Python versions on your machine.
 
-**Activating the virtualenv**: `source venv/bin/activate` (Linux).
+**Activating the virtualenv**: `source venv/bin/activate` (Linux)
 
 **Installing the requirements**: `pip install -r requirements.txt`
+
+**Deactivating the virtualenv**: `source deactivate`
 
 ### Front-end
 
