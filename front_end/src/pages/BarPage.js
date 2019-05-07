@@ -10,13 +10,29 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 class BarPage extends Component {
 
+  constructor() {
+    super()
+    this.state = {
+      data: null,
+      error: null
+    }
+  }
+
+  isLoading = () => this.state.data === null && !this.hasError();
+  hasError = () => this.state.error !== null;
+
   componentDidMount() {
     this.fetchData();
   }
 
   handleGetDataSuccess = response => {
     console.log(response);
+    this.setState({data: response.result.data});
+    console.log(this.state);
   };
+
+  getBarGraph(data) {
+  }
 
   handleGetDataFailure = error => {
     console.log(error);
@@ -26,18 +42,25 @@ class BarPage extends Component {
     ApiUtils.getData()
       .then(this.handleGetDataSuccess)
       .catch(this.handleGetDataFailure);
-  }
+  };
 
   render(){
 
-    const data = BarData
+    if (this.isLoading()){
+      return (<div></div>)
+    }
+
+    if (this.hasError()) {
+      return (<div></div>)
+    }
 
     return (
       <div className="App">
         <h1>Bar Chart</h1>
-        <BarChart data={BarData} />
+        <BarChart data={this.state.data} height="500" />
       </div>
     );
+
   }
 }
 

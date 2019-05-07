@@ -10,10 +10,17 @@ class BarChart extends Component {
 
     const data = this.props.data;
 
+    const height = this.props.height;
+
+    var maxVal = Math.max( ...data );
+    console.log (maxVal);
+
+    var barMult = height / (maxVal+(maxVal/10))
+
     const svg = d3.select("body")
     .append("svg")
     .attr("width", 700)
-    .attr("height", 500)
+    .attr("height", height)
     .style("margin-left", 100);
 
     svg.selectAll("rect")
@@ -21,9 +28,9 @@ class BarChart extends Component {
       .enter()
       .append("rect")
       .attr("x", (d, i) => i * 70)
-      .attr("y", (d, i) => 500 - 10 * d)
+      .attr("y", (d, i) => 500 - barMult * d)
       .attr("width", 65)
-      .attr("height", (d, i) => d * 10)
+      .attr("height", (d, i) => d * barMult)
       .attr("fill", "green")
   }
 
