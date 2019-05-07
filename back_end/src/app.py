@@ -1,9 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_restful.utils.cors import crossdomain
+from flask_cors import CORS
 
 DEBUGGING_MODE = True
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
