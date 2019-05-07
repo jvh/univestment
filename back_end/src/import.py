@@ -8,11 +8,11 @@ class Import:
         self.box_office_data = self.read_box_office()
 
     def check_file(self, file_path):
-        '''
+        """
         Check if a data file exists
 
         :param file_path: path to the data file starting from root_data_path
-        '''
+        """
         try:
             open(self.root_data_path + file_path, 'r')
             return True
@@ -20,11 +20,11 @@ class Import:
             return False
 
     def read_box_office(self):
-        '''
+        """
         Read in boxofficemojo dataset. Store file as: 'boxoffice.csv'
 
         :returns the data file
-        '''
+        """
         file_path = 'boxofficemojo/boxoffice.csv'
         if self.check_file(file_path):
             box_office_data = pd.read_csv(self.root_data_path + file_path)
@@ -34,12 +34,13 @@ class Import:
             return None
 
     def get_boxoffice_record(self, record):
-        '''
-        return a record (column) from the boxoffice datafile
+        """
+        return a record or set of records (column/s) from the boxoffice datafile
+        available records: rank, title, studio, lifetime_gross, year
 
         :param record: string or list(string)
         :return: data record
-        '''
+        """
         if self.box_office_data is not None:
             try:
                 data_record =  self.box_office_data[record]
