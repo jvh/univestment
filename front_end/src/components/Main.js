@@ -3,6 +3,7 @@ import { Switch, Route } from 'react-router-dom';
 import { Col } from 'react-bootstrap';
 
 import HomePage from '../pages/HomePage.js';
+import BarPage from '../pages/BarPage.js';
 
 
 const Main = props => {
@@ -12,12 +13,13 @@ const Main = props => {
     <Component {...routerProps} {...props} />
 
   const homePageRenderer = setBaseProps(HomePage)(props);
+  const barPageRenderer = setBaseProps(BarPage)(props);
 
   return (
     <main>
       <Col className="main">
         <Switch>
-          <Route exact path='/' render={homePageRenderer} />
+          <Route exact path='/' render={barPageRenderer} />
           <Route exact path='/*' render={homePageRenderer} />
         </Switch>
       </Col>
