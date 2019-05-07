@@ -5,7 +5,7 @@ class ImportFiles:
 
     def __init__(self):
         self.root_data_path = '../open_datasets/'
-        self.box_office_data = self.read_box_office()
+        self.box_office_data = self.read_boxofficemojo()
 
     def check_file(self, file_path):
         """
@@ -20,7 +20,7 @@ class ImportFiles:
             return False
 
     def read_boxofficemojo(self):
-        self.read_file('boxofficemojo/boxoffice.csv')
+        return self.read_file('boxofficemojo/boxoffice.csv')
 
     def read_file(self, file_path):
         if self.check_file(file_path):
