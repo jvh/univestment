@@ -6,8 +6,6 @@ __pycache__/
 .DS_Store
 .idea/
 
-./front_end/package-lock.json
-
 # C extensions
 *.so
 
