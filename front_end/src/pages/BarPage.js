@@ -57,7 +57,7 @@ class BarPage extends Component {
     return (
       <div className="App">
         <h1>Bar Chart</h1>
-        <BarChart data={this.state.data} height="500" />
+        <BarChart data={this.state.data} height="500" width="700"/>
       </div>
     );
 
