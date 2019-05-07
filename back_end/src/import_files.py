@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-class Import:
+class ImportFiles:
 
     def __init__(self):
         self.root_data_path = '../open_datasets/'
