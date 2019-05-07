@@ -6,7 +6,6 @@ class Import:
     def __init__(self):
         self.root_data_path = '../open_datasets/'
         self.box_office_data = self.read_box_office()
-        self.get_boxoffice_record('dwdw')
 
     def check_file(self, file_path):
         '''
@@ -32,6 +31,7 @@ class Import:
             return box_office_data
         else:
             print('import for boxofficemojo failed')
+            return None
 
     def get_boxoffice_record(self, record):
         '''
@@ -40,12 +40,14 @@ class Import:
         :param record: string or list(string)
         :return: data record
         '''
-        if self.box_office_data:
+        if self.box_office_data is not None:
             try:
                 data_record =  self.box_office_data[record]
                 return data_record
             except ValueError:
                 print('invalid record heading')
+                return None
+
 
 #if __name__ == '__main__':
-    #import_data = Import()
+#    import_data = Import()
