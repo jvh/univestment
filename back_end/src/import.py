@@ -6,7 +6,6 @@ class Import:
     def __init__(self):
         self.root_data_path = '../open_datasets/'
         self.box_office_data = self.read_box_office()
-        self.get_boxoffice_record('dwdw')
 
     def check_file(self, file_path):
         '''
