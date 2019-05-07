@@ -42,7 +42,7 @@ class LineGraph extends Component {
     var svg = d3.select("body").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-      .append("g")
+        .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // 3. Call the x axis in a group tag
@@ -72,7 +72,6 @@ class LineGraph extends Component {
         .attr("r", 5)
           .on("mouseover", function(a, b, c) {
       			console.log(a)
-            this.attr('class', 'focus')
     		})
           .on("mouseout", function() {  })
   }

@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import * as d3 from "d3";
+import '../css/Main.css';
+import ColourUtils from '../utils/ColourUtils.js';
 
 class BarChart extends Component {
   componentDidMount() {
@@ -31,7 +33,7 @@ class BarChart extends Component {
       .attr("y", (d, i) => 500 - barMult * d)
       .attr("width", 65)
       .attr("height", (d, i) => d * barMult)
-      .attr("fill", "green")
+      .attr("fill", ColourUtils.dark_blue);
   }
 
   render(){
