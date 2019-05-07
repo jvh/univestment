@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_restful.utils.cors import crossdomain
 
 DEBUGGING_MODE = True
 
@@ -11,6 +12,7 @@ def hello_world():
 
 
 @app.route('/test_data', methods=['GET', 'POST'])
+@crossdomain(origin='*')
 def test_data():
     if request.method == 'POST':
         return 'ok'
