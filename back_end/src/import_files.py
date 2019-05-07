@@ -19,13 +19,10 @@ class ImportFiles:
         except FileNotFoundError:
             return False
 
-    def read_box_office(self):
-        """
-        Read in boxofficemojo dataset. Store file as: 'boxoffice.csv'
+    def read_boxofficemojo(self):
+        self.read_file('boxofficemojo/boxoffice.csv')
 
-        :returns the data file
-        """
-        file_path = 'boxofficemojo/boxoffice.csv'
+    def read_file(self, file_path):
         if self.check_file(file_path):
             box_office_data = pd.read_csv(self.root_data_path + file_path)
             return box_office_data
