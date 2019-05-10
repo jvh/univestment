@@ -7,7 +7,8 @@ class ImportFiles:
     def __init__(self):
         path = '{}/../..'.format(ROOT_DIR)
         self.root_data_path = '{}/open_datasets/'.format(path)
-        self.box_office_data = self.read_boxofficemojo()
+        self.admissions_data = self.read_admissions()
+        self.uni_addresses = self.read_uni_addresses()
 
     def check_file(self, file_path):
         """
@@ -21,32 +22,42 @@ class ImportFiles:
         except FileNotFoundError:
             return False
 
-    def read_boxofficemojo(self):
-        return self.read_file('boxofficemojo/boxoffice.csv')
-
     def read_file(self, file_path):
+        """
+        read a file and return a dataframe containing the contents of the file
+
+        :param file_path: path to file from root data path
+        :return: dataframe
+        """
         if self.check_file(file_path):
-            box_office_data = pd.read_csv(self.root_data_path + file_path)
-            return box_office_data
+            data = pd.read_csv(self.root_data_path + file_path)
+            return data
         else:
             raise FileNotFoundError('Please check that the filepath exists: {}'.format(file_path))
 
-    def get_boxoffice_record(self, record):
+    def read_admissions(self):
         """
-        return a record or set of records (column/s) from the boxoffice datafile
-        available records: rank, title, studio, lifetime_gross, year
+        Read data file containing admission data and return contents in dataframe
 
-        :param record: string or list(string)
-        :return: data record
+        :return: dataframe
         """
-        if self.box_office_data is not None:
-            try:
-                data_record =  self.box_office_data[record]
-                return data_record
-            except ValueError:
-                print('invalid record heading')
-                return None
+        try:
+            return self.read_file('admissions/admissions.csv')
+        except FileNotFoundError:
+            return None
+
+    def read_uni_addresses(self):
+        """
+        Read data file containing university address data and return contents in dataframe
+
+        :return: dataframe
+        """
+        try:
+            return self.read_file('university_addresses/university_addresses.csv')
+        except FileNotFoundError:
+            return None
 
 
-if __name__ == '__main__':
-    imp = ImportFiles()
+# if __name__ == '__main__':
+#     imp = ImportFiles()
+#     print()

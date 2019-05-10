@@ -3,6 +3,7 @@ import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import './App.css';
 import Main from './components/Main.js';
 import Header from './components/Header.js';
+import Footer from './components/Footer.js';
 
 class App extends Component {
   componentDidMount(){
@@ -12,8 +13,9 @@ class App extends Component {
       return(
         <div>
           <BrowserRouter>
-            <Header></Header>
-            <Main></Main>
+            <Header/>
+            <Main/>
+            <Footer/>
           </BrowserRouter>
         </div>
       );

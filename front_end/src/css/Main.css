@@ -1,3 +1,11 @@
+.homebackground {
+  background-image: url('../img/background_2.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  height: calc(100vh - 54px);
+}
+
 .centre {
   padding-left: 20vw;
   padding-right: 20vw;
@@ -71,6 +79,16 @@
   margin: 0 auto;
 }
 
+.adv-btn {
+  color: white;
+}
+
+.container-xsmall{
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .border {
   border: 1px solid blue;
 }
@@ -85,36 +103,4 @@
 
 .pad-top {
   padding-top: 30px;
-}
-
-
-.dark_1 {
-  .color: #0c0b11;
-}
-.dark_2 {
-  .color: #151422;
-}
-.dark_blue_1 {
-  .color: #09274d;
-}
-.mid_blue_1 {
-  .color: #415780;
-}
-.brown_1 {
-  .color: #645363;
-}
-.brown_2 {
-  .color: #986b68;
-}
-.brown_3 {
-  .color: #976b6a;
-}
-.brown_4 {
-  .color: #fab57c;
-}
-.brown_5 {
-  .color: #a08073;
-}
-.brown_6 {
-  .color: #8a5d4a;
 }

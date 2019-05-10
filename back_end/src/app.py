@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 from flask_restful.utils.cors import crossdomain
 from flask_cors import CORS
 from back_end.src import zoopla_ingest as Zoopla
+from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
+    AdzunaAuthorisationException, AdzunaRequestFormatException
 
 from back_end.src import import_files as imp
 from back_end.src import DEVELOPMENT
@@ -35,16 +37,31 @@ def trend_data():
 
     return 'test'
 
+
 @app.route('/search')
 def query_property_listing():
     """
-    Query the Zoopla API for property listings using the received parameters
+    Query the Adzuna API for property listings using the received parameters
 
-    :return:
+    :return: Property listing
     """
     params = request.args.to_dict()
-    property_listing = zoopla.get_property_listing(params)
-    return jsonify(property_listing.get("listing"))
+
+    try:
+        property_listing = adzuna.get_property_listing(params)
+        return jsonify(property_listing.get("results"))
+    except AdzunaAuthorisationException:
+        return jsonify({"error": 410})
+    except AdzunaRequestFormatException:
+        return jsonify({"error": 400})
+    except AdzunaAPIException:
+        return jsonify({"error": 500})
+
+
+
+    # params = request.args.to_dict()
+    # property_listing = zoopla.get_property_listing(params)
+    # return jsonify(property_listing.get("listing"))
 
 
 # class DataManipulation:
@@ -55,7 +72,8 @@ def query_property_listing():
 
 # data = DataManipulation()
 
-zoopla = Zoopla.ZooplaIngest()
+#zoopla = Zoopla.ZooplaIngest()
+adzuna = Adzuna()
 
 if __name__ == '__main__':
     # print(data.trends())
