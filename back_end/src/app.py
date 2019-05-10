@@ -37,12 +37,13 @@ def trend_data():
 
     return 'test'
 
+
 @app.route('/search')
 def query_property_listing():
     """
     Query the Zoopla API for property listings using the received parameters
 
-    :return:
+    :return: Property listing
     """
     params = request.args.to_dict()
     property_listing = zoopla.get_property_listing(params)
