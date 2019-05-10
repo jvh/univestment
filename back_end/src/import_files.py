@@ -1,11 +1,11 @@
 import pandas as pd
-from back_end.src import constants
+from back_end.src import ROOT_DIR
 
 
 class ImportFiles:
 
     def __init__(self):
-        path = '{}/../..'.format(constants.ROOT_DIR)
+        path = '{}/../..'.format(ROOT_DIR)
         self.root_data_path = '{}/open_datasets/'.format(path)
         self.box_office_data = self.read_boxofficemojo()
 

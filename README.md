@@ -30,6 +30,12 @@ It is recommended to create a virtual environment in the `back_end` directory. Y
 
 **Deactivating the virtualenv**: `source deactivate`
 
+### PYTHONPATH
+
+For Flask to run correctly, PYTHONPATH must be set. This should be set in the top-level folder (this one). 
+
+Please use command `export PYTHONPATH='.'` in the top-level directory if you are receiving any import errors.
+
 ### Front-end
 
 See `./front-end/README.md` for information on running the front end.

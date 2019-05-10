@@ -1,12 +1,12 @@
 from zoopla import Zoopla, exceptions as zoopla_exceptions
 
-from back_end.src import constants
+from back_end.src import ZOOPLAAPIKEY
 
 
 class ZooplaIngest:
 
     def __init__(self):
-        self.zoopla = Zoopla(api_key=constants.ZOOPLAAPIKEY)
+        self.zoopla = Zoopla(api_key=ZOOPLAAPIKEY)
 
     def get_property_listing(self, params):
         """

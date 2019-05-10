@@ -2,9 +2,7 @@ from flask import Flask, jsonify, request
 from flask_restful.utils.cors import crossdomain
 from flask_cors import CORS
 from back_end.src import import_files as imp
-
-
-DEBUGGING_MODE = True
+from back_end.src import DEVELOPMENT
 
 app = Flask(__name__)
 CORS(app)
@@ -45,5 +43,8 @@ class DataManipulation:
 data = DataManipulation()
 
 if __name__ == '__main__':
-    print(data.trends())
-    app.run(port=5000, debug=DEBUGGING_MODE)
+    # print(data.trends())
+    if DEVELOPMENT:
+        app.run(port=5000, debug=True)
+    else:
+        app.run(port=5000, debug=False)
