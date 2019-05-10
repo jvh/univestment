@@ -32,6 +32,20 @@ It is recommended to create a virtual environment in the `back_end` directory. Y
 
 ### Front-end
 
+See `./front-end/README.md` for information on running the front end.
+
+### Database
+
+We are using PostgreSQL for the database. Postgres runs on a server in which you can interact with.
+
+Postgres can be interacted with using the following command `pg_ctl -D /usr/local/var/postgres`. Ensure that you append one of the following to perform the function that you require:
+
+* `start`: Starts the server
+* `stop`: Stops the server
+* `status`: Status of the server
+
+E.g. to start the server you would run the command `pg_ctl -D /usr/local/var/postgres start`
+
 ### Installation
 
 You must install [Node.js](https://nodejs.org/en/download/) for use on the local machine.
