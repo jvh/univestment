@@ -19,14 +19,12 @@ const Main = props => {
 
   return (
     <main>
-      <Col className="main">
-        <Switch>
-          <Route exact path='/' render={homePageRenderer} />
-          <Route exact path='/line' render={linePageRenderer} />
-          <Route exact path='/bar' render={barPageRenderer} />
-          <Route exact path='/*' render={homePageRenderer} />
-        </Switch>
-      </Col>
+      <Switch>
+        <Route exact path='/' render={homePageRenderer} />
+        <Route exact path='/line' render={linePageRenderer} />
+        <Route exact path='/bar' render={barPageRenderer} />
+        <Route exact path='/*' render={homePageRenderer} />
+      </Switch>
     </main>
   );
 }

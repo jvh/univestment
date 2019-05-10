@@ -7,7 +7,8 @@ const host = 'http://localhost:5000';
 
 // API endpoints
 const endpoints = {
-  test_data: { get: data => `${host}/test_data` }
+  test_data: { get: data => `${host}/test_data` },
+  search: { get: data => `${host}/test_data` }
 };
 
 // GET request function builder
@@ -48,5 +49,6 @@ const addPost = (societyId, content) =>
 
 export default {
     getData: fetch(endpoints.test_data),
+    search: fetch(endpoints.search),
     addPost: addPost
   };
