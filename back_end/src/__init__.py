@@ -7,6 +7,8 @@ import os
 
 # The root directory is set to be this particular file
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Postgres parameters
+POSTGRES_SUPER = 'postgres'
 POSTGRES_PASSWORD = 'r$B4wnH*HSB#v2W'
 POSTGRES_USERNAME = 'comp6214_team'
 POSTGRES_PORT = "5432"

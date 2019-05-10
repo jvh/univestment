@@ -1,11 +1,11 @@
 import psycopg2
-from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE
+from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, DEVELOPMENT
 
 
 class DatabaseHandler:
 
     def __init__(self):
-        self.create_tables()
+        self.database_commands()
 
     @staticmethod
     def create_pricing_table():
@@ -16,7 +16,7 @@ class DatabaseHandler:
         """
         house_price_data = \
             'CREATE TABLE IF NOT EXISTS house_price_data (' \
-            '   id INTEGER PRIMARY KEY,' \
+            '   id ,' \
             '   price FLOAT NOT NULL,' \
             '   date_of_transfer DATE,' \
             '   postcode TEXT NOT NULL,' \
@@ -30,7 +30,8 @@ class DatabaseHandler:
             '   town_city TEXT,' \
             '   district TEXT,' \
             '   county TEXT,' \
-            '   price_paid_transaction_type TEXT' \
+            '   price_paid_transaction_type TEXT,' \
+            '   PRIMARY KEY (id)' \
             ');'
         return house_price_data
 
@@ -43,10 +44,11 @@ class DatabaseHandler:
         """
         admissions_data = \
             'CREATE TABLE IF NOT EXISTS admissions_data (' \
-            '   id INTEGER PRIMARY KEY,' \
+            '   id uuid DEFAULT uuid_generate_v4 (),' \
             '   year INTEGER NOT NULL,' \
             '   university TEXT NOT NULL,' \
-            '   admissions INTEGER NOT NULL' \
+            '   admissions INTEGER NOT NULL,' \
+            '   PRIMARY KEY (id)' \
             ');'
         return admissions_data
 
@@ -59,11 +61,12 @@ class DatabaseHandler:
         """
         uni_addresses_data = \
             'CREATE TABLE IF NOT EXISTS uni_addresses_table (' \
-            '   id INTEGER PRIMARY KEY,' \
+            '   id uuid DEFAULT uuid_generate_v4 (),' \
             '   establishment_name TEXT NOT NULL,' \
             '   street TEXT,' \
             '   Town TEXT,' \
-            '   postcode TEXT NOT NULL' \
+            '   postcode TEXT NOT NULL,' \
+            '   PRIMARY KEY (id)' \
             ');'
         return uni_addresses_data
 
@@ -79,14 +82,25 @@ class DatabaseHandler:
         Create tables for all data sets if they do not already exist
         """
         try:
-            connection = psycopg2.connect(user=POSTGRES_USERNAME,
+            if DEVELOPMENT:
+                username = POSTGRES_SUPER
+            else:
+                username = POSTGRES_USERNAME
+
+            connection = psycopg2.connect(user=username,
                                           password=POSTGRES_PASSWORD,
                                           database=POSTGRES_DATABASE)
 
             cursor = connection.cursor()
 
+            # Downloading extensions
+            cursor.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
+
+            # Creating tables
             for table_command in DatabaseHandler.create_tables():
                 cursor.execute(table_command)
+
+            #
 
             connection.commit()
             connection.close()
