@@ -36,12 +36,15 @@ See `./front-end/README.md` for information on running the front end.
 
 ### Database
 
-We are using PostgreSQL for the database.
+We are using PostgreSQL for the database. Postgres runs on a server in which you can interact with.
 
-Start postgres using `pg_ctl -D /usr/local/var/postgres start`
+Postgres can be interacted with using the following command `pg_ctl -D /usr/local/var/postgres`. Ensure that you append one of the following to perform the function that you require:
 
-Stop postgres using `pg_ctl -D /usr/local/var/postgres stop`
+* `start`: Starts the server
+* `stop`: Stops the server
+* `status`: Status of the server
 
+E.g. to start the server you would run the command `pg_ctl -D /usr/local/var/postgres start`
 
 ### Installation
 
