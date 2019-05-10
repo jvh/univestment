@@ -16,7 +16,7 @@ class DatabaseHandler:
         """
         house_price_data = \
             'CREATE TABLE IF NOT EXISTS house_price_data (' \
-            '   id ,' \
+            '   id uuid DEFAULT uuid_generate_v4 (),' \
             '   price FLOAT NOT NULL,' \
             '   date_of_transfer DATE,' \
             '   postcode TEXT NOT NULL,' \
