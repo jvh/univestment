@@ -1,11 +1,12 @@
 import psycopg2
-from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE
-
+from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_IP, POSTGRES_PORT
+from sqlalchemy import create_engine
+from back_end.src.import_files import ImportFiles
 
 class DatabaseHandler:
 
     def __init__(self):
-        self.create_tables()
+        self.database_commands()
 
     @staticmethod
     def create_pricing_table():
@@ -58,8 +59,8 @@ class DatabaseHandler:
         :return: string representing table field commands
         """
         uni_addresses_data = \
-            'CREATE TABLE IF NOT EXISTS uni_addresses_table (' \
-            '   id INTEGER PRIMARY KEY,' \
+            'CREATE TABLE IF NOT EXISTS uni_addresses_data (' \
+            '   id uuid DEFAULT uuid_generate_v4 (),' \
             '   establishment_name TEXT NOT NULL,' \
             '   street TEXT,' \
             '   Town TEXT,' \
@@ -85,6 +86,8 @@ class DatabaseHandler:
 
             cursor = connection.cursor()
 
+            cursor.execute('CREATE EXTENSION IF NOT EXISTS "uuid-oosp"')
+
             for table_command in DatabaseHandler.create_tables():
                 cursor.execute(table_command)
 
@@ -94,6 +97,15 @@ class DatabaseHandler:
         except (Exception, psycopg2.Error) as error :
             print ("Error connecting to postgres: ", error)
 
+    @staticmethod
+    def fill_uni_addresses():
+        engine = create_engine('postgresql://{}:{}@127.0.0.1:{}/{}'.format(POSTGRES_USERNAME, POSTGRES_PASSWORD
+                                                                            , POSTGRES_PORT, POSTGRES_DATABASE))
+        importf = ImportFiles()
+        data = importf.uni_addresses
+        data.to_sql('uni_addresses_data', engine, if_exists="append")
+
 
 if __name__ == "__main__":
     db = DatabaseHandler()
+    db.fill_uni_addresses()
