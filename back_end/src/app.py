@@ -45,7 +45,9 @@ def query_property_listing():
     :return:
     """
     params = request.args.to_dict()
-    return "done"
+    property_listing = zoopla.get_property_listing(params)
+    return jsonify(property_listing.get("listing"))
+
 
 # class DataManipulation:
 #     def trends(self):
