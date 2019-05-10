@@ -44,7 +44,7 @@ See `./front-end/README.md` for information on running the front end.
 
 ### Database
 
-We are using PostgreSQL for the database. Postgres runs on a server in which you can interact with.
+We are using PostgreSQL for the database. Postgres runs on a server in which you can interact with. Use [this tutorial](https://www.codementor.io/engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb) to configure.
 
 Postgres can be interacted with using the following command `pg_ctl -D /usr/local/var/postgres`. Ensure that you append one of the following to perform the function that you require:
 
