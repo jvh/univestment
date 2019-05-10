@@ -3,10 +3,12 @@ from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE
 
 
 class DatabaseHandler:
+
     def __init__(self):
         self.create_tables()
 
-    def create_pricing_table(self):
+    @staticmethod
+    def create_pricing_table():
         """
         Schema for the house pricing data
 
@@ -30,9 +32,10 @@ class DatabaseHandler:
             '   county TEXT,' \
             '   price_paid_transaction_type TEXT' \
             ');'
-        yield house_price_data
+        return house_price_data
 
-    def create_admissions_table(self):
+    @staticmethod
+    def create_admissions_table():
         """
         Schema for the university admissions data
 
@@ -45,9 +48,10 @@ class DatabaseHandler:
             '   university TEXT NOT NULL,' \
             '   admissions INTEGER NOT NULL' \
             ');'
-        yield admissions_data
+        return admissions_data
 
-    def create_uni_addresses_table(self):
+    @staticmethod
+    def create_uni_addresses_table():
         """
         Schema for the university address data
 
@@ -61,9 +65,16 @@ class DatabaseHandler:
             '   Town TEXT,' \
             '   postcode TEXT NOT NULL' \
             ');'
-        yield uni_addresses_data
+        return uni_addresses_data
 
-    def create_tables(self):
+    @staticmethod
+    def create_tables():
+        yield DatabaseHandler.create_pricing_table()
+        yield DatabaseHandler.create_admissions_table()
+        yield DatabaseHandler.create_uni_addresses_table()
+
+    @staticmethod
+    def database_commands():
         """
         Create tables for all data sets if they do not already exist
         """
@@ -74,11 +85,7 @@ class DatabaseHandler:
 
             cursor = connection.cursor()
 
-            for table_command in self.create_pricing_table():
-                cursor.execute(table_command)
-            for table_command in self.create_admissions_table():
-                cursor.execute(table_command)
-            for table_command in self.create_uni_addresses_table():
+            for table_command in DatabaseHandler.create_tables():
                 cursor.execute(table_command)
 
             connection.commit()
