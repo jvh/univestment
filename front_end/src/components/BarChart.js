@@ -13,6 +13,7 @@ class BarChart extends Component {
     const data = this.props.data;
 
     const height = this.props.height;
+    const width = this.props.width;
 
     var maxVal = Math.max( ...data );
     console.log (maxVal);
@@ -21,7 +22,7 @@ class BarChart extends Component {
 
     const svg = d3.select("body")
     .append("svg")
-    .attr("width", 700)
+    .attr("width", width)
     .attr("height", height)
     .style("margin-left", 100);
 
