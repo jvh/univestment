@@ -32,13 +32,19 @@ It is recommended to create a virtual environment in the `back_end` directory. Y
 
 **Deactivating the virtualenv**: `source deactivate`
 
+### PYTHONPATH
+
+For Flask to run correctly, PYTHONPATH must be set. This should be set in the top-level folder (this one). 
+
+Please use command `export PYTHONPATH='.'` in the top-level directory if you are receiving any import errors.
+
 ### Front-end
 
 See `./front-end/README.md` for information on running the front end.
 
 ### Database
 
-We are using PostgreSQL for the database. Postgres runs on a server in which you can interact with.
+We are using PostgreSQL for the database. Postgres runs on a server in which you can interact with. Use [this tutorial](https://www.codementor.io/engineerapart/getting-started-with-postgresql-on-mac-osx-are8jcopb) to configure.
 
 Postgres can be interacted with using the following command `pg_ctl -D /usr/local/var/postgres`. Ensure that you append one of the following to perform the function that you require:
 
@@ -47,6 +53,8 @@ Postgres can be interacted with using the following command `pg_ctl -D /usr/loca
 * `status`: Status of the server
 
 E.g. to start the server you would run the command `pg_ctl -D /usr/local/var/postgres start`
+
+`psql postgres` to allow for administrator commands + command line interface.
 
 ### Installation
 
