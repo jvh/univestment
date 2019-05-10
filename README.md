@@ -54,6 +54,8 @@ Postgres can be interacted with using the following command `pg_ctl -D /usr/loca
 
 E.g. to start the server you would run the command `pg_ctl -D /usr/local/var/postgres start`
 
+`psql postgres` to allow for administrator commands + command line interface.
+
 ### Installation
 
 You must install [Node.js](https://nodejs.org/en/download/) for use on the local machine.
