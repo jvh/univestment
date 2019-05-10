@@ -22,6 +22,10 @@ Admission data for U.K. universities.
 
 ### Back-end
 
+The back-end is written primarily in Python.
+
+#### Python Virtual Environment
+
 It is recommended to create a virtual environment in the `back_end` directory. You can do this by using virtualenv, a Python package.
 
 **Creating a virtualenv**: `virtualenv venv`. You may need to add on the parameter `-p python3` if you have multiple Python versions on your machine.
@@ -32,7 +36,13 @@ It is recommended to create a virtual environment in the `back_end` directory. Y
 
 **Deactivating the virtualenv**: `source deactivate`
 
-### PYTHONPATH
+#### API Keys
+
+For full usage, API keys are necessary. The following commands **must** be run from the main working directory:
+
+* `export GOOGLE_APPLICATION_CREDENTIALS="api/google_key.json"` 
+
+#### PYTHONPATH
 
 For Flask to run correctly, PYTHONPATH must be set. This should be set in the top-level folder (this one). 
 
