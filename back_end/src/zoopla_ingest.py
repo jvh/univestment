@@ -29,5 +29,12 @@ class ZooplaIngest:
             raise zoopla_exceptions.ZooplaAPIException(str(e))
 
 
-if __name__ == "__main__":
-    zi = ZooplaIngest()
+# if __name__ == "__main__":
+#     zi = ZooplaIngest()
+#     result = zi.get_property_listing({
+#         'maximum_beds': 2,
+#         'page_size': 100,
+#         'listing_status': 'sale',
+#         'area': 'Blackley, Greater Manchester'
+#     })
+#     print(result)
