@@ -41,7 +41,7 @@ def trend_data():
 @app.route('/search')
 def query_property_listing():
     """
-    Query the Zoopla API for property listings using the received parameters
+    Query the Adzuna API for property listings using the received parameters
 
     :return: Property listing
     """

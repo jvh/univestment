@@ -24,6 +24,12 @@ class Adzuna:
         pass
 
     def get_property_listing(self, params=None):
+        """
+        Query the Adzuna API for property listings
+
+        :param params: dict of query parameters
+        :return: dict of returned results
+        """
         if not params:
             params = {}
 
