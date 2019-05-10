@@ -1,11 +1,6 @@
 import pandas as pd
-import os
 from back_end.src import constants
 
-dir = os.path.dirname(__file__)
-
-# dirpath = os.getcwd()
-# print(dirpath)
 
 class ImportFiles:
 
@@ -21,7 +16,6 @@ class ImportFiles:
         :param file_path: path to the data file starting from root_data_path
         """
         try:
-            print(self.root_data_path)
             open(self.root_data_path + file_path, 'r')
             return True
         except FileNotFoundError:
@@ -35,8 +29,7 @@ class ImportFiles:
             box_office_data = pd.read_csv(self.root_data_path + file_path)
             return box_office_data
         else:
-            print('import for boxofficemojo failed')
-            return None
+            raise FileNotFoundError('Please check that the filepath exists: {}'.format(file_path))
 
     def get_boxoffice_record(self, record):
         """
@@ -57,4 +50,3 @@ class ImportFiles:
 
 if __name__ == '__main__':
     imp = ImportFiles()
-    print(imp.read_boxofficemojo())

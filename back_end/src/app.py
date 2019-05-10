@@ -1,6 +1,10 @@
 from flask import Flask, jsonify, request
 from flask_restful.utils.cors import crossdomain
 from flask_cors import CORS
+from back_end.src import zoopla_ingest as Zoopla
+
+from back_end.src import import_files as imp
+
 
 DEBUGGING_MODE = True
 
@@ -29,8 +33,32 @@ def trend_data():
 
     :return: The original data along with predicted data related to movie trends
     """
+    print(data.trends())
+
     return 'test'
 
+@app.route('/search')
+def query_property_listing():
+    """
+    Query the Zoopla API for property listings using the received parameters
+
+    :return:
+    """
+    params = request.args.to_dict()
+    property_listing = zoopla.get_property_listing(params)
+    return jsonify(property_listing.get("listing"))
+
+
+# class DataManipulation:
+#     def trends(self):
+#         files = imp.ImportFiles()
+#         return files.box_office_data
+
+
+# data = DataManipulation()
+
+zoopla = Zoopla.ZooplaIngest()
 
 if __name__ == '__main__':
+    # print(data.trends())
     app.run(port=5000, debug=DEBUGGING_MODE)
