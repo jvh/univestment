@@ -2,6 +2,7 @@ import psycopg2
 from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_IP, POSTGRES_PORT
 from sqlalchemy import create_engine
 from back_end.src.import_files import ImportFiles
+import pandas as pd
 
 class DatabaseHandler:
 
@@ -17,7 +18,9 @@ class DatabaseHandler:
         """
         house_price_data = \
             'CREATE TABLE IF NOT EXISTS house_price_data (' \
-            '   id INTEGER PRIMARY KEY,' \
+            '   index INTEGER PRIMARY KEY,' \
+            '   level_0 TEXT,' \
+            '   level_1 TEXT,' \
             '   price FLOAT NOT NULL,' \
             '   date_of_transfer DATE,' \
             '   postcode TEXT NOT NULL,' \
@@ -60,14 +63,14 @@ class DatabaseHandler:
         """
         uni_addresses_data = \
             'CREATE TABLE IF NOT EXISTS uni_addresses_data (' \
-            '   id uuid DEFAULT uuid_generate_v4 (),' \
-            '   establishment_name TEXT NOT NULL,' \
+            '   index INTEGER PRIMARY KEY,' \
+            '   establishmentname TEXT,' \
             '   street TEXT,' \
-            '   Town TEXT,' \
-            '   postcode TEXT NOT NULL' \
+            '   town TEXT,' \
+            '   postcode TEXT' \
             ');'
         return uni_addresses_data
-
+#'   id uuid DEFAULT uuid_generate_v4 (),' \
     @staticmethod
     def create_tables():
         yield DatabaseHandler.create_pricing_table()
@@ -86,7 +89,7 @@ class DatabaseHandler:
 
             cursor = connection.cursor()
 
-            cursor.execute('CREATE EXTENSION IF NOT EXISTS "uuid-oosp"')
+            #cursor.execute('CREATE EXTENSION IF NOT EXISTS "uuid-oosp"')
 
             for table_command in DatabaseHandler.create_tables():
                 cursor.execute(table_command)
@@ -103,9 +106,24 @@ class DatabaseHandler:
                                                                             , POSTGRES_PORT, POSTGRES_DATABASE))
         importf = ImportFiles()
         data = importf.uni_addresses
-        data.to_sql('uni_addresses_data', engine, if_exists="append")
+        data.to_sql('uni_addresses_data', engine, if_exists="replace", index=True)
+
+    @staticmethod
+    def fill_property_data():
+        engine = create_engine('postgresql://{}:{}@127.0.0.1:{}/{}'.format(POSTGRES_USERNAME, POSTGRES_PASSWORD
+                                                                           , POSTGRES_PORT, POSTGRES_DATABASE))
+        importf = ImportFiles()
+        skiprows = 0
+        while True:
+            data = importf.read_property_data(skiprows)
+            skiprows = skiprows + 500
+            data = pd.DataFrame(data.get_chunk(1))
+            data.to_sql('house_price_data', engine, if_exists="append", index=True)
+            if data.shape(0) < 500:
+                break
 
 
 if __name__ == "__main__":
     db = DatabaseHandler()
     db.fill_uni_addresses()
+    db.fill_property_data()
