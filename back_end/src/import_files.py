@@ -57,6 +57,10 @@ class ImportFiles:
         except FileNotFoundError:
             return None
 
+    @staticmethod
+    def print_dataframe(data):
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+            print(data)
 
 # if __name__ == '__main__':
 #     imp = ImportFiles()

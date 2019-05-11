@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_restful.utils.cors import crossdomain
 from flask_cors import CORS
-from back_end.src import zoopla_ingest as Zoopla
 from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
     AdzunaAuthorisationException, AdzunaRequestFormatException
 

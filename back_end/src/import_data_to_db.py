@@ -8,6 +8,7 @@ from uuid import uuid4
 
 import pandas as pd
 
+
 class DatabaseHandler:
 
     def __init__(self):
@@ -22,7 +23,7 @@ class DatabaseHandler:
         """
         house_price_data = \
             'CREATE TABLE IF NOT EXISTS house_price_data (' \
-            '   id uuid DEFAULT uuid_generate_v4 (),' \
+            '   id UUID PRIMARY KEY,' \
             '   price FLOAT NOT NULL,' \
             '   date_of_transfer DATE,' \
             '   postcode TEXT NOT NULL,' \
@@ -32,12 +33,9 @@ class DatabaseHandler:
             '   primary_addressable_object_name TEXT,' \
             '   secondary_addressable_object_name TEXT,' \
             '   street TEXT,' \
-            '   locality TEXT,' \
             '   town_city TEXT,' \
-            '   district TEXT,' \
             '   county TEXT,' \
             '   price_paid_transaction_type TEXT,' \
-            '   PRIMARY KEY (id)' \
             ');'
         return house_price_data
 
@@ -51,11 +49,10 @@ class DatabaseHandler:
 
         admissions_data = \
             'CREATE TABLE IF NOT EXISTS admissions_data (' \
-            '   id UUID DEFAULT uuid_generate_v4 (),' \
+            '   id UUID PRIMARY KEY,' \
             '   year INTEGER NOT NULL,' \
             '   university TEXT NOT NULL,' \
-            '   admissions INTEGER NOT NULL,' \
-            '   PRIMARY KEY (id)' \
+            '   admissions INTEGER NOT NULL' \
             ');'
         return admissions_data
 
@@ -97,7 +94,6 @@ class DatabaseHandler:
                                               password=POSTGRES_PASSWORD,
                                               dbname=POSTGRES_DATABASE)
 
-
             cursor = connection.cursor()
 
             # Downloading extensions
@@ -107,7 +103,16 @@ class DatabaseHandler:
             for table_command in DatabaseHandler.create_tables():
                 cursor.execute(table_command)
 
-            #
+            engine = create_engine('postgresql://{}:{}@127.0.0.1:{}/{}'.format(POSTGRES_USERNAME, POSTGRES_PASSWORD,
+                                                                               POSTGRES_PORT, POSTGRES_DATABASE))
+
+            connection.commit()
+
+
+            # Populate databases if not already populated
+            import_files = ImportFiles()
+            # DatabaseHandler.fill_uni_addresses(engine, import_files)
+            DatabaseHandler.fill_admissions_data(engine, import_files)
 
             connection.commit()
             connection.close()
@@ -116,20 +121,23 @@ class DatabaseHandler:
             print ("Error connecting to postgres: ", error)
 
     @staticmethod
-    def fill_uni_addresses():
-        engine = create_engine('postgresql://{}:{}@127.0.0.1:{}/{}'.format(POSTGRES_USERNAME, POSTGRES_PASSWORD,
-                                                                           POSTGRES_PORT, POSTGRES_DATABASE))
-        import_files = ImportFiles()
+    def fill_admissions_data(engine, import_files):
+        data = import_files.admissions_data
+        data.columns = map(str.lower, data.columns)
+        data['id'] = [uuid4() for _ in range(len(data.index))]
+
+        ImportFiles.print_dataframe(data)
+
+
+        data.to_sql('uni_addresses_data', engine, if_exists="append", index=False)
+
+    @staticmethod
+    def fill_uni_addresses(engine, import_files):
         data = import_files.uni_addresses
         data.columns = map(str.lower, data.columns)
-        # data['id'] = uuid4()
         data['id'] = [uuid4() for _ in range(len(data.index))]
-        with pd.option_context('display.max_rows', None, 'display.max_columns',
-                               None):  # more options can be specified also
-            print(data)
         data.to_sql('uni_addresses_data', engine, if_exists="append", index=False)
 
 
 if __name__ == "__main__":
     db = DatabaseHandler()
-    db.fill_uni_addresses()
