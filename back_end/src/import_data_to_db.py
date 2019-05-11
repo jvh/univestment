@@ -117,8 +117,9 @@ class DatabaseHandler:
         while True:
             data = importf.read_property_data(skiprows)
             skiprows = skiprows + 500
-            data = pd.DataFrame(data.get_chunk(1))
-            data.to_sql('house_price_data', engine, if_exists="append", index=True)
+            for chunk in data:
+                record = pd.DataFrame(chunk)
+                record.to_sql('house_price_data', engine, if_exists="append", index=True)
             if data.shape(0) < 500:
                 break
 
