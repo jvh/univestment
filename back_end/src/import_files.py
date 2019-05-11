@@ -59,6 +59,11 @@ class ImportFiles:
 
     @staticmethod
     def print_dataframe(data):
+        """
+        Pretty prints a Pandas dataframe
+
+        :param data: The dataframe
+        """
         with pd.option_context('display.max_rows', None, 'display.max_columns', None):
             print(data)
 
