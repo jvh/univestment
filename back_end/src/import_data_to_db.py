@@ -23,18 +23,13 @@ class DatabaseHandler:
         house_price_data = \
             'CREATE TABLE IF NOT EXISTS house_price_data (' \
             '   id UUID PRIMARY KEY,' \
-            '   price FLOAT NOT NULL,' \
+            '   price INTEGER NOT NULL,' \
             '   date_of_transfer TEXT,' \
             '   postcode TEXT NOT NULL,' \
             '   property_type TEXT,' \
-            '   is_newly_built BOOL,' \
-            '   duration TEXT,' \
-            '   primary_addressable_object_name TEXT,' \
-            '   secondary_addressable_object_name TEXT,' \
             '   street TEXT,' \
             '   town_city TEXT,' \
-            '   county TEXT,' \
-            '   price_paid_transaction_type TEXT' \
+            '   county TEXT' \
             ');'
         return house_price_data
 
@@ -136,17 +131,24 @@ class DatabaseHandler:
 
     @staticmethod
     def fill_house_data(engine, import_files):
+        print("importing house price data. Go get a coffee or something")
         count = 1
         data = import_files.read_property_data()
+
         for chunk in data:
             chunked_data = pd.DataFrame(chunk)
-            chunked_data = chunked_data.drop(columns=["iden", "record status", "locality", "district"])
+            chunked_data = chunked_data.drop(columns=["iden", "record status", "locality", "district",
+                                                      "is_newly_built", "duration",
+                                                      "primary_addressable_object_name",
+                                                      "secondary_addressable_object_name",
+                                                      "price_paid_transaction_type", "record status"])
             chunked_data = chunked_data[pd.notnull(chunked_data['postcode'])]
             chunked_data['id'] = [uuid4() for _ in range(len(chunked_data.index))]
             chunked_data.to_sql('house_price_data', engine, if_exists="append", index=False)
+
             print("chunk interval done: {}".format(count))
             count = count + 1
-        print("done")
+        print("finished importing house price data. yay")
 
 
 if __name__ == "__main__":

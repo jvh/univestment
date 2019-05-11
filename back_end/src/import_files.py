@@ -75,7 +75,7 @@ class ImportFiles:
         Read data file containing historic property data and return contents in dataframe
         :return: dataframe
         """
-        chunksize = 500
+        chunksize = 20000
         names = ["iden",
                 "price",
                "date_of_transfer",
