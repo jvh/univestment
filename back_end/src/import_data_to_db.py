@@ -10,8 +10,9 @@ from uuid import uuid4
 
 class DatabaseHandler:
 
-    def __init__(self):
-        self.database_commands()
+    def __init__(self, load_data=False):
+        if load_data:
+            self.database_commands()
 
     @staticmethod
     def create_pricing_table():
@@ -24,7 +25,7 @@ class DatabaseHandler:
             'CREATE TABLE IF NOT EXISTS house_price_data (' \
             '   id UUID PRIMARY KEY,' \
             '   price INTEGER NOT NULL,' \
-            '   date_of_transfer TEXT,' \
+            '   date_of_transfer DATE,' \
             '   postcode TEXT NOT NULL,' \
             '   property_type TEXT,' \
             '   street TEXT,' \
@@ -69,6 +70,11 @@ class DatabaseHandler:
 
     @staticmethod
     def create_tables():
+        """
+        return SQL statements for creating tables
+
+        :return String
+        """
         yield DatabaseHandler.create_pricing_table()
         yield DatabaseHandler.create_admissions_table()
         yield DatabaseHandler.create_uni_addresses_table()
@@ -113,17 +119,56 @@ class DatabaseHandler:
             print ("Error connecting to postgres: ", error)
 
     @staticmethod
+    def query_database(query):
+        """
+        Query the housing database and return all results
+
+        :param query: String representing query
+        :return: list(Tuple) of returned results
+        """
+        try:
+            if DEVELOPMENT:
+                connection = psycopg2.connect(user=POSTGRES_SUPER,
+                                              password=POSTGRES_SUPER_PASSWORD,
+                                              dbname=POSTGRES_DATABASE)
+            else:
+                connection = psycopg2.connect(user=POSTGRES_USERNAME,
+                                              password=POSTGRES_PASSWORD,
+                                              dbname=POSTGRES_DATABASE)
+
+            cursor = connection.cursor()
+
+            cursor.execute(query)
+
+            result = cursor.fetchall()
+
+            connection.close()
+            cursor.close()
+            return result
+        except (Exception, psycopg2.Error) as error :
+            print ("Error connecting to postgres: ", error)
+
+    @staticmethod
     def fill_admissions_data(engine, import_files):
+        """
+        Store admissions data in admissions_data table
+
+        :param engine: database engine object
+        :param import_files: ImportFiles object
+        """
         data = import_files.admissions_data
         data.columns = map(str.lower, data.columns)
         data['id'] = [uuid4() for _ in range(len(data.index))]
-
-        #§ImportFiles.print_dataframe(data)
-
         data.to_sql('admissions_data', engine, if_exists="replace", index=False)
 
     @staticmethod
     def fill_uni_addresses(engine, import_files):
+        """
+        Store university address data in uni_addresses_data table
+
+        :param engine: database engine object
+        :param import_files: ImportFiles object
+        """
         data = import_files.uni_addresses
         data.columns = map(str.lower, data.columns)
         data['id'] = [uuid4() for _ in range(len(data.index))]
@@ -131,6 +176,12 @@ class DatabaseHandler:
 
     @staticmethod
     def fill_house_data(engine, import_files):
+        """
+        Store university house price data in house_price_data table
+
+        :param engine: database engine object
+        :param import_files: ImportFiles object
+        """
         print("importing house price data. Go get a coffee or something")
         count = 1
         data = import_files.read_property_data()
@@ -152,4 +203,4 @@ class DatabaseHandler:
 
 
 if __name__ == "__main__":
-    db = DatabaseHandler()
+    db = DatabaseHandler(load_data=True)
