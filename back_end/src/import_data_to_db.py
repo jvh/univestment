@@ -3,6 +3,7 @@ from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE
     DEVELOPMENT, POSTGRES_SUPER_PASSWORD, POSTGRES_IP
 from back_end.src.import_files import ImportFiles
 from sqlalchemy import create_engine
+import pandas as pd
 
 from uuid import uuid4
 
@@ -23,7 +24,7 @@ class DatabaseHandler:
             'CREATE TABLE IF NOT EXISTS house_price_data (' \
             '   id UUID PRIMARY KEY,' \
             '   price FLOAT NOT NULL,' \
-            '   date_of_transfer DATE,' \
+            '   date_of_transfer TEXT,' \
             '   postcode TEXT NOT NULL,' \
             '   property_type TEXT,' \
             '   is_newly_built BOOL,' \
@@ -108,6 +109,7 @@ class DatabaseHandler:
             import_files = ImportFiles()
             DatabaseHandler.fill_uni_addresses(engine, import_files)
             DatabaseHandler.fill_admissions_data(engine, import_files)
+            DatabaseHandler.fill_house_data(engine, import_files)
 
             connection.commit()
             connection.close()
@@ -121,7 +123,7 @@ class DatabaseHandler:
         data.columns = map(str.lower, data.columns)
         data['id'] = [uuid4() for _ in range(len(data.index))]
 
-        ImportFiles.print_dataframe(data)
+        #§ImportFiles.print_dataframe(data)
 
         data.to_sql('admissions_data', engine, if_exists="replace", index=False)
 
@@ -131,6 +133,20 @@ class DatabaseHandler:
         data.columns = map(str.lower, data.columns)
         data['id'] = [uuid4() for _ in range(len(data.index))]
         data.to_sql('uni_addresses_data', engine, if_exists="replace", index=False)
+
+    @staticmethod
+    def fill_house_data(engine, import_files):
+        count = 1
+        data = import_files.read_property_data()
+        for chunk in data:
+            chunked_data = pd.DataFrame(chunk)
+            chunked_data = chunked_data.drop(columns=["iden", "record status", "locality", "district"])
+            chunked_data = chunked_data[pd.notnull(chunked_data['postcode'])]
+            chunked_data['id'] = [uuid4() for _ in range(len(chunked_data.index))]
+            chunked_data.to_sql('house_price_data', engine, if_exists="append", index=False)
+            print("chunk interval done: {}".format(count))
+            count = count + 1
+        print("done")
 
 
 if __name__ == "__main__":
