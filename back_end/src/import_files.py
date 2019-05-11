@@ -6,7 +6,7 @@ class ImportFiles:
 
     def __init__(self):
         path = '{}/../..'.format(ROOT_DIR)
-        self.root_data_path = '{}/open_datasets/'.format(path)
+        self.root_data_path = '{}/open_datasets.nosync/'.format(path)
         self.admissions_data = self.read_admissions()
         self.uni_addresses = self.read_uni_addresses()
 
@@ -57,6 +57,15 @@ class ImportFiles:
         except FileNotFoundError:
             return None
 
+    @staticmethod
+    def print_dataframe(data):
+        """
+        Pretty prints a Pandas dataframe
+
+        :param data: The dataframe
+        """
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+            print(data)
 
 # if __name__ == '__main__':
 #     imp = ImportFiles()

@@ -4,6 +4,9 @@ import io
 from google.cloud import vision
 from google.cloud.vision import types
 
+"""
+Taken from tutorial https://cloud.google.com/vision/docs/internet-detection
+"""
 
 def annotate(path):
     """Returns web annotations given the path to an image."""
