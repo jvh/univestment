@@ -17,5 +17,5 @@ POSTGRES_DATABASE = 'housing_data'
 # Adzuna API id and ket
 ADZUNAAPIKEY = "eedd7f406e1a43d0f25bddb4facfbf63"
 ADZUNAAPIID = "d1b12649"
-# Set to be True when development is occurring (False for preduction)
+# Set to be True when development is occurring (False for production)
 DEVELOPMENT = True

@@ -1,6 +1,12 @@
 import psycopg2
-from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, DEVELOPMENT
+from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, POSTGRES_PORT, \
+    DEVELOPMENT
+from back_end.src.import_files import ImportFiles
+from sqlalchemy import create_engine, Column
 
+from uuid import uuid4
+
+import pandas as pd
 
 class DatabaseHandler:
 
@@ -42,9 +48,10 @@ class DatabaseHandler:
 
         :return: string representing table field commands
         """
+
         admissions_data = \
             'CREATE TABLE IF NOT EXISTS admissions_data (' \
-            '   id uuid DEFAULT uuid_generate_v4 (),' \
+            '   id UUID DEFAULT uuid_generate_v4 (),' \
             '   year INTEGER NOT NULL,' \
             '   university TEXT NOT NULL,' \
             '   admissions INTEGER NOT NULL,' \
@@ -60,13 +67,12 @@ class DatabaseHandler:
         :return: string representing table field commands
         """
         uni_addresses_data = \
-            'CREATE TABLE IF NOT EXISTS uni_addresses_table (' \
-            '   id uuid DEFAULT uuid_generate_v4 (),' \
-            '   establishment_name TEXT NOT NULL,' \
+            'CREATE TABLE IF NOT EXISTS uni_addresses_data (' \
+            '   id UUID PRIMARY KEY,' \
+            '   establishmentname TEXT NOT NULL,' \
             '   street TEXT,' \
-            '   Town TEXT,' \
-            '   postcode TEXT NOT NULL,' \
-            '   PRIMARY KEY (id)' \
+            '   town TEXT,' \
+            '   postcode TEXT NOT NULL' \
             ');'
         return uni_addresses_data
 
@@ -83,13 +89,14 @@ class DatabaseHandler:
         """
         try:
             if DEVELOPMENT:
-                username = POSTGRES_SUPER
+                connection = psycopg2.connect(user=POSTGRES_SUPER,
+                                              password='password',
+                                              dbname=POSTGRES_DATABASE)
             else:
-                username = POSTGRES_USERNAME
+                connection = psycopg2.connect(user=POSTGRES_USERNAME,
+                                              password=POSTGRES_PASSWORD,
+                                              dbname=POSTGRES_DATABASE)
 
-            connection = psycopg2.connect(user=username,
-                                          password=POSTGRES_PASSWORD,
-                                          database=POSTGRES_DATABASE)
 
             cursor = connection.cursor()
 
@@ -108,6 +115,21 @@ class DatabaseHandler:
         except (Exception, psycopg2.Error) as error :
             print ("Error connecting to postgres: ", error)
 
+    @staticmethod
+    def fill_uni_addresses():
+        engine = create_engine('postgresql://{}:{}@127.0.0.1:{}/{}'.format(POSTGRES_USERNAME, POSTGRES_PASSWORD,
+                                                                           POSTGRES_PORT, POSTGRES_DATABASE))
+        import_files = ImportFiles()
+        data = import_files.uni_addresses
+        data.columns = map(str.lower, data.columns)
+        # data['id'] = uuid4()
+        data['id'] = [uuid4() for _ in range(len(data.index))]
+        with pd.option_context('display.max_rows', None, 'display.max_columns',
+                               None):  # more options can be specified also
+            print(data)
+        data.to_sql('uni_addresses_data', engine, if_exists="append", index=False)
+
 
 if __name__ == "__main__":
     db = DatabaseHandler()
+    db.fill_uni_addresses()
