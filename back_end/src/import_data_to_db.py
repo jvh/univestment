@@ -94,9 +94,6 @@ class DatabaseHandler:
 
             cursor = connection.cursor()
 
-            # Downloading extensions
-            cursor.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
-
             # Creating tables
             for table_command in DatabaseHandler.create_tables():
                 cursor.execute(table_command)
@@ -109,7 +106,7 @@ class DatabaseHandler:
 
             # Populate databases if not already populated
             import_files = ImportFiles()
-            # DatabaseHandler.fill_uni_addresses(engine, import_files)
+            DatabaseHandler.fill_uni_addresses(engine, import_files)
             DatabaseHandler.fill_admissions_data(engine, import_files)
 
             connection.commit()
@@ -126,14 +123,14 @@ class DatabaseHandler:
 
         ImportFiles.print_dataframe(data)
 
-        data.to_sql('uni_addresses_data', engine, if_exists="append", index=False)
+        data.to_sql('admissions_data', engine, if_exists="replace", index=False)
 
     @staticmethod
     def fill_uni_addresses(engine, import_files):
         data = import_files.uni_addresses
         data.columns = map(str.lower, data.columns)
         data['id'] = [uuid4() for _ in range(len(data.index))]
-        data.to_sql('uni_addresses_data', engine, if_exists="append", index=False)
+        data.to_sql('uni_addresses_data', engine, if_exists="replace", index=False)
 
 
 if __name__ == "__main__":
