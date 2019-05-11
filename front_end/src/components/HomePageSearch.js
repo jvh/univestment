@@ -13,6 +13,8 @@ import ApiUtils from '../utils/ApiUtils.js';
 
 import SearchForm from '../forms/SearchForm.js';
 
+import { Link } from 'react-router-dom';
+
 //import ValidationUtils from '../utils/ValidationUtils';
 
 class HomePageSearch extends Component {
@@ -27,37 +29,11 @@ class HomePageSearch extends Component {
       }
 
       this.handleFormChange = this.handleFormChange.bind(this);
-      this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     advOptions = () => {
       this.setState({isOpened: !this.state.isOpened});
       console.log(this.state.isOpened);
-    }
-
-    handleSubmit = event => {
-
-      console.log("Submit")
-
-      const { location, min_price, max_price, min_beds } = this.state.form;
-
-      var search = { location };
-
-      search = (min_price === "No min" || min_price === undefined) ? search : { ...search, min_price };
-      search = (max_price === "No max" || max_price === undefined) ? search : { ...search, max_price };
-      search = (min_price === "No min" || min_beds === undefined) ? search : { ...search, min_beds };
-
-      console.log(search);
-
-      ApiUtils.search(search)
-      .then(this.handleSearchSuccess)
-      .catch(this.handleSearchFailure);
-
-    }
-
-    handleSearchSuccess = () => {
-      this.context.router.push('/search');
-      console.log("Hello");
     }
 
     handleFormChange = event => {
@@ -74,22 +50,23 @@ class HomePageSearch extends Component {
 
    render() {
      return (
-       <div className="container-xsmall">
+       <div>
 
        <Form onSubmit={this.handleSubmit}>
+         <FormLabel style={{fontWeight:"bold"}}>Location</FormLabel>
          <FormGroup controlId="postcode">
            <FormControl
              name="location"
              type="text"
              value={this.state.form.location}
-             placeholder="Location..."
+             placeholder="Please enter Postcode..."
              onChange={this.handleFormChange}
            />
          </FormGroup>
 
          <Row>
            <FormGroup as={Col} controlId="min_price">
-             <FormLabel style={{color:'white'}} >Min Price</FormLabel>
+             <FormLabel style={{fontWeight:"bold"}}>Min Price</FormLabel>
 
              <InputGroup>
                <InputGroup.Prepend>
@@ -147,7 +124,7 @@ class HomePageSearch extends Component {
            </FormGroup>
 
            <FormGroup as={Col} controlId="min_price">
-             <FormLabel style={{color:'white'}} >Max Price</FormLabel>
+             <FormLabel style={{fontWeight:"bold"}}>Max Price</FormLabel>
              <InputGroup>
                <InputGroup.Prepend>
                  <InputGroup.Text id="inputGroupPrepend">£</InputGroup.Text>
@@ -203,7 +180,7 @@ class HomePageSearch extends Component {
            </FormGroup>
 
            <FormGroup as={Col} controlId="min_price">
-             <FormLabel style={{color:'white'}} >Min. Beds</FormLabel>
+             <FormLabel style={{fontWeight:"bold"}}>Min. Beds</FormLabel>
              <FormControl as="select"
                name="min_beds"
                value={this.state.form.min_beds}
@@ -228,7 +205,7 @@ class HomePageSearch extends Component {
            <Collapse isOpened={this.state.isOpened}>
 
              <FormGroup as={Col} controlId="distance">
-               <FormLabel style={{color:'white'}} >Distance from Location</FormLabel>
+               <FormLabel style={{fontWeight:"bold"}}>Distance from Location</FormLabel>
 
 
                <InputGroup>
@@ -255,7 +232,7 @@ class HomePageSearch extends Component {
 
 
              <FormGroup as={Col} controlId="property_type">
-               <FormLabel style={{color:'white'}} >Property Type</FormLabel>
+               <FormLabel style={{fontWeight:"bold"}}>Property Type</FormLabel>
                <FormControl as="select">
                  name="property_type"
                  value={this.state.form.prop_type}
@@ -268,22 +245,25 @@ class HomePageSearch extends Component {
            </Collapse>
          </Row>
 
-         <Row>
+         <Row className="pad-top">
 
            <FormGroup as={Col} controlId="advanced">
              <div className="text-left">
-               <Button variant="link" style={{color:'white'}} onClick={this.advOptions}>
+               <Button variant="link" onClick={this.advOptions}>
                  Advanced Options...
                </Button>
              </div>
            </FormGroup>
-           <FormGroup as={Col} controlId="search">
-             <div  className="text-right">
-               <Button type="button" onClick={this.handleSubmit}>
-                 Search...
-               </Button>
-             </div>
-           </FormGroup>
+
+         <FormGroup as={Col} controlId="search">
+           <div  className="text-right">
+            <Link to={{pathname:'/search', state:{form: this.state.form}}}>
+             <Button type="button">
+               Search
+             </Button>
+             </Link>
+           </div>
+         </FormGroup>
          </Row>
        </Form>
        </div>
