@@ -2,11 +2,9 @@ import psycopg2
 from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, POSTGRES_PORT, \
     DEVELOPMENT
 from back_end.src.import_files import ImportFiles
-from sqlalchemy import create_engine, Column
+from sqlalchemy import create_engine
 
 from uuid import uuid4
-
-import pandas as pd
 
 
 class DatabaseHandler:
@@ -35,7 +33,7 @@ class DatabaseHandler:
             '   street TEXT,' \
             '   town_city TEXT,' \
             '   county TEXT,' \
-            '   price_paid_transaction_type TEXT,' \
+            '   price_paid_transaction_type TEXT' \
             ');'
         return house_price_data
 
@@ -127,7 +125,6 @@ class DatabaseHandler:
         data['id'] = [uuid4() for _ in range(len(data.index))]
 
         ImportFiles.print_dataframe(data)
-
 
         data.to_sql('uni_addresses_data', engine, if_exists="append", index=False)
 
