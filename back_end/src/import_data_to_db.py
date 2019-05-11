@@ -1,6 +1,6 @@
 import psycopg2
 from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, POSTGRES_PORT, \
-    DEVELOPMENT
+    DEVELOPMENT, POSTGRES_SUPER_PASSWORD, POSTGRES_IP
 from back_end.src.import_files import ImportFiles
 from sqlalchemy import create_engine
 
@@ -85,7 +85,7 @@ class DatabaseHandler:
         try:
             if DEVELOPMENT:
                 connection = psycopg2.connect(user=POSTGRES_SUPER,
-                                              password='password',
+                                              password=POSTGRES_SUPER_PASSWORD,
                                               dbname=POSTGRES_DATABASE)
             else:
                 connection = psycopg2.connect(user=POSTGRES_USERNAME,
@@ -98,11 +98,11 @@ class DatabaseHandler:
             for table_command in DatabaseHandler.create_tables():
                 cursor.execute(table_command)
 
-            engine = create_engine('postgresql://{}:{}@127.0.0.1:{}/{}'.format(POSTGRES_USERNAME, POSTGRES_PASSWORD,
-                                                                               POSTGRES_PORT, POSTGRES_DATABASE))
+            engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(POSTGRES_USERNAME, POSTGRES_PASSWORD,
+                                                                        POSTGRES_IP, POSTGRES_PORT,
+                                                                        POSTGRES_DATABASE))
 
             connection.commit()
-
 
             # Populate databases if not already populated
             import_files = ImportFiles()
