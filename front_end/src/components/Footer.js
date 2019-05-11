@@ -9,7 +9,7 @@ class Footer extends React.Component {
   render() {
 
     return (
-      <div className="bg-grey">
+      <div className="background">
         <div className="container footer-container">
           <div className="row row-pad no-pad-top">
             <div>

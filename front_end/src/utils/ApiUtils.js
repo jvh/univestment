@@ -8,7 +8,7 @@ const host = 'http://localhost:5000';
 // API endpoints
 const endpoints = {
   test_data: { get: data => `${host}/test_data` },
-  search: { get: data => `${host}/test_data` }
+  search: { get: data => `${host}/search` }
 };
 
 // GET request function builder

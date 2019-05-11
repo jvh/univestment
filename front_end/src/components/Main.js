@@ -5,6 +5,7 @@ import { Col } from 'react-bootstrap';
 import HomePage from '../pages/HomePage.js';
 import BarPage from '../pages/BarPage.js';
 import LinePage from '../pages/LinePage.js';
+import ResultsPage from '../pages/ResultsPage.js';
 
 
 const Main = props => {
@@ -16,12 +17,13 @@ const Main = props => {
   const homePageRenderer = setBaseProps(HomePage)(props);
   const barPageRenderer = setBaseProps(BarPage)(props);
   const linePageRenderer = setBaseProps(LinePage)(props);
+  const resultsPageRenderer = setBaseProps(ResultsPage)(props);
 
   return (
     <main>
       <Switch>
         <Route exact path='/' render={homePageRenderer} />
-        <Route exact path='/line' render={linePageRenderer} />
+        <Route name='search' render={resultsPageRenderer} />
         <Route exact path='/bar' render={barPageRenderer} />
         <Route exact path='/*' render={homePageRenderer} />
       </Switch>
