@@ -6,6 +6,7 @@ import HomePage from '../pages/HomePage.js';
 import BarPage from '../pages/BarPage.js';
 import LinePage from '../pages/LinePage.js';
 import ResultsPage from '../pages/ResultsPage.js';
+import PropertyPage from '../pages/PropertyPage.js';
 
 
 const Main = props => {
@@ -18,13 +19,15 @@ const Main = props => {
   const barPageRenderer = setBaseProps(BarPage)(props);
   const linePageRenderer = setBaseProps(LinePage)(props);
   const resultsPageRenderer = setBaseProps(ResultsPage)(props);
+  const propertyPageRenderer = setBaseProps(PropertyPage)(props);
 
   return (
     <main>
       <Switch>
         <Route exact path='/' render={homePageRenderer} />
-        <Route name='search' render={resultsPageRenderer} />
+        <Route exact path='/property' render={propertyPageRenderer} />
         <Route exact path='/bar' render={barPageRenderer} />
+        <Route exact path='/search' render={resultsPageRenderer} />
         <Route exact path='/*' render={homePageRenderer} />
       </Switch>
     </main>
