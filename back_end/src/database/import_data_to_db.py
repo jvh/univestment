@@ -1,11 +1,14 @@
 import psycopg2
-from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, DEVELOPMENT, POSTGRES_SUPER_PASSWORD
+from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, DEVELOPMENT, \
+    POSTGRES_SUPER_PASSWORD
 import pandas as pd
 from uuid import uuid4
-from back_end.src import geo_locations
 
 
 class DatabaseHandler:
+    def __init__(self):
+        from back_end.src import geo_locations
+
     @staticmethod
     def create_pricing_table():
         """
