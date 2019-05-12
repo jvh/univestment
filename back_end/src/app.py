@@ -71,7 +71,7 @@ def query_property_listing():
                 DatabaseHandler.insert_to_db(query, params)
 
             if large:
-                r['hd_img'] = large
+                r['image_url'] = large
 
         return jsonify(results)
     except AdzunaAuthorisationException:
