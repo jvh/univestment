@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom';
 
 //import ValidationUtils from '../utils/ValidationUtils';
 
-class HomePageSearch extends Component {
+class FilterResults extends Component {
 
     constructor(props) {
       super(props);
@@ -25,7 +25,7 @@ class HomePageSearch extends Component {
         form: {
           location: ''
         },
-        isOpened: props.isOpened
+        isOpened: false
       }
 
       this.handleFormChange = this.handleFormChange.bind(this);
@@ -33,9 +33,6 @@ class HomePageSearch extends Component {
 
     advOptions = () => {
       this.setState({isOpened: !this.state.isOpened});
-      if (this.props.collapse !== null) {
-        this.props.collapse();
-      }
       console.log(this.state.isOpened);
     }
 
@@ -275,4 +272,4 @@ class HomePageSearch extends Component {
 }
 
 
-export default HomePageSearch;
+export default FilterResults;
