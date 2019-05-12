@@ -30,6 +30,11 @@ def database_commands(load_data=False):
         for table_command in DatabaseHandler.create_tables():
             cursor.execute(table_command)
 
+        connection.commit()
+
+        import_files = ImportFiles()
+        DatabaseHandler.fill_uni_addresses(engine, import_files)
+
         # If you need to load the data into the database
         if load_data:
             # Populate databases if not already populated

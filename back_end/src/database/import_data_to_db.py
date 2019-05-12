@@ -2,6 +2,7 @@ import psycopg2
 from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, DEVELOPMENT, POSTGRES_SUPER_PASSWORD
 import pandas as pd
 from uuid import uuid4
+from back_end.src import geo_locations
 
 
 class DatabaseHandler:
@@ -55,7 +56,9 @@ class DatabaseHandler:
             '   establishmentname TEXT NOT NULL,' \
             '   street TEXT,' \
             '   town TEXT,' \
-            '   postcode TEXT NOT NULL' \
+            '   postcode TEXT NOT NULL,' \
+            '   longitude FLOAT NOT NULL,' \
+            '   latitude FLOAT NOT NULL' \
             ');'
         return uni_addresses_data
 
@@ -112,7 +115,6 @@ class DatabaseHandler:
         except (Exception, psycopg2.Error) as error :
             print("Error connecting to postgres: ", error)
 
-
     @staticmethod
     def query_database(query, params=""):
         """
@@ -160,7 +162,7 @@ class DatabaseHandler:
         data = import_files.admissions_data
         data.columns = map(str.lower, data.columns)
         data['id'] = [uuid4() for _ in range(len(data.index))]
-        data.to_sql('admissions_data', engine, if_exists="replace", index=False)
+        data.to_sql('admissions_data', engine, if_exists="fail", index=False)
 
     @staticmethod
     def fill_uni_addresses(engine, import_files):
@@ -173,6 +175,16 @@ class DatabaseHandler:
         data = import_files.uni_addresses
         data.columns = map(str.lower, data.columns)
         data['id'] = [uuid4() for _ in range(len(data.index))]
+        longitude = []
+        latitude = []
+        data = data[pd.notnull(data['postcode'])]
+        for row in data['postcode']:
+            long, lat = geo_locations.get_coords_from_postcode(row)
+            longitude.append(long)
+            latitude.append(lat)
+        data['longitude'] = longitude
+        data['latitude'] = latitude
+
         data.to_sql('uni_addresses_data', engine, if_exists="replace", index=False)
 
     @staticmethod
@@ -198,7 +210,7 @@ class DatabaseHandler:
             chunked_data['postcode'] = chunked_data['postcode'].apply(lambda x: x.replace(" ",""))
             chunked_data['id'] = [uuid4() for _ in range(len(chunked_data.index))]
 
-            chunked_data.to_sql('house_price_data', engine, if_exists="append", index=False)
+            chunked_data.to_sql('house_price_data', engine, if_exists="fail", index=False)
 
             print("chunk interval done: {}".format(count))
             count = count + 1
