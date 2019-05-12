@@ -63,7 +63,7 @@ def query_property_listing():
 
 if __name__ == '__main__':
     if DEVELOPMENT:
-        app.run(port=5000, debug=True)
+        app.run(host='0.0.0.0', port=5000, debug=True)
     else:
-        app.run(port=5000, debug=False)
+        app.run(host='0.0.0.0', port=5000, debug=False)
 
