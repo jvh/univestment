@@ -4,8 +4,11 @@ from flask_cors import CORS
 from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
     AdzunaAuthorisationException, AdzunaRequestFormatException
 from back_end.src.database.import_data_to_db import DatabaseHandler
-
 from back_end.src import DEVELOPMENT
+from back_end.src import vision
+from uuid import uuid4
+import pandas as pd
+import psycopg2.extras as psql_extras
 
 adzuna = Adzuna()
 app = Flask(__name__)
@@ -37,7 +40,7 @@ def test_data():
 #
 #     return 'test'
 
-db = DatabaseHandler(load_data=False)
+db = DatabaseHandler()
 
 @app.route('/search')
 def query_property_listing():
@@ -51,8 +54,23 @@ def query_property_listing():
     try:
         property_listing = adzuna.get_property_listing(params)
         results = property_listing.get("results")
-        #db.query_database("SELECT * FROM house_price_data WHERE postcode = '{}' ".format(results["postcode"]))
-        return jsonify(property_listing.get("results"))
+
+        for r in results:
+            img = r['image_url']
+            query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
+            result = DatabaseHandler.query_database(query)
+            # Doesn't exist in the DB, place in there
+            if not result:
+                large = vision.get_large_from_thumbnail(img)
+                # If a large version of the image exists
+                if large:
+                    id = uuid4()
+                    id = psql_extras.UUID_adapter(id)
+                    params = (id, img, large)
+                    query = "INSERT INTO img_thumbnail_to_lrg VALUES (%s, %s, %s);"
+                    DatabaseHandler.insert_to_db(query, params)
+
+        return jsonify(results)
     except AdzunaAuthorisationException:
         return jsonify({"error": 410})
     except AdzunaRequestFormatException:

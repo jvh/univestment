@@ -22,15 +22,13 @@ def database_commands(load_data=False):
 
         cursor = connection.cursor()
 
-        # Creating tables
-        for table_command in DatabaseHandler.create_tables():
-            cursor.execute(table_command)
-
         engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(POSTGRES_USERNAME, POSTGRES_PASSWORD,
                                                                     POSTGRES_IP, POSTGRES_PORT,
                                                                     POSTGRES_DATABASE))
 
-        connection.commit()
+        # Creating tables
+        for table_command in DatabaseHandler.create_tables():
+            cursor.execute(table_command)
 
         # If you need to load the data into the database
         if load_data:

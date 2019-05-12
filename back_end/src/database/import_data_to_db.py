@@ -60,6 +60,21 @@ class DatabaseHandler:
         return uni_addresses_data
 
     @staticmethod
+    def create_img_thumbnail():
+        """
+        Schema for img_thumbnail_to_lrg
+
+        :return: string representing table field commands
+        """
+        img_thumbnail_to_lrg = \
+            'CREATE TABLE IF NOT EXISTS img_thumbnail_to_lrg (' \
+            '   id UUID PRIMARY KEY,' \
+            '   thumbnail_url TEXT NOT NULL,' \
+            '   lrg_url TEXT NOT NULL' \
+            ');'
+        return img_thumbnail_to_lrg
+
+    @staticmethod
     def create_tables():
         """
         return SQL statements for creating tables
@@ -69,13 +84,42 @@ class DatabaseHandler:
         yield DatabaseHandler.create_pricing_table()
         yield DatabaseHandler.create_admissions_table()
         yield DatabaseHandler.create_uni_addresses_table()
+        yield DatabaseHandler.create_img_thumbnail()
 
     @staticmethod
-    def query_database(query):
+    def insert_to_db(query, params=""):
+        """
+        Insert into a database
+
+        :param query: String representing query
+        :param params: Any additional parameters which are passed (in tuple format)
+        """
+        try:
+            if DEVELOPMENT:
+                connection = psycopg2.connect(user=POSTGRES_SUPER,
+                                              password=POSTGRES_SUPER_PASSWORD,
+                                              dbname=POSTGRES_DATABASE)
+            else:
+                connection = psycopg2.connect(user=POSTGRES_USERNAME,
+                                              password=POSTGRES_PASSWORD,
+                                              dbname=POSTGRES_DATABASE)
+
+            cursor = connection.cursor()
+            cursor.execute(query, params)
+            connection.commit()
+            connection.close()
+            cursor.close()
+        except (Exception, psycopg2.Error) as error :
+            print("Error connecting to postgres: ", error)
+
+
+    @staticmethod
+    def query_database(query, params=""):
         """
         Query the housing database and return all results
 
         :param query: String representing query
+        :param params: Any additional parameters which are passed (in tuple format)
         :return: list(Tuple) of returned results
         """
         try:
@@ -90,15 +134,17 @@ class DatabaseHandler:
 
             cursor = connection.cursor()
 
-            cursor.execute(query)
+            if not params:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, params)
 
             result = cursor.fetchall()
-
             connection.close()
             cursor.close()
             return result
         except (Exception, psycopg2.Error) as error :
-            print ("Error connecting to postgres: ", error)
+            print("Error connecting to postgres: ", error)
 
     def postcode_query(self):
         pass
