@@ -1,11 +1,7 @@
-import argparse
 import io
-
 from google.cloud import vision
 from google.cloud.vision import types
 
-"""
-"""
 
 def annotate(path):
     """
@@ -60,16 +56,8 @@ def return_large(web_detection_result):
     else:
         return None
 
-if __name__ == '__main__':
-    # parser = argparse.ArgumentParser(
-    #     description=__doc__,
-    #     formatter_class=argparse.RawDescriptionHelpFormatter)
-    # path_help = str('The image to detect, can be web URI, '
-    #                 'Google Cloud Storage, or path to local file.')
-    # parser.add_argument('image_url', help=path_help)
-    # args = parser.parse_args()
-    #
-    # report(annotate(args.image_url))
 
-    a = get_large_from_thumbnail("https://s3-eu-west-1.amazonaws.com/property.adzuna.co.uk/e3dafc5f824674cb70bea8d375caaf4dc5eff714f678b67574f6f9f689a6def7.jpeg")
+if __name__ == '__main__':
+    url = "https://s3-eu-west-1.amazonaws.com/property.adzuna.co.uk/e3dafc5f824674cb70bea8d375caaf4dc5eff714f678b67574f6f9f689a6def7.jpeg"
+    a = get_large_from_thumbnail(url)
     print(a)

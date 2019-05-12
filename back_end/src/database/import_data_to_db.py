@@ -70,7 +70,7 @@ class DatabaseHandler:
             'CREATE TABLE IF NOT EXISTS img_thumbnail_to_lrg (' \
             '   id UUID PRIMARY KEY,' \
             '   thumbnail_url TEXT NOT NULL,' \
-            '   lrg_url TEXT NOT NULL' \
+            '   lrg_url TEXT' \
             ');'
         return img_thumbnail_to_lrg
 

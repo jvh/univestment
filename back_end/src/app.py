@@ -7,7 +7,6 @@ from back_end.src.database.import_data_to_db import DatabaseHandler
 from back_end.src import DEVELOPMENT
 from back_end.src import vision
 from uuid import uuid4
-import pandas as pd
 import psycopg2.extras as psql_extras
 
 adzuna = Adzuna()
@@ -59,16 +58,20 @@ def query_property_listing():
             img = r['image_url']
             query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
             result = DatabaseHandler.query_database(query)
+
+            if result:
+                large = result[0][-1]
             # Doesn't exist in the DB, place in there
-            if not result:
+            else:
                 large = vision.get_large_from_thumbnail(img)
-                # If a large version of the image exists
-                if large:
-                    id = uuid4()
-                    id = psql_extras.UUID_adapter(id)
-                    params = (id, img, large)
-                    query = "INSERT INTO img_thumbnail_to_lrg VALUES (%s, %s, %s);"
-                    DatabaseHandler.insert_to_db(query, params)
+                gen_id = uuid4()
+                gen_id = psql_extras.UUID_adapter(gen_id)
+                params = (gen_id, img, large)
+                query = "INSERT INTO img_thumbnail_to_lrg VALUES (%s, %s, %s);"
+                DatabaseHandler.insert_to_db(query, params)
+
+            if large:
+                r['hd_img'] = large
 
         return jsonify(results)
     except AdzunaAuthorisationException:
