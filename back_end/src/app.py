@@ -4,6 +4,7 @@ from flask_cors import CORS
 from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
     AdzunaAuthorisationException, AdzunaRequestFormatException
 from back_end.src.database.import_data_to_db import DatabaseHandler
+from back_end.src.response_processing import AdzunaResponseProcessor
 
 from back_end.src import DEVELOPMENT
 
@@ -37,7 +38,8 @@ def test_data():
 #
 #     return 'test'
 
-db = DatabaseHandler(load_data=False)
+db = DatabaseHandler()
+arp = AdzunaResponseProcessor()
 
 @app.route('/search')
 def query_property_listing():
@@ -51,7 +53,7 @@ def query_property_listing():
     try:
         property_listing = adzuna.get_property_listing(params)
         results = property_listing.get("results")
-        #db.query_database("SELECT * FROM house_price_data WHERE postcode = '{}' ".format(results["postcode"]))
+        arp.query_by_postcode(results)
         return jsonify(property_listing.get("results"))
     except AdzunaAuthorisationException:
         return jsonify({"error": 410})
