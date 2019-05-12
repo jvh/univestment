@@ -20,6 +20,8 @@ Admission data for U.K. universities.
 
 ## Development
 
+Connect to the deployment server using SSH: `ssh -p 9922 odi13@jacktarbox.co.uk`.
+
 ### Back-end
 
 The back-end is written primarily in Python.
@@ -65,6 +67,22 @@ Postgres can be interacted with using the following command `pg_ctl -D /usr/loca
 E.g. to start the server you would run the command `pg_ctl -D /usr/local/var/postgres start`
 
 `psql postgres` to allow for administrator commands + command line interface.
+
+#### On the Server
+
+Run `sudo su - postgres` to access the user for postgres.
+
+Command `psql` to login to postgres server.
+
+`\connect housing_data` to connect to housing_data database.
+
+`\dt` to view all relations (tables).
+
+`\d+ table_name` to view schema of table_name.
+
+`SELECT * FROM table_name;` view contents of table_name.
+
+`DROP TABLE table_name;` remove table_name.
 
 ### Installation
 
