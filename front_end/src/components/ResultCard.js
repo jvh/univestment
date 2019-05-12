@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 import {Row, Col} from 'react-bootstrap';
 
+import { Link } from 'react-router-dom';
+
 const ResultCard = (props) => {
 
   console.log(props);
@@ -27,11 +29,12 @@ const ResultCard = (props) => {
     <div>
       <div className="spacer-sml">
       </div>
-
-      <div className="row row-pad result results-bg">
+      <div className="row row-pad result results-bg rounded">
         <div className="col-sm-12 col-md-4">
           <div>
-          <img className="result-image" src={img_url} alt=""/>
+            <Link to={{pathname:'/property', state:{form: props}}}>
+              <img className="result-image" src={img_url} alt=""/>
+            </Link>
           </div>
           <div>
             <h1 className="align-center">£{props.sale_price}</h1>
@@ -53,6 +56,8 @@ const ResultCard = (props) => {
             <div className="col-sm">
               <img className="adzuna_logo" src="../img/adzuna_logo.jpg" alt=""/>
             </div>
+          </div>
+          <div>
           </div>
         </div>
       </div>

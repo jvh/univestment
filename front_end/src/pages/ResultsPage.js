@@ -9,8 +9,9 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 import ApiUtils from '../utils/ApiUtils.js';
 import ResultsList from '../components/ResultsList.js';
-import HomePageSearch from '../components/HomePageSearch.js';
+import FilterResults from '../components/FilterResults.js';
 import ResultsMap from '../components/ResultsMap.js';
+
 
 class ResultsPage extends Component {
 
@@ -72,10 +73,22 @@ class ResultsPage extends Component {
       if (this.state.width < 1830) {
         return (
           <div>
-            <div className="container-small results-bg">
-            <HomePageSearch {...this.props}/>
+            <div className="container-small">
+              <div className="spacer-sml">
+              </div>
+              <div className="row-pad row result rounded results-bg">
+                <div className="col-12">
+                  <FilterResults {...this.props}/>
+                </div>
+              </div>
             </div>
-            <ResultsMap results={this.state.search_results}/>
+            <div className="container-small">
+              <div className="spacer-sml">
+              </div>
+              <div className="row result results-bg">
+                <ResultsMap results={this.state.search_results}/>
+              </div>
+            </div>
             <ResultsList results={this.state.search_results}/>
           </div>
         );
@@ -90,9 +103,9 @@ class ResultsPage extends Component {
                 <div className="container-small">
                   <div className="spacer-sml">
                   </div>
-                  <div className="row-pad row result results-bg">
+                  <div className="row-pad row result rounded results-bg">
                     <div className="col-12">
-                      <HomePageSearch {...this.props}/>
+                      <FilterResults {...this.props}/>
                     </div>
                   </div>
                 </div>

@@ -3,7 +3,8 @@ import axios from 'axios';
 const USE_MOCKS = false;
 
 // REST API root URL
-const host = 'http://127.0.0.1:5000';
+const host = 'http://api.univestment.co.uk';
+
 
 // API endpoints
 const endpoints = {
