@@ -208,4 +208,4 @@ class DatabaseHandler:
 
 
 if __name__ == "__main__":
-    db = DatabaseHandler(load_data=True)
+    db = DatabaseHandler(load_data=False)
