@@ -20,6 +20,8 @@ Admission data for U.K. universities.
 
 ## Development
 
+Connect to the deployment server using SSH: `ssh -p 9922 odi13@jacktarbox.co.uk`.
+
 ### Back-end
 
 The back-end is written primarily in Python.
