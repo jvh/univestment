@@ -148,6 +148,9 @@ class DatabaseHandler:
         except (Exception, psycopg2.Error) as error :
             print ("Error connecting to postgres: ", error)
 
+    def postcode_query(self):
+        pass
+
     @staticmethod
     def fill_admissions_data(engine, import_files):
         """
@@ -194,7 +197,9 @@ class DatabaseHandler:
                                                       "secondary_addressable_object_name",
                                                       "price_paid_transaction_type", "record status"])
             chunked_data = chunked_data[pd.notnull(chunked_data['postcode'])]
+            chunked_data['postcode'] = chunked_data['postcode'].apply(lambda x: x.replace(" ",""))
             chunked_data['id'] = [uuid4() for _ in range(len(chunked_data.index))]
+
             chunked_data.to_sql('house_price_data', engine, if_exists="append", index=False)
 
             print("chunk interval done: {}".format(count))
