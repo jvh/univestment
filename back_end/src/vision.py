@@ -55,9 +55,3 @@ def return_large(web_detection_result):
         return web_detection_result.partial_matching_images[0].url
     else:
         return None
-
-
-if __name__ == '__main__':
-    url = "https://s3-eu-west-1.amazonaws.com/property.adzuna.co.uk/e3dafc5f824674cb70bea8d375caaf4dc5eff714f678b67574f6f9f689a6def7.jpeg"
-    a = get_large_from_thumbnail(url)
-    print(a)
