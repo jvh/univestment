@@ -1,9 +1,9 @@
-from back_end.src.import_files import ImportFiles
+from back_end.src.database.import_files import ImportFiles
 from sqlalchemy import create_engine
 from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, POSTGRES_PORT, \
     DEVELOPMENT, POSTGRES_SUPER_PASSWORD, POSTGRES_IP
 import psycopg2
-from back_end.src.import_data_to_db import DatabaseHandler
+from back_end.src.database.import_data_to_db import DatabaseHandler
 
 
 def database_commands(load_data=False):

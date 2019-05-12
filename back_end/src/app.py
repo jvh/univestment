@@ -3,7 +3,7 @@ from flask_restful.utils.cors import crossdomain
 from flask_cors import CORS
 from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
     AdzunaAuthorisationException, AdzunaRequestFormatException
-from back_end.src.import_data_to_db import DatabaseHandler
+from back_end.src.database.import_data_to_db import DatabaseHandler
 
 from back_end.src import DEVELOPMENT
 
