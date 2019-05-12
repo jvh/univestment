@@ -66,6 +66,22 @@ E.g. to start the server you would run the command `pg_ctl -D /usr/local/var/pos
 
 `psql postgres` to allow for administrator commands + command line interface.
 
+#### On the Server
+
+Run `sudo su - postgres` to access the user for postgres.
+
+Command `psql` to login to postgres server.
+
+`\connect housing_data` to connect to housing_data database.
+
+`\dt` to view all relations (tables).
+
+`\d+ table_name` to view schema of table_name.
+
+`SELECT * FROM table_name;` view contents of table_name.
+
+`DROP TABLE table_name;` remove table_name.
+
 ### Installation
 
 You must install [Node.js](https://nodejs.org/en/download/) for use on the local machine.
