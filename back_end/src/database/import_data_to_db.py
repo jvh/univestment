@@ -1,19 +1,10 @@
 import psycopg2
-from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, POSTGRES_PORT, \
-    DEVELOPMENT, POSTGRES_SUPER_PASSWORD, POSTGRES_IP
-from back_end.src.import_files import ImportFiles
-from sqlalchemy import create_engine
+from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, DEVELOPMENT, POSTGRES_SUPER_PASSWORD
 import pandas as pd
-
 from uuid import uuid4
 
 
 class DatabaseHandler:
-
-    def __init__(self, load_data=False):
-        if load_data:
-            self.database_commands()
-
     @staticmethod
     def create_pricing_table():
         """
@@ -78,45 +69,6 @@ class DatabaseHandler:
         yield DatabaseHandler.create_pricing_table()
         yield DatabaseHandler.create_admissions_table()
         yield DatabaseHandler.create_uni_addresses_table()
-
-    @staticmethod
-    def database_commands():
-        """
-        Create tables for all data sets if they do not already exist
-        """
-        try:
-            if DEVELOPMENT:
-                connection = psycopg2.connect(user=POSTGRES_SUPER,
-                                              password=POSTGRES_SUPER_PASSWORD,
-                                              dbname=POSTGRES_DATABASE)
-            else:
-                connection = psycopg2.connect(user=POSTGRES_USERNAME,
-                                              password=POSTGRES_PASSWORD,
-                                              dbname=POSTGRES_DATABASE)
-
-            cursor = connection.cursor()
-
-            # Creating tables
-            for table_command in DatabaseHandler.create_tables():
-                cursor.execute(table_command)
-
-            engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(POSTGRES_USERNAME, POSTGRES_PASSWORD,
-                                                                        POSTGRES_IP, POSTGRES_PORT,
-                                                                        POSTGRES_DATABASE))
-
-            connection.commit()
-
-            # Populate databases if not already populated
-            import_files = ImportFiles()
-            DatabaseHandler.fill_uni_addresses(engine, import_files)
-            DatabaseHandler.fill_admissions_data(engine, import_files)
-            DatabaseHandler.fill_house_data(engine, import_files)
-
-            connection.commit()
-            connection.close()
-            cursor.close()
-        except (Exception, psycopg2.Error) as error :
-            print ("Error connecting to postgres: ", error)
 
     @staticmethod
     def query_database(query):
@@ -205,7 +157,3 @@ class DatabaseHandler:
             print("chunk interval done: {}".format(count))
             count = count + 1
         print("finished importing house price data. yay")
-
-
-if __name__ == "__main__":
-    db = DatabaseHandler(load_data=False)

@@ -16,7 +16,7 @@ class ResultsMap extends Component {
   render() {
     return (
       // Important! Always set the container height explicitly
-      <div className="map">
+      <div className="map rounded">
         <GoogleMapReact
           bootstrapURLKeys={{ key:'AIzaSyCElo3BDmiGTGaF6E-Cq6aVwgiihfPPA7c'}}
           defaultCenter={this.props.center}
