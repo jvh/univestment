@@ -10,6 +10,7 @@ from uuid import uuid4
 import psycopg2.extras as psql_extras
 from back_end.src import geo_locations
 from copy import deepcopy
+import math
 
 adzuna = Adzuna()
 app = Flask(__name__)
@@ -58,13 +59,34 @@ def test_data():
 db = DatabaseHandler()
 
 
-def large_images_only():
+def large_images_only(results):
     """
-
-
-    :return:
+    Gets those properties with large images only (not only thumbnails)
     """
-    pass
+    new_results = []
+
+    for i in range(len(results)):
+        r = results[i]
+        img = r['image_url']
+        query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
+        result = DatabaseHandler.query_database(query)
+
+        if result:
+            large = result[0][-1]
+        # Doesn't exist in the DB, place in there
+        else:
+            large = vision.get_large_from_thumbnail(img)
+            gen_id = uuid4()
+            gen_id = psql_extras.UUID_adapter(gen_id)
+            params = (gen_id, img, large)
+            query = "INSERT INTO img_thumbnail_to_lrg VALUES (%s, %s, %s);"
+            DatabaseHandler.insert_to_db(query, params)
+
+        if large:
+            r['image_url'] = large
+            new_results.append(r)
+
+    return new_results
 
 
 def format_params(params):
@@ -88,7 +110,6 @@ def query_property_listing():
     :return: Property listing
     """
     params = request.args.to_dict()
-    results = []
     try:
         # If the user has selected they're searching for student rental opportunities
         if "search_student_lets" in params and params["search_student_lets"] == 'true':
@@ -106,6 +127,9 @@ def query_property_listing():
             if not nearby_unis:
                 return jsonify({"error": "No universities within area specified."})
 
+            # The set of properties surrounding those universities
+            properties = []
+
             # Searching for houses from each university
             for uni in nearby_unis:
                 post = uni[3]
@@ -118,47 +142,36 @@ def query_property_listing():
                 property_listing = adzuna.get_property_listing(uni_params)
                 results = property_listing.get("results")
 
-                #UNIS
-                # results
+                for r in results:
+                    # Assigning that property to a particular university
+                    r['university'] = uni[0]
+                    if r not in properties:
+                        properties.append(r)
 
-            #     return jsonify(results)
-            #
-            #     print(results)
-            #     pass
-            #
-            # return jsonify(params)
+            results = large_images_only(list(properties))
         else:
-            property_listing = adzuna.get_property_listing(params)
+            print("started")
+            property_listing = adzuna.get_property_listing(1, params)
             results = property_listing.get("results")
-
-            # The results which don't have a large image
-            small_images = []
-
-            for i in range(len(results)):
-                r = results[i]
-                img = r['image_url']
-                query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
-                result = DatabaseHandler.query_database(query)
-
-                if result:
-                    large = result[0][-1]
-                # Doesn't exist in the DB, place in there
-                else:
-                    large = vision.get_large_from_thumbnail(img)
-                    gen_id = uuid4()
-                    gen_id = psql_extras.UUID_adapter(gen_id)
-                    params = (gen_id, img, large)
-                    query = "INSERT INTO img_thumbnail_to_lrg VALUES (%s, %s, %s);"
-                    DatabaseHandler.insert_to_db(query, params)
-
-                if large:
-                    r['image_url'] = large
-                else:
-                    small_images.append(r)
-
-            # Removing results with only small images
-            for s in small_images:
-                results.remove(s)
+            print("should be 50: {}".format(len(results)))
+            results = large_images_only(results)
+            property_count = property_listing.get("count")
+            properties = [x for x in results]
+            print("initial count: {}\n".format(len(properties)))
+            pages_needed = math.ceil(int(property_count)/50)
+            current_page = 2
+            while (current_page*50) < pages_needed:
+                property_listing = adzuna.get_property_listing(current_page, params)
+                results = property_listing.get("results")
+                results = large_images_only(results)
+                print("results count: {}\n".format(len(results)))
+                for x in results:
+                    properties.append(x)
+                current_page += 1
+            print("total count: {}\n".format(len(properties)))
+            #print(properties)
+            print("final actual count: {}".format(len(properties)))
+            results = large_images_only(results)
 
         if not results:
             return jsonify({"error": "No results returned"})

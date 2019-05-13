@@ -18,12 +18,12 @@ class AdzunaRequestFormatException(Exception):
 
 
 class Adzuna:
-    API_URL = 'http://api.adzuna.com/v1/api/property/gb/search/1'
+    API_URL = 'http://api.adzuna.com/v1/api/property/gb/search/'
 
     def __init__(self):
         pass
 
-    def get_property_listing(self, params=None):
+    def get_property_listing(self, current_page, params=None):
         """
         Query the Adzuna API for property listings
 
@@ -36,7 +36,8 @@ class Adzuna:
         params.update({"app_id": ADZUNAAPIID})
         params.update({"app_key": ADZUNAAPIKEY})
         params.update({"category": "for-sale"})
-        response = requests.get(self.API_URL, params=params)
+        base_url = self.API_URL + str(current_page)
+        response = requests.get(base_url, params=params)
 
         if response.ok:
             results = response.json()
