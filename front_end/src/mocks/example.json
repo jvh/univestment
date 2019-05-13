@@ -1,10 +1,6 @@
-const LineData = [(0,0),(1,1),(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,9)];
-
-const BarData = [12, 5, 6, 6, 9, 10, 15, 5, 3];
-
-const Filtered = [
+[
   {
-    "property" : {
+    "property": {
       "adzuna": {
         "__CLASS__": "Adzuna::API::Response::Property",
         "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoxMTE0ODQ2NzYxLCJzIjoiTDM2aWZzcHpULWU4QXRJVkpUN2ZIQSJ9.aSOZYQoAZoantJMeCJLmEm26mDl1IzVZufFSZlcE0Nw",
@@ -61,6 +57,5 @@ const Filtered = [
         ]
       }
     }
-  }];
-
-export { LineData, BarData, Filtered };
+  }
+]

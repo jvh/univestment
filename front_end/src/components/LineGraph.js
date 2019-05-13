@@ -4,17 +4,24 @@ import * as d3 from "d3";
 import '../css/Graphs.css';
 
 class LineGraph extends Component {
+
+  constructor(props) {
+    super(props);
+  }
+
   componentDidMount() {
     this.drawChart();
   }
 
   drawChart() {
 
+    const node = this.node;
+
     const data = this.props.data;
 
     var margin = {top: 50, right: 50, bottom: 50, left: 50}
-      , width = window.innerWidth - margin.left - margin.right // Use the window's width
-      , height = window.innerHeight - margin.top - margin.bottom; // Use the window's height
+      , width = this.props.width - margin.left - margin.right // Use the window's width
+      , height = this.props.width - margin.top - margin.bottom; // Use the window's height
 
     // The number of datapoints
     var n = 21;
@@ -39,9 +46,10 @@ class LineGraph extends Component {
     var dataset = d3.range(n).map(function(d) { return {"y": d3.randomUniform(1)() } })
 
     // 1. Add the SVG to the page and employ #2
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select(node).append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
+        .attr("style", "display:block")
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -74,10 +82,11 @@ class LineGraph extends Component {
       			console.log(a)
     		})
           .on("mouseout", function() {  })
+
   }
 
   render(){
-    return <div id={"#" + this.props.id}></div>
+    return <svg ref={node => this.node = node} width={500} height={500}></svg>
   }
 }
 

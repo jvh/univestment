@@ -9,21 +9,23 @@ const ResultsList = (props) => {
 
   const renderResultsCard = result => {
       return (
-        <ResultCard {...result}/>
+        <ResultCard {...result} search={props.search}/>
       );
   }
 
-  var results = Array.from(props.results)
+  var results = Array.from(props.search.search_results)
 
   console.log(results);
 
   if (results && results.length > 0) {
     return (
-      <div className="container-small">  
+      <div className="container-small">
         {
           results
             .map(renderResultsCard)
         }
+        <div className="spacer-sml">
+        </div>
       </div>
 
     );

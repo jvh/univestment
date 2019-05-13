@@ -23,11 +23,11 @@ class HomePageSearch extends Component {
       super(props);
       this.state = {
         form: {
-          location: ''
+          where: ''
         },
-        isOpened: props.isOpened
+        isOpened: props.isOpened,
+        isSubmitEnabled: false
       }
-
       this.handleFormChange = this.handleFormChange.bind(this);
     }
 
@@ -36,12 +36,29 @@ class HomePageSearch extends Component {
       if (this.props.collapse !== null) {
         this.props.collapse();
       }
-      console.log(this.state.isOpened);
     }
 
-    handleFormChange = event => {
+  validatePostcode = postcode => {
+    postcode = postcode.replace(/\s/g, "");
+    var regex = /^[A-Z]{1,2}[0-9]{1,2}[A-Z]{0,1} ?[0-9][A-Z]{2}$/i;
+    console.log(regex.test(postcode));
+    return regex.test(postcode);
+  }
+
+  handleFormChange = event => {
+
+    console.log("CHANGE")
+
      var value = event.target.value;
      const name = event.target.name;
+
+     console.log(name + " > " + value);
+
+     if (name === "where"){
+       var valid = this.validatePostcode(value);
+       console.log(valid);
+       this.setState({isSubmitEnabled:valid});
+     }
 
      this.setState({
        form: {
@@ -59,9 +76,9 @@ class HomePageSearch extends Component {
          <FormLabel style={{fontWeight:"bold"}}>Location</FormLabel>
          <FormGroup controlId="postcode">
            <FormControl
-             name="location"
+             name="where"
              type="text"
-             value={this.state.form.location}
+             value={this.state.form.where}
              placeholder="Please enter Postcode..."
              onChange={this.handleFormChange}
            />
@@ -76,8 +93,8 @@ class HomePageSearch extends Component {
                  <InputGroup.Text id="inputGroupPrepend">£</InputGroup.Text>
                </InputGroup.Prepend>
                <FormControl as="select"
-                 name="min_price"
-                 value={this.state.form.min_price}
+                 name="price_min"
+                 value={this.state.form.price_min}
                  onChange={this.handleFormChange}>
 
                  <option>No min</option>
@@ -133,8 +150,8 @@ class HomePageSearch extends Component {
                  <InputGroup.Text id="inputGroupPrepend">£</InputGroup.Text>
                </InputGroup.Prepend>
                <FormControl as="select"
-                 name="max_price"
-                 value={this.state.form.max_price}
+                 name="price_max"
+                 value={this.state.form.price_max}
                  onChange={this.handleFormChange}>
                  <option>No max</option>
                  <option>10,000</option>
@@ -185,8 +202,8 @@ class HomePageSearch extends Component {
            <FormGroup as={Col} controlId="min_price">
              <FormLabel style={{fontWeight:"bold"}}>Min. Beds</FormLabel>
              <FormControl as="select"
-               name="min_beds"
-               value={this.state.form.min_beds}
+               name="beds"
+               value={this.state.form.beds}
                onChange={this.handleFormChange}>
                <option>No min</option>
                <option>1</option>
@@ -206,16 +223,13 @@ class HomePageSearch extends Component {
          <Row>
 
            <Collapse isOpened={this.state.isOpened}>
-
              <FormGroup as={Col} controlId="distance">
                <FormLabel style={{fontWeight:"bold"}}>Distance from Location</FormLabel>
-
-
                <InputGroup>
-                 <FormControl as="select">
+                 <FormControl
+                  as="select"
                   name="distance"
                   value={this.state.form.distance}
-                  defaultValue=10
                   onChange={this.handleFormChange}>
                   <option>1</option>
                   <option>2</option>
@@ -236,7 +250,8 @@ class HomePageSearch extends Component {
 
              <FormGroup as={Col} controlId="property_type">
                <FormLabel style={{fontWeight:"bold"}}>Property Type</FormLabel>
-               <FormControl as="select">
+               <FormControl
+                as="select"
                  name="property_type"
                  value={this.state.form.prop_type}
                  onChange={this.handleFormChange}>
@@ -261,7 +276,7 @@ class HomePageSearch extends Component {
          <FormGroup as={Col} controlId="search">
            <div  className="text-right">
             <Link to={{pathname:'/search', state:{form: this.state.form}}}>
-             <Button type="button">
+             <Button type="button" disabled={!this.state.isSubmitEnabled}>
                Search
              </Button>
              </Link>
