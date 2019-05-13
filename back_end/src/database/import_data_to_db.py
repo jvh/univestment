@@ -6,8 +6,6 @@ from uuid import uuid4
 
 
 class DatabaseHandler:
-    # def __init__(self):
-    #     from back_end.src import geo_locations
 
     @staticmethod
     def create_pricing_table():
@@ -48,6 +46,48 @@ class DatabaseHandler:
     def create_property_table():
         """
         Schema for seen_adverts
+
+        :return: string representing table field commands
+        """
+        seen_adverts = \
+            'CREATE TABLE IF NOT EXISTS seen_adverts (' \
+            '   id INTEGER PRIMARY KEY, ' \
+            '   beds INTEGER,' \
+            '   description TEXT,' \
+            '   image_url TEXT,' \
+            '   is_furnished BOOLEAN,' \
+            '   latitude FLOAT,' \
+            '   longitude FLOAT,' \
+            '   postcode TEXT,' \
+            '   property_type TEXT,' \
+            '   redirect_url TEXT,' \
+            '   sale_price FLOAT,' \
+            '   title TEXT,' \
+            '   university TEXT,' \
+            '   date_of_insertion DATE NOT NULL DEFAULT NOW(),' \
+            '   has_large_img BOOLEAN NOT NULL' \
+            ');'
+        return seen_adverts
+
+    @staticmethod
+    def create_seen_queries():
+        """
+        Schema for seen_queries
+
+        :return: string representing table field commands
+        """
+        seen_queries = \
+            'CREATE TABLE IF NOT EXISTS seen_queries (' \
+            '   id UUID PRIMARY KEY, ' \
+            '   query TEXT NOT NULL,' \
+            '   properties TEXT' \
+            ');'
+        return seen_queries
+
+    @staticmethod
+    def create_query_table():
+        """
+        Schema for processed_queries
 
         :return: string representing table field commands
         """
@@ -134,6 +174,7 @@ class DatabaseHandler:
         yield DatabaseHandler.create_img_thumbnail()
         yield DatabaseHandler.create_prediction_table()
         yield DatabaseHandler.create_property_table()
+        yield DatabaseHandler.create_seen_queries()
 
     @staticmethod
     def insert_to_db(query, params=""):

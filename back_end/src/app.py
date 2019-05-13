@@ -6,10 +6,11 @@ from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
 from back_end.src.database.import_data_to_db import DatabaseHandler
 from back_end.src import DEVELOPMENT
 from back_end.src import vision
-from uuid import uuid4
+import uuid
 import psycopg2.extras as psql_extras
 from back_end.src import geo_locations
 from copy import deepcopy
+import datetime
 
 adzuna = Adzuna()
 app = Flask(__name__)
@@ -67,12 +68,11 @@ def large_images_only(results):
         # Doesn't exist in the DB, place in there
         else:
             large = vision.get_large_from_thumbnail(img)
-            gen_id = uuid4()
+            gen_id = uuid.uuid4()
             gen_id = psql_extras.UUID_adapter(gen_id)
             params = (gen_id, img, large)
             query = "INSERT INTO img_thumbnail_to_lrg VALUES (%s, %s, %s);"
             DatabaseHandler.insert_to_db(query, params)
-
         if large:
             r['image_url'] = large
             new_results.append(r)
@@ -93,6 +93,14 @@ def format_params(params):
     return params
 
 
+def get_property_args(p):
+    uni = None
+    if 'university' in p:
+        uni = p['university']
+    params = (p['id'], p['beds'], p['description'], p['image_url'], p['is_furnished'], p['latitude'], p['longitude'],
+              p['postcode'], p['property_type'], p['redirect_url'], p['sale_price'], p['title'], uni, True)
+    return params
+
 @app.route('/search')
 def query_property_listing():
     """
@@ -101,6 +109,20 @@ def query_property_listing():
     :return: Property listing
     """
     params = request.args.to_dict()
+    id = uuid.uuid3(uuid.NAMESPACE_DNS, str(sorted(params)))
+
+    query = "SELECT properties FROM seen_queries WHERE id={}".format(id)
+
+    if_processed = DatabaseHandler.query_database(query)
+
+    # If the query has been processed beforehand
+    if if_processed:
+        pass
+
+    print(if_processed)
+
+    print(id)
+    # return 's'
     results = []
     try:
         # If the user has selected they're searching for student rental opportunities
@@ -139,6 +161,8 @@ def query_property_listing():
                     r['university'] = uni[0]
                     if r not in properties:
                         properties.append(r)
+
+                results = properties
         else:
             params = format_params(params)
             property_listing = adzuna.get_property_listing(params)
@@ -147,7 +171,36 @@ def query_property_listing():
         if not results:
             return jsonify({"error": "No results returned"})
         else:
-            results = large_images_only(results)
+            large_images = large_images_only(results)
+            query_id = uuid.uuid3(uuid.NAMESPACE_DNS, str(params))
+            property_id_list = []
+
+            # Adding advertisements to seen_adverts table
+            for r in results:
+                property_id_list.append(r['id'])
+                args = (r['id'],)
+
+                # Identify if the property advertisement has already been seen by the table
+                seen_property_listing = "SELECT id FROM seen_adverts WHERE id=%s;"
+                seen_before = DatabaseHandler.query_database(seen_property_listing, args)
+
+                # If it has been seen, update date
+                if seen_before:
+                    search_property_query = "UPDATE seen_adverts SET date_of_insertion=DEFAULT WHERE id=%s;"
+                    DatabaseHandler.insert_to_db(search_property_query, args)
+                else:
+                    # Add it to the table
+                    add_property_query = "INSERT INTO seen_adverts VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
+                                         "%s, %s, %s, DEFAULT, %s);"
+                    args = get_property_args(r)
+                    DatabaseHandler.insert_to_db(add_property_query, args)
+
+            # # Add it to the table
+            # add_property_query = "INSERT INTO seen_adverts VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
+            #                      "%s, %s, %s, DEFAULT, %s);"
+            # args = get_property_args(r)
+
+
         return jsonify(results)
     except AdzunaAuthorisationException:
         return jsonify({"error": 410})
