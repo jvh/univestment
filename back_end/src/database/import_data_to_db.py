@@ -38,7 +38,7 @@ class DatabaseHandler:
         """
         predictions_data = \
             'CREATE TABLE IF NOT EXISTS predictions_data (' \
-            '   id UUID PRIMARY KEY, ' \
+            '   outcode TEXT PRIMARY KEY, ' \
             '   historical_data TEXT NOT NULL,' \
             '   prediction_data TEXT NOT NULL' \
             ');'
