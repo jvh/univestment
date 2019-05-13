@@ -50,6 +50,7 @@ const addPost = (societyId, content) =>
 const buildQuery = (params) => {
   var query=`where=${params.where}`;
 
+  console.log("SEARCH PARAMS")
   console.log(params);
 
   query = params.price_min === undefined ? query : `${query}&price_min=${params.price_min}`;

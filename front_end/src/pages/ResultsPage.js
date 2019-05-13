@@ -14,7 +14,7 @@ import ResultsMap from '../components/ResultsMap.js';
 
 import LoadingSpinner from '../components/LoadingSpinner.js';
 
-
+const MOCK = false;
 
 class ResultsPage extends Component {
 
@@ -60,7 +60,7 @@ class ResultsPage extends Component {
 
     console.log("Submit")
 
-    const { where, price_min, price_max, beds, distance } = this.props.location.state.form;
+    const { where, price_min, price_max, beds, distance, uni_search, km_away_from_uni } = this.props.location.state.form;
 
     this.setState({form:this.props.location.state.form});
 
@@ -70,12 +70,24 @@ class ResultsPage extends Component {
     search = (price_max === "No max" || price_max === undefined) ? search : { ...search, price_max };
     search = (beds === "No min" || beds === undefined) ? search : { ...search, beds };
     search = (distance === undefined) ? search : { ...search, distance };
+    //search = (km_away_from_uni === undefined)
 
     console.log("search");
 
-    ApiUtils.search(search)
-    .then(this.handleSearchSuccess)
-    .catch(this.handleSearchFailure);
+
+    if (MOCK) {
+      this.setState({search: {
+          form:this.state.form,
+          search_results: Filtered
+        }
+      });
+      console.log()
+      this.setState({isLoading: false});
+    } else {
+      ApiUtils.search(search)
+      .then(this.handleSearchSuccess)
+      .catch(this.handleSearchFailure);
+    }
 
   }
 
@@ -84,9 +96,10 @@ class ResultsPage extends Component {
     console.log(Filtered);
     this.setState({search: {
         form:this.state.form,
-        search_results: Filtered
+        search_results: response
       }
     });
+    console.log()
     this.setState({isLoading: false});
   }
 

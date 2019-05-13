@@ -1,9 +1,11 @@
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+
 .homebackground {
-  background-image: url('../img/background_2.png');
+  background-image: url('../img/background_2.jpg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  height: calc(100vh - 56px);
+  height: calc(100vh - 54px);
 }
 
 .grad {
@@ -11,19 +13,26 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  height: calc(100vh - 56px);
+  height: calc(100vh - 54px);
 }
 
 .loading {
   padding-top: 30vh;
-  height: calc(100vh - 56px);
+  height: calc(100vh - 54px);
 }
 
 .title-logo {
   width:100%;
 }
 
+.switch-pad {
+  padding-top: 5px;
+}
 
+.switch-inner {
+  width:50%;
+  margin: 0 auto;
+}
 
 .header-logo {
   height: 360%;
@@ -35,7 +44,7 @@
   position: relative;
   top: -22px;
   height: 30px;
-  font-family: Baskerville, "Baskerville Old Face", "Goudy Old Style", Garamond, "Times New Roman", serif;
+  font-family: Pacifico, Baskerville, "Baskerville Old Face", "Goudy Old Style", Garamond, "Times New Roman", serif;
 }
 
 .logo-container {
@@ -54,7 +63,8 @@
   font-size: 550%;
   color: #ffffff;
   font-weight: 800;
-  font-family: Baskerville, "Baskerville Old Face", "Goudy Old Style", Garamond, "Times New Roman", serif;
+  text-align: center;
+  font-family: Pacifico, Baskerville, "Baskerville Old Face", "Goudy Old Style", Garamond, "Times New Roman", serif;
 }
 
 .centre {
@@ -192,6 +202,7 @@
 
 .container-small{
   max-width: 855px;
+  min-width: 750px;
   width: 100%;
   margin: 0 auto;
 }
@@ -249,8 +260,14 @@
 }
 
 .graph {
+  display: block;
+  margin: auto;
+}
+
+.graph-outer {
   min-height: 500px;
-  min-width: 500px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .map {
