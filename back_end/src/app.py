@@ -19,6 +19,7 @@ adzuna = Adzuna()
 app = Flask(__name__)
 CORS(app)
 db = DatabaseHandler()
+arp = AdzunaResponseProcessor()
 
 # Valid parameters for adzuna
 valid_adzuna_params = {'country', 'app_id', 'app_key', 'page', 'results_per_page', 'what', 'what_and', 'what_phrase',
@@ -97,9 +98,6 @@ def format_params(params):
     return params
 
 
-db = DatabaseHandler()
-arp = AdzunaResponseProcessor()
-
 @app.route('/search')
 def query_property_listing():
     """
@@ -109,6 +107,7 @@ def query_property_listing():
     """
     params = request.args.to_dict()
     results = []
+    final_response = []
     try:
         # If the user has selected they're searching for student rental opportunities
         if "search_student_lets" in params and params["search_student_lets"] == 'true':
@@ -155,13 +154,29 @@ def query_property_listing():
         if not results:
             return jsonify({"error": "No results returned"})
         else:
-            results = large_images_only(results)
+            #results = large_images_only(results)
             historic_prices, predicted_prices = get_existing_outcode_processing(results)
             estimates = {}
             for property in results:
+
+
                 outcode = property["postcode"][:len(property["postcode"])-3]
+
                 current_estimate = get_current_estimate(historic_prices[outcode][1][-1], predicted_prices[outcode][1][0])
                 estimates[outcode] = current_estimate
+
+                property_dict = {"property": {"adzuna": property}}
+
+                # placeholder
+                property_dict["property"]["investment"] = [{"type": "flip"}, {"market_value": 1300000}]
+
+                property_dict["historic_data"] = {"outcode": {"historic": {"x": historic_prices[outcode][0],
+                                                                           "y": historic_prices[outcode][1]}}}
+                property_dict["historic_data"]["outcode"]["predicted"] = {"x": predicted_prices[outcode][0],
+                                                                          "y": predicted_prices[outcode][1]}
+
+                property_dict["postcode"] = {"property": list(arp.query_by_postcode(property.get("postcode")))}
+                final_response.append(property_dict)
 
             for r in results:
                 img = r['image_url']
@@ -182,7 +197,7 @@ def query_property_listing():
                 if large:
                     r['image_url'] = large
 
-        return jsonify(results)
+        return jsonify(final_response)
     except AdzunaAuthorisationException:
         return jsonify({"error": 410})
     except AdzunaRequestFormatException:
@@ -192,6 +207,13 @@ def query_property_listing():
 
 
 def get_current_estimate(historic_month, predicted_month):
+    """
+    estimate the current value of a property
+
+    :param historic_month: predicted value from previous month
+    :param predicted_month: predicted value for next month
+    :return: estimated value
+    """
     today = int(time.strftime("%d"))
     delta = (predicted_month - historic_month)/30
     estimate = historic_month + (today * delta)
@@ -242,7 +264,6 @@ def get_existing_outcode_processing(results):
 
 
 if __name__ == '__main__':
-
     if DEVELOPMENT:
         app.run(host='0.0.0.0', port=5000, debug=True)
     else:
