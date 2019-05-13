@@ -47,7 +47,7 @@ def get_universities_near_location(location, distance):
         uni_long = uni[-1]
         uni_loc = (uni_lat, uni_long)
         km_away = geodesic(origin, uni_loc).kilometers
-        if km_away < distance:
+        if km_away < float(distance):
             nearby_unis.append(uni)
 
     return nearby_unis

@@ -9,6 +9,7 @@ from back_end.src import vision
 from uuid import uuid4
 import psycopg2.extras as psql_extras
 from back_end.src import geo_locations
+from copy import deepcopy
 
 adzuna = Adzuna()
 app = Flask(__name__)
@@ -74,9 +75,16 @@ def query_property_listing():
 
             nearby_unis = geo_locations.get_universities_near_location(params['where'], params['radius_from'])
 
+            # Searching for houses from each university
             for uni in nearby_unis:
-                pass
+                post = uni[3]
+                uni_params = deepcopy(params)
+                uni_params['where'] = post
+                uni_params['distance'] = params['km_away_from_uni']
 
+                
+                print(uni_params)
+                pass
 
             return jsonify(params)
         else:
