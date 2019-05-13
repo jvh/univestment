@@ -1,18 +1,13 @@
 import psycopg2
-from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, POSTGRES_PORT, \
-    DEVELOPMENT, POSTGRES_SUPER_PASSWORD, POSTGRES_IP
-from back_end.src.import_files import ImportFiles
-from sqlalchemy import create_engine
+from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, DEVELOPMENT, \
+    POSTGRES_SUPER_PASSWORD
 import pandas as pd
-
 from uuid import uuid4
 
 
 class DatabaseHandler:
-
-    def __init__(self, load_data=False):
-        if load_data:
-            self.database_commands()
+    # def __init__(self):
+    #     from back_end.src import geo_locations
 
     @staticmethod
     def create_pricing_table():
@@ -33,6 +28,21 @@ class DatabaseHandler:
             '   county TEXT' \
             ');'
         return house_price_data
+
+    @staticmethod
+    def create_prediction_table():
+        """
+        Schema for predictions_data (out codes only)
+
+        :return: string representing table field commands
+        """
+        predictions_data = \
+            'CREATE TABLE IF NOT EXISTS predictions_data (' \
+            '   outcode TEXT PRIMARY KEY, ' \
+            '   historical_data TEXT NOT NULL,' \
+            '   prediction_data TEXT NOT NULL' \
+            ');'
+        return predictions_data
 
     @staticmethod
     def create_admissions_table():
@@ -64,9 +74,26 @@ class DatabaseHandler:
             '   establishmentname TEXT NOT NULL,' \
             '   street TEXT,' \
             '   town TEXT,' \
-            '   postcode TEXT NOT NULL' \
+            '   postcode TEXT NOT NULL,' \
+            '   longitude FLOAT NOT NULL,' \
+            '   latitude FLOAT NOT NULL' \
             ');'
         return uni_addresses_data
+
+    @staticmethod
+    def create_img_thumbnail():
+        """
+        Schema for img_thumbnail_to_lrg
+
+        :return: string representing table field commands
+        """
+        img_thumbnail_to_lrg = \
+            'CREATE TABLE IF NOT EXISTS img_thumbnail_to_lrg (' \
+            '   id UUID PRIMARY KEY,' \
+            '   thumbnail_url TEXT NOT NULL,' \
+            '   lrg_url TEXT' \
+            ');'
+        return img_thumbnail_to_lrg
 
     @staticmethod
     def create_tables():
@@ -78,11 +105,16 @@ class DatabaseHandler:
         yield DatabaseHandler.create_pricing_table()
         yield DatabaseHandler.create_admissions_table()
         yield DatabaseHandler.create_uni_addresses_table()
+        yield DatabaseHandler.create_img_thumbnail()
+        yield DatabaseHandler.create_prediction_table()
 
     @staticmethod
-    def database_commands():
+    def insert_to_db(query, params=""):
         """
-        Create tables for all data sets if they do not already exist
+        Insert into a database
+
+        :param query: String representing query
+        :param params: Any additional parameters which are passed (in tuple format)
         """
         try:
             if DEVELOPMENT:
@@ -95,35 +127,20 @@ class DatabaseHandler:
                                               dbname=POSTGRES_DATABASE)
 
             cursor = connection.cursor()
-
-            # Creating tables
-            for table_command in DatabaseHandler.create_tables():
-                cursor.execute(table_command)
-
-            engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(POSTGRES_USERNAME, POSTGRES_PASSWORD,
-                                                                        POSTGRES_IP, POSTGRES_PORT,
-                                                                        POSTGRES_DATABASE))
-
-            connection.commit()
-
-            # Populate databases if not already populated
-            import_files = ImportFiles()
-            DatabaseHandler.fill_uni_addresses(engine, import_files)
-            DatabaseHandler.fill_admissions_data(engine, import_files)
-            DatabaseHandler.fill_house_data(engine, import_files)
-
+            cursor.execute(query, params)
             connection.commit()
             connection.close()
             cursor.close()
         except (Exception, psycopg2.Error) as error :
-            print ("Error connecting to postgres: ", error)
+            print("Error connecting to postgres: ", error)
 
     @staticmethod
-    def query_database(query):
+    def query_database(query, params=""):
         """
         Query the housing database and return all results
 
         :param query: String representing query
+        :param params: Any additional parameters which are passed (in tuple format)
         :return: list(Tuple) of returned results
         """
         try:
@@ -138,15 +155,17 @@ class DatabaseHandler:
 
             cursor = connection.cursor()
 
-            cursor.execute(query)
+            if not params:
+                cursor.execute(query)
+            else:
+                cursor.execute(query, params)
 
             result = cursor.fetchall()
-
             connection.close()
             cursor.close()
             return result
         except (Exception, psycopg2.Error) as error :
-            print ("Error connecting to postgres: ", error)
+            print("Error connecting to postgres: ", error)
 
     def postcode_query(self):
         pass
@@ -162,7 +181,7 @@ class DatabaseHandler:
         data = import_files.admissions_data
         data.columns = map(str.lower, data.columns)
         data['id'] = [uuid4() for _ in range(len(data.index))]
-        data.to_sql('admissions_data', engine, if_exists="replace", index=False)
+        data.to_sql('admissions_data', engine, if_exists="fail", index=False)
 
     @staticmethod
     def fill_uni_addresses(engine, import_files):
@@ -172,9 +191,21 @@ class DatabaseHandler:
         :param engine: database engine object
         :param import_files: ImportFiles object
         """
+        from back_end.src import geo_locations
+
         data = import_files.uni_addresses
         data.columns = map(str.lower, data.columns)
         data['id'] = [uuid4() for _ in range(len(data.index))]
+        longitude = []
+        latitude = []
+        data = data[pd.notnull(data['postcode'])]
+        for row in data['postcode']:
+            long, lat = geo_locations.get_coords_from_postcode(row)
+            longitude.append(long)
+            latitude.append(lat)
+        data['longitude'] = longitude
+        data['latitude'] = latitude
+
         data.to_sql('uni_addresses_data', engine, if_exists="replace", index=False)
 
     @staticmethod
@@ -200,12 +231,8 @@ class DatabaseHandler:
             chunked_data['postcode'] = chunked_data['postcode'].apply(lambda x: x.replace(" ",""))
             chunked_data['id'] = [uuid4() for _ in range(len(chunked_data.index))]
 
-            chunked_data.to_sql('house_price_data', engine, if_exists="append", index=False)
+            chunked_data.to_sql('house_price_data', engine, if_exists="fail", index=False)
 
             print("chunk interval done: {}".format(count))
             count = count + 1
         print("finished importing house price data. yay")
-
-
-if __name__ == "__main__":
-    db = DatabaseHandler(load_data=False)

@@ -56,7 +56,8 @@ class ImportFiles:
         :return: dataframe
         """
         try:
-            return self.read_file('university_addresses/university_addresses.csv')
+            file = self.read_file('university_addresses/university_addresses.csv')
+            return file
         except FileNotFoundError:
             return None
 
@@ -97,8 +98,3 @@ class ImportFiles:
                                   names=names)
         except FileNotFoundError:
             return None
-
-
-# if __name__ == '__main__':
-#     imp = ImportFiles()
-#     print()

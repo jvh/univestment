@@ -92,6 +92,8 @@ You must install [Node.js](https://nodejs.org/en/download/) for use on the local
 
 Please see README.md in `front_end` for information on front-end usage.
 
+We are using the Adzuna API in order to access current property listings. An example of the Adzuna API is as follows: `https://api.adzuna.com/v1/api/property/gb/search/1/?app_id=INSERT_APP_ID&app_key=INSERT_APP_KEY&category=for-sale&results_per_page=10&where=SO173RZ`
+
 ## Extensions
 
 Using news sources to further aid estimation of future trends
