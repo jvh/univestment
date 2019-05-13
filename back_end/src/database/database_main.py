@@ -16,9 +16,12 @@ def database_commands(load_data=False):
                                           password=POSTGRES_SUPER_PASSWORD,
                                           dbname=POSTGRES_DATABASE)
         else:
-            connection = psycopg2.connect(user=POSTGRES_USERNAME,
-                                          password=POSTGRES_PASSWORD,
+            connection = psycopg2.connect(user=POSTGRES_SUPER,
+                                          password=POSTGRES_SUPER_PASSWORD,
                                           dbname=POSTGRES_DATABASE)
+            # connection = psycopg2.connect(user=POSTGRES_USERNAME,
+            #                               password=POSTGRES_PASSWORD,
+            #                               dbname=POSTGRES_DATABASE)
 
         cursor = connection.cursor()
 

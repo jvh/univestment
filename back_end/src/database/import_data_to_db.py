@@ -6,8 +6,8 @@ from uuid import uuid4
 
 
 class DatabaseHandler:
-    def __init__(self):
-        from back_end.src import geo_locations
+    # def __init__(self):
+    #     from back_end.src import geo_locations
 
     @staticmethod
     def create_pricing_table():
@@ -191,6 +191,8 @@ class DatabaseHandler:
         :param engine: database engine object
         :param import_files: ImportFiles object
         """
+        from back_end.src import geo_locations
+
         data = import_files.uni_addresses
         data.columns = map(str.lower, data.columns)
         data['id'] = [uuid4() for _ in range(len(data.index))]
@@ -198,7 +200,7 @@ class DatabaseHandler:
         latitude = []
         data = data[pd.notnull(data['postcode'])]
         for row in data['postcode']:
-            long, lat = self.geo_locations.get_coords_from_postcode(row)
+            long, lat = geo_locations.get_coords_from_postcode(row)
             longitude.append(long)
             latitude.append(lat)
         data['longitude'] = longitude
