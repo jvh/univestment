@@ -30,6 +30,21 @@ class DatabaseHandler:
         return house_price_data
 
     @staticmethod
+    def create_prediction_table():
+        """
+        Schema for predictions_data (out codes only)
+
+        :return: string representing table field commands
+        """
+        predictions_data = \
+            'CREATE TABLE IF NOT EXISTS predictions_data (' \
+            '   id UUID PRIMARY KEY, ' \
+            '   historical_data TEXT NOT NULL,' \
+            '   prediction_data TEXT NOT NULL' \
+            ');'
+        return predictions_data
+
+    @staticmethod
     def create_admissions_table():
         """
         Schema for the university admissions data
@@ -91,6 +106,7 @@ class DatabaseHandler:
         yield DatabaseHandler.create_admissions_table()
         yield DatabaseHandler.create_uni_addresses_table()
         yield DatabaseHandler.create_img_thumbnail()
+        yield DatabaseHandler.create_prediction_table()
 
     @staticmethod
     def insert_to_db(query, params=""):
