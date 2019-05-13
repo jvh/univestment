@@ -150,13 +150,14 @@ def query_property_listing():
             params = format_params(params)
             property_listing = adzuna.get_property_listing(params)
             results = property_listing.get("results")
+            print()
 
         if not results:
             return jsonify({"error": "No results returned"})
         else:
             results = large_images_only(results)
             property_dict = build_property_dict(results)
-            final_response.append(property_dict)
+            final_response = property_dict
 
             for r in results:
                 img = r['image_url']
@@ -189,6 +190,7 @@ def query_property_listing():
 def build_property_dict(results):
     historic_prices, predicted_prices = get_existing_outcode_processing(results)
     estimates = {}
+    final_list = []
     for property in results:
         outcode = property["postcode"][:len(property["postcode"]) - 3]
 
@@ -206,7 +208,8 @@ def build_property_dict(results):
                                                                   "y": predicted_prices[outcode][1]}
 
         property_dict["postcode"] = {"property": list(arp.query_by_postcode(property.get("postcode")))}
-        return property_dict
+        final_list.append(property_dict)
+    return final_list
 
 
 def get_current_estimate(historic_month, predicted_month):
