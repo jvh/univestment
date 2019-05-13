@@ -5,7 +5,7 @@ from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
     AdzunaAuthorisationException, AdzunaRequestFormatException
 from back_end.src.database.import_data_to_db import DatabaseHandler
 from back_end.src.response_processing import AdzunaResponseProcessor
-
+import json
 from back_end.src import DEVELOPMENT
 from back_end.src import vision
 from uuid import uuid4
@@ -53,7 +53,7 @@ def test_data():
 
 db = DatabaseHandler()
 arp = AdzunaResponseProcessor()
-
+from back_end.src import ROOT_DIR
 @app.route('/search')
 def query_property_listing():
     """
@@ -87,14 +87,16 @@ def query_property_listing():
                 property_listing = adzuna.get_property_listing(uni_params)
                 results = property_listing.get("results")
 
-
-                print(results)
                 pass
 
             return jsonify(params)
         else:
             property_listing = adzuna.get_property_listing(params)
             results = property_listing.get("results")
+
+            historic_prices, predicted_prices = get_existing_outcode_processing(results)
+            print(historic_prices)
+            print(predicted_prices)
 
             for r in results:
                 img = r['image_url']
@@ -124,7 +126,52 @@ def query_property_listing():
         return jsonify({"error": 500})
 
 
+def get_existing_outcode_processing(results):
+    """
+    Given an outcode, determine if the outcode has already undergone preprocessing. If it has, return the result from
+    the database
+    """
+    outcodes = set()
+    for x in results:
+        postcode = x.get("postcode")
+        if postcode:
+            outcode = postcode[0:len(postcode)-3]
+            outcodes.add(outcode)
+
+    arp.query_by_outcode(outcodes)
+    historic_prices = {}
+    predicted_prices = {}
+    for outcode in outcodes:
+        query_results = arp.query_for_price_data(outcode)
+
+        historic_data = query_results[0][0].split(":")
+        historic_months = historic_data[0]
+        historic_averages = historic_data[1]
+
+        historic_months = historic_months[1:len(historic_months)-1].split(",")
+        historic_averages = historic_averages[1:len(historic_averages)-1].split(",")
+
+        historic_months = list(map(lambda x: int(x), historic_months))
+        historic_averages = list(map(lambda x: float(x), historic_averages))
+
+        predicted_data = query_results[0][1].split(":")
+        predicted_months = predicted_data[0]
+        predicted_averages = predicted_data[1]
+
+        predicted_months = predicted_months[1:len(predicted_months) - 1].split(",")
+        predicted_averages = predicted_averages[1:len(predicted_averages) - 1].split(",")
+
+        predicted_months = list(map(lambda x: int(x), predicted_months))
+        predicted_averages = list(map(lambda x: float(x), predicted_averages))
+
+        historic_prices[outcode] = (historic_months, historic_averages)
+        predicted_prices[outcode] = (predicted_months, predicted_averages)
+    return historic_prices, predicted_prices
+
+
+
 if __name__ == '__main__':
+
     if DEVELOPMENT:
         app.run(host='0.0.0.0', port=5000, debug=True)
     else:
