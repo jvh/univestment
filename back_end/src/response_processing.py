@@ -9,19 +9,25 @@ class AdzunaResponseProcessor:
     def __init__(self):
         self.db = DatabaseHandler
 
-    def query_by_poscode(self, response_data):
+    def query_by_postcode(self, postcode):
         """
         Query database for properties by postcode
 
         :param response_data: response object containing parameters
         :return:
         """
-        postcode = response_data.get("postcode")
-        query_results_street = self.db.query_database("SELECT * FROM house_price_data WHERE "
-                                                      "postcode = '{}' ORDER BY date_of_transfer;".format(postcode))
-        return query_results_street
+        query = "SELECT * FROM house_price_data WHERE postcode = '{}' ORDER BY date_of_transfer;".format(postcode)
+        results = DatabaseHandler.query_database(query)
+        return results
 
-    def query_by_outcode(self, response_data):
+    def query_for_price_data(self, outcode):
+        #print(outcode)
+        query = "SELECT historical_data, prediction_data FROM predictions_data WHERE outcode = '{}';".format(outcode)
+        results = DatabaseHandler.query_database(query)
+        #print(results)
+        return results
+
+    def query_by_outcode(self, outcodes):
         """
         Query database for properties by outcode
 
@@ -30,18 +36,22 @@ class AdzunaResponseProcessor:
         """
         #returned_house_prices_street = []
         #returned_house_prices_area = []
-        for response in response_data:
-            postcode = response.get("postcode")
-            outcode = postcode[0:len(postcode)-3]
-            if postcode is not None:
+        for outcode in outcodes:
+            query = "SELECT outcode FROM predictions_data WHERE outcode = '{}'".format(outcode)
+            result = DatabaseHandler.query_database(query)
+
+            if not result:
                 query_results_area = self.db.query_database("SELECT * FROM house_price_data WHERE substr(postcode,1,{})"
                                                             " = '{}' ORDER BY date_of_transfer;"
-                                                            .format(len(postcode)-3, outcode))
+                                                            .format(len(outcode), outcode))
 
-                #returned_house_prices_area = returned_house_prices_area + query_results_area
-
-                points, price = self.generate_prediction(query_results_area)
-                return points, price, query_results_area
+                # returned_house_prices_area = returned_house_prices_area + query_results_area
+                if query_results_area:
+                    start_date, historic_data, predicted_data = self.generate_prediction(query_results_area)
+                    #print("{} {} {}".format(start_date, historic_data, predicted_data))
+                    #print("inserting: {} {} {} {}".format(outcode, start_date, historic_data, predicted_data))
+                    self.insert_predictions(outcode, start_date, historic_data, predicted_data)
+                    #return points, price, query_results_area
 
     def generate_prediction(self, data):
         """
@@ -68,32 +78,49 @@ class AdzunaResponseProcessor:
         #predict next 24 months
         predictions = model_fit.predict(len(pricing_data["price"]), len(pricing_data["price"]) + 23)
 
-        points = pricing_data.index.to_series().apply(lambda x: pricing_data.datetime.strftime(x, '%m')).tolist()
-        time_points = self.generate_date_points(points)
-        time_points += [i+len(time_points)+1 for i in range(24)]
-        final_prices = pricing_data["prices"] + predictions.tolist()
-        return time_points, final_prices
+        start_date = pricing_data.index.to_series().tolist()[0]
+        #print('-----------------------')
+        #print(pricing_data.index)
+
+        historic_points = pricing_data.index.to_series().apply(lambda x: pd.datetime.strftime(x, '%m:%Y'))\
+            .tolist()
+        historic_points = self.generate_date_points(historic_points)
+        predicted_points = [i+len(historic_points)+1 for i in range(24)]
+
+        historic_prices = pricing_data["price"].tolist()
+        predicted_prices = predictions.tolist()
+
+        historic_data = (historic_points, historic_prices)
+        predicted_data = (predicted_points, predicted_prices)
+
+        return start_date, historic_data, predicted_data
+
+    @staticmethod
+    def insert_predictions(outcode, start_date, historic, predictions):
+        historic_data = str(historic[0]) + ":" + str(historic[1])
+        predictions_data = str(predictions[0]) + ":" + str(predictions[1])
+        params = (outcode, start_date, historic_data, predictions_data)
+        #print(params[2])
+        query = "INSERT INTO predictions_data VALUES (%s, %s, %s, %s)"
+        DatabaseHandler.insert_to_db(query, params)
 
     @staticmethod
     def generate_date_points(dates):
         """
         generate date points for timeseries
 
-        :param dates: list(datetime)
+        :param dates: list(String)
         :return: list(int)
         """
+        current_year = int(dates[0].split(":")[1])
+        year_modifier = 0
         points = []
-        counter = 1
-        last_month = 0
-        for date in dates:
-            if date == 12:
-                last_month = 0
-                points.append(counter)
-                counter += 1
-            elif date != last_month + 1:
-                last_month += 1
-            else:
-                points.append(counter)
-                counter += 1
 
+        for date in dates:
+            year = int(date.split(":")[1])
+            if year > current_year:
+                year_modifier += 12 * (year-current_year)
+                current_year = year
+            current_point = int(date.split(":")[0])
+            points.append(current_point+year_modifier)
         return points
