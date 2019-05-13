@@ -7,6 +7,8 @@ enum34==1.1.6
 Flask==1.0.2
 Flask-Cors==3.0.7
 Flask-RESTful==0.3.7
+geographiclib==1.49
+geopy==1.19.0
 google-api-core==1.10.0
 google-auth==1.6.3
 google-cloud-vision==0.36.0
