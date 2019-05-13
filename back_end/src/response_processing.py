@@ -9,36 +9,55 @@ class AdzunaResponseProcessor:
     def __init__(self):
         self.db = DatabaseHandler
 
-    def query_by_postcode(self, response_data):
+    def query_by_poscode(self, response_data):
         """
-        Query database for postcodes
+        Query database for properties by postcode
 
-        :param response_data:
+        :param response_data: response object containing parameters
         :return:
         """
-        returned_house_prices_street = []
-        returned_house_prices_area = []
+        postcode = response_data.get("postcode")
+        query_results_street = self.db.query_database("SELECT * FROM house_price_data WHERE "
+                                                      "postcode = '{}' ORDER BY date_of_transfer;".format(postcode))
+        return query_results_street
+
+    def query_by_outcode(self, response_data):
+        """
+        Query database for properties by outcode
+
+        :param response_data: response object containing parameters
+        :return:
+        """
+        #returned_house_prices_street = []
+        #returned_house_prices_area = []
         for response in response_data:
             postcode = response.get("postcode")
+            outcode = postcode[0:len(postcode)-3]
             if postcode is not None:
-                query_results_street = self.db.query_database("SELECT * FROM house_price_data WHERE "
-                                                       "postcode = '{}' ORDER BY date_of_transfer;".format(postcode))
-                query_results_area = self.db.query_database("SELECT * FROM house_price_data WHERE substr(postcode,1,{}) "
-                                                            "= '{}' ORDER BY date_of_transfer;".format(len(postcode)-3, postcode[0:len(postcode)-3]))
-                returned_house_prices_street = returned_house_prices_street + query_results_street
-                returned_house_prices_area = returned_house_prices_area + query_results_area
+                query_results_area = self.db.query_database("SELECT * FROM house_price_data WHERE substr(postcode,1,{})"
+                                                            " = '{}' ORDER BY date_of_transfer;"
+                                                            .format(len(postcode)-3, outcode))
 
-                points, price = self.generate_prediction(returned_house_prices_area)
-                return points, price, returned_house_prices_street
+                #returned_house_prices_area = returned_house_prices_area + query_results_area
+
+                points, price = self.generate_prediction(query_results_area)
+                return points, price, query_results_area
 
     def generate_prediction(self, data):
+        """
+        Create and train a autoregressive model and predict property prices for the next 24 months
+
+        :param data:
+        :return: list(int) of points, list(int) of prices
+        """
         pricing_data = pd.DataFrame(data)
         pricing_data = pricing_data.drop(columns=[0, 3, 4, 5, 6, 7])
         pricing_data.rename(columns={1: "price", 2: "date"}, inplace=True)
         pricing_data.date = pd.to_datetime(pricing_data.date, infer_datetime_format=True)
 
         #Remove outliers (more than 3 s.d. from mean)
-        pricing_data = pricing_data[np.abs(pricing_data.price - pricing_data.price.mean()) <= (3 * pricing_data.price.std())]
+        pricing_data = pricing_data[np.abs(pricing_data.price - pricing_data.price.mean())
+                                    <= (3 * pricing_data.price.std())]
         pricing_data.set_index(pricing_data.date, inplace=True)
         pricing_data = pricing_data.groupby(pd.Grouper(freq='M')).mean().dropna()
 
@@ -57,6 +76,12 @@ class AdzunaResponseProcessor:
 
     @staticmethod
     def generate_date_points(dates):
+        """
+        generate date points for timeseries
+
+        :param dates: list(datetime)
+        :return: list(int)
+        """
         points = []
         counter = 1
         last_month = 0
