@@ -39,6 +39,7 @@ class DatabaseHandler:
         predictions_data = \
             'CREATE TABLE IF NOT EXISTS predictions_data (' \
             '   outcode TEXT PRIMARY KEY, ' \
+            '   start_date DATE NOT NULL,'  \
             '   historical_data TEXT NOT NULL,' \
             '   prediction_data TEXT NOT NULL' \
             ');'

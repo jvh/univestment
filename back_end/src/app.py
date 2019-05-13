@@ -4,12 +4,16 @@ from flask_cors import CORS
 from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
     AdzunaAuthorisationException, AdzunaRequestFormatException
 from back_end.src.database.import_data_to_db import DatabaseHandler
+from back_end.src.response_processing import AdzunaResponseProcessor
+
 from back_end.src import DEVELOPMENT
 from back_end.src import vision
 from uuid import uuid4
 import psycopg2.extras as psql_extras
 from back_end.src import geo_locations
 from copy import deepcopy
+import time
+
 
 adzuna = Adzuna()
 app = Flask(__name__)
@@ -93,6 +97,9 @@ def format_params(params):
     return params
 
 
+db = DatabaseHandler()
+arp = AdzunaResponseProcessor()
+
 @app.route('/search')
 def query_property_listing():
     """
@@ -139,6 +146,7 @@ def query_property_listing():
                     r['university'] = uni[0]
                     if r not in properties:
                         properties.append(r)
+
         else:
             params = format_params(params)
             property_listing = adzuna.get_property_listing(params)
@@ -148,6 +156,32 @@ def query_property_listing():
             return jsonify({"error": "No results returned"})
         else:
             results = large_images_only(results)
+            historic_prices, predicted_prices = get_existing_outcode_processing(results)
+            estimates = {}
+            for property in results:
+                outcode = property["postcode"][:len(property["postcode"])-3]
+                current_estimate = get_current_estimate(historic_prices[outcode][1][-1], predicted_prices[outcode][1][0])
+                estimates[outcode] = current_estimate
+
+            for r in results:
+                img = r['image_url']
+                query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
+                result = DatabaseHandler.query_database(query)
+
+                if result:
+                    large = result[0][-1]
+                # Doesn't exist in the DB, place in there
+                else:
+                    large = vision.get_large_from_thumbnail(img)
+                    gen_id = uuid4()
+                    gen_id = psql_extras.UUID_adapter(gen_id)
+                    params = (gen_id, img, large)
+                    query = "INSERT INTO img_thumbnail_to_lrg VALUES (%s, %s, %s);"
+                    DatabaseHandler.insert_to_db(query, params)
+
+                if large:
+                    r['image_url'] = large
+
         return jsonify(results)
     except AdzunaAuthorisationException:
         return jsonify({"error": 410})
@@ -157,7 +191,58 @@ def query_property_listing():
         return jsonify({"error": 500})
 
 
+def get_current_estimate(historic_month, predicted_month):
+    today = int(time.strftime("%d"))
+    delta = (predicted_month - historic_month)/30
+    estimate = historic_month + (today * delta)
+    return estimate
+
+
+def get_existing_outcode_processing(results):
+    """
+    Given an outcode, determine if the outcode has already undergone preprocessing. If it has, return the result from
+    the database
+    """
+    outcodes = set()
+    for x in results:
+        postcode = x.get("postcode")
+        if postcode:
+            outcode = postcode[0:len(postcode)-3]
+            outcodes.add(outcode)
+
+    arp.query_by_outcode(outcodes)
+    historic_prices = {}
+    predicted_prices = {}
+    for outcode in outcodes:
+        query_results = arp.query_for_price_data(outcode)
+
+        historic_data = query_results[0][0].split(":")
+        historic_months = historic_data[0]
+        historic_averages = historic_data[1]
+
+        historic_months = historic_months[1:len(historic_months)-1].split(",")
+        historic_averages = historic_averages[1:len(historic_averages)-1].split(",")
+
+        historic_months = list(map(lambda x: int(x), historic_months))
+        historic_averages = list(map(lambda x: float(x), historic_averages))
+
+        predicted_data = query_results[0][1].split(":")
+        predicted_months = predicted_data[0]
+        predicted_averages = predicted_data[1]
+
+        predicted_months = predicted_months[1:len(predicted_months) - 1].split(",")
+        predicted_averages = predicted_averages[1:len(predicted_averages) - 1].split(",")
+
+        predicted_months = list(map(lambda x: int(x), predicted_months))
+        predicted_averages = list(map(lambda x: float(x), predicted_averages))
+
+        historic_prices[outcode] = (historic_months, historic_averages)
+        predicted_prices[outcode] = (predicted_months, predicted_averages)
+    return historic_prices, predicted_prices
+
+
 if __name__ == '__main__':
+
     if DEVELOPMENT:
         app.run(host='0.0.0.0', port=5000, debug=True)
     else:
