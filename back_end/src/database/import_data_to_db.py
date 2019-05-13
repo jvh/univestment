@@ -183,8 +183,8 @@ class DatabaseHandler:
         data['id'] = [uuid4() for _ in range(len(data.index))]
         data.to_sql('admissions_data', engine, if_exists="fail", index=False)
 
-    # @staticmethod
-    def fill_uni_addresses(self, engine, import_files):
+    @staticmethod
+    def fill_uni_addresses(engine, import_files):
         """
         Store university address data in uni_addresses_data table
 
