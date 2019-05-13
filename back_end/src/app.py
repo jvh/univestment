@@ -84,8 +84,11 @@ def query_property_listing():
                 uni_params['where'] = post
                 uni_params['distance'] = params['km_away_from_uni']
 
-                
-                print(uni_params)
+                property_listing = adzuna.get_property_listing(uni_params)
+                results = property_listing.get("results")
+
+
+                print(results)
                 pass
 
             return jsonify(params)
