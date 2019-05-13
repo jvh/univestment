@@ -168,7 +168,7 @@ def query_property_listing():
                     large = result[0][-1]
                 # Doesn't exist in the DB, place in there
                 else:
-                    large = vision.get_large_from_thumbnail(img)
+                    #large = vision.get_large_from_thumbnail(img)
                     gen_id = uuid4()
                     gen_id = psql_extras.UUID_adapter(gen_id)
                     params = (gen_id, img, large)
@@ -192,6 +192,9 @@ def build_property_dict(results):
     estimates = {}
     final_list = []
     for property in results:
+        if "postcode" not in property:
+            continue
+
         outcode = property["postcode"][:len(property["postcode"]) - 3]
 
         current_estimate = get_current_estimate(historic_prices[outcode][1][-1], predicted_prices[outcode][1][0])
