@@ -15,6 +15,12 @@ adzuna = Adzuna()
 app = Flask(__name__)
 CORS(app)
 
+# Valid parameters for adzuna
+valid_adzuna_params = {'country', 'app_id', 'app_key', 'page', 'results_per_page', 'what', 'what_and', 'what_phrase',
+                'what_or', 'what_exclude', 'title_only', 'location0', 'location1', 'location2', 'location3',
+                'location4', 'location5	', 'location6', 'location7', 'where', ' distance', 'max_days_old',
+                'category', 'sort_direction', 'sort_by', 'beds', 'is_furnished', 'price_min', 'price_max',
+                'price_include_unknown', 'property_type'}
 
 @app.route('/')
 def hello_world():
@@ -52,6 +58,28 @@ def test_data():
 db = DatabaseHandler()
 
 
+def large_images_only():
+    """
+
+
+    :return:
+    """
+    pass
+
+
+def format_params(params):
+    """
+    Formats a set of given parameters for use by adzuna
+
+    :param params: The params requiring formatting
+    :return: Params which are now able to be used to adzuna
+    """
+    for p in deepcopy(params):
+        if p not in valid_adzuna_params:
+            del params[p]
+    return params
+
+
 @app.route('/search')
 def query_property_listing():
     """
@@ -60,7 +88,7 @@ def query_property_listing():
     :return: Property listing
     """
     params = request.args.to_dict()
-
+    results = []
     try:
         # If the user has selected they're searching for student rental opportunities
         if "search_student_lets" in params and params["search_student_lets"] == 'true':
@@ -75,6 +103,9 @@ def query_property_listing():
 
             nearby_unis = geo_locations.get_universities_near_location(params['where'], params['radius_from'])
 
+            if not nearby_unis:
+                return jsonify({"error": "No universities within area specified."})
+
             # Searching for houses from each university
             for uni in nearby_unis:
                 post = uni[3]
@@ -82,19 +113,29 @@ def query_property_listing():
                 uni_params['where'] = post
                 uni_params['distance'] = params['km_away_from_uni']
 
+                # Formatting parameters for use by adzuna
+                uni_params = format_params(uni_params)
                 property_listing = adzuna.get_property_listing(uni_params)
                 results = property_listing.get("results")
 
+                #UNIS
+                # results
 
-                print(results)
-                pass
-
-            return jsonify(params)
+            #     return jsonify(results)
+            #
+            #     print(results)
+            #     pass
+            #
+            # return jsonify(params)
         else:
             property_listing = adzuna.get_property_listing(params)
             results = property_listing.get("results")
 
-            for r in results:
+            # The results which don't have a large image
+            small_images = []
+
+            for i in range(len(results)):
+                r = results[i]
                 img = r['image_url']
                 query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
                 result = DatabaseHandler.query_database(query)
@@ -112,7 +153,15 @@ def query_property_listing():
 
                 if large:
                     r['image_url'] = large
+                else:
+                    small_images.append(r)
 
+            # Removing results with only small images
+            for s in small_images:
+                results.remove(s)
+
+        if not results:
+            return jsonify({"error": "No results returned"})
         return jsonify(results)
     except AdzunaAuthorisationException:
         return jsonify({"error": 410})
@@ -123,6 +172,7 @@ def query_property_listing():
 
 
 if __name__ == '__main__':
+    print(DEVELOPMENT)
     if DEVELOPMENT:
         app.run(host='0.0.0.0', port=5000, debug=True)
     else:
