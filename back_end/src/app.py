@@ -154,29 +154,9 @@ def query_property_listing():
         if not results:
             return jsonify({"error": "No results returned"})
         else:
-            #results = large_images_only(results)
-            historic_prices, predicted_prices = get_existing_outcode_processing(results)
-            estimates = {}
-            for property in results:
-
-
-                outcode = property["postcode"][:len(property["postcode"])-3]
-
-                current_estimate = get_current_estimate(historic_prices[outcode][1][-1], predicted_prices[outcode][1][0])
-                estimates[outcode] = current_estimate
-
-                property_dict = {"property": {"adzuna": property}}
-
-                # placeholder
-                property_dict["property"]["investment"] = [{"type": "flip"}, {"market_value": 1300000}]
-
-                property_dict["historic_data"] = {"outcode": {"historic": {"x": historic_prices[outcode][0],
-                                                                           "y": historic_prices[outcode][1]}}}
-                property_dict["historic_data"]["outcode"]["predicted"] = {"x": predicted_prices[outcode][0],
-                                                                          "y": predicted_prices[outcode][1]}
-
-                property_dict["postcode"] = {"property": list(arp.query_by_postcode(property.get("postcode")))}
-                final_response.append(property_dict)
+            results = large_images_only(results)
+            property_dict = build_property_dict(results)
+            final_response.append(property_dict)
 
             for r in results:
                 img = r['image_url']
@@ -204,6 +184,29 @@ def query_property_listing():
         return jsonify({"error": 400})
     except AdzunaAPIException:
         return jsonify({"error": 500})
+
+
+def build_property_dict(results):
+    historic_prices, predicted_prices = get_existing_outcode_processing(results)
+    estimates = {}
+    for property in results:
+        outcode = property["postcode"][:len(property["postcode"]) - 3]
+
+        current_estimate = get_current_estimate(historic_prices[outcode][1][-1], predicted_prices[outcode][1][0])
+        estimates[outcode] = current_estimate
+
+        property_dict = {"property": {"adzuna": property}}
+
+        # placeholder
+        property_dict["property"]["investment"] = {"market_value": current_estimate}
+
+        property_dict["historic_data"] = {"outcode": {"historic": {"x": historic_prices[outcode][0],
+                                                                   "y": historic_prices[outcode][1]}}}
+        property_dict["historic_data"]["outcode"]["predicted"] = {"x": predicted_prices[outcode][0],
+                                                                  "y": predicted_prices[outcode][1]}
+
+        property_dict["postcode"] = {"property": list(arp.query_by_postcode(property.get("postcode")))}
+        return property_dict
 
 
 def get_current_estimate(historic_month, predicted_month):
