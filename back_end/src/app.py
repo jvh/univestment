@@ -353,11 +353,21 @@ def query_property_listing():
     :return: Property listing
     """
     params = request.args.to_dict()
+    # The params collected exclusively for preprocessing
+    preprocessing_params = {}
+    if 'where' in params:
+        preprocessing_params['where'] = params['where']
+    if 'distance' in params:
+        preprocessing_params['distance'] = params['distance']
+    if 'km_away_from_uni' in params:
+        preprocessing_params['km_away_from_uni'] = params['km_away_from_uni']
+    if 'radius_from' in params:
+        preprocessing_params['radius_from'] = params['radius_from']
 
     # Converting the parameters to a hash (that is deterministic)
     string_to_hash = []
-    for p in sorted(params):
-        string_to_hash.append(p + '&' + params[p])
+    for p in sorted(preprocessing_params):
+        string_to_hash.append(p + '&' + preprocessing_params[p])
     string_to_hash = ';'.join(string_to_hash)
     query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
     query_id = psql_extras.UUID_adapter(query_id)
