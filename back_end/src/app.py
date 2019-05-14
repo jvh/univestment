@@ -24,7 +24,7 @@ arp = AdzunaResponseProcessor()
 # Valid parameters for adzuna
 valid_adzuna_params = {'country', 'app_id', 'app_key', 'page', 'results_per_page', 'what', 'what_and', 'what_phrase',
                 'what_or', 'what_exclude', 'title_only', 'location0', 'location1', 'location2', 'location3',
-                'location4', 'location5	', 'location6', 'location7', 'where', ' distance', 'max_days_old',
+                'location4', 'location5	', 'location6', 'location7', 'where', 'distance', 'max_days_old',
                 'category', 'sort_direction', 'sort_by', 'beds', 'is_furnished', 'price_min', 'price_max',
                 'price_include_unknown', 'property_type'}
 
@@ -348,6 +348,20 @@ def get_all_listings(params):
     return property_listing
 
 
+def format_results(results, params):
+    """
+    Formats results such that we only return ones which are appropriate
+    """
+    if 'beds' in params:
+        beds = params['beds']
+    if 'price_min' in params:
+        min_price = params['price_min']
+    if 'price_max' in params:
+        max_price = params['price_max']
+
+    return results
+
+
 @app.route('/search')
 def query_property_listing():
     """
@@ -366,6 +380,8 @@ def query_property_listing():
         preprocessing_params['km_away_from_uni'] = params['km_away_from_uni']
     if 'radius_from' in params:
         preprocessing_params['radius_from'] = params['radius_from']
+
+    print(preprocessing_params)
 
     # Converting the parameters to a hash (that is deterministic)
     string_to_hash = []
@@ -406,7 +422,7 @@ def query_property_listing():
 
                 print("Populating seen_queries and seen_adverts tables...")
                 # Populates seen_queries and seen_adverts tables with results of query
-                populate_seen_tables(results, large_images, query_id, params)
+                populate_seen_tables(results, large_images, query_id, preprocessing_params)
 
                 # The final results after processing
                 final_result = large_images
@@ -418,9 +434,11 @@ def query_property_listing():
         except AdzunaAPIException:
             return jsonify({"error": 500})
 
+    formatted_results = format_results(final_result, params)
+
     print("Building the machine learning model for outcodes...")
     # Builds the results with other metadata into a format to be consumed by frontend
-    property_dict = build_property_dict(final_result)
+    property_dict = build_property_dict(formatted_results)
     print("Finished.")
     return jsonify(property_dict)
 

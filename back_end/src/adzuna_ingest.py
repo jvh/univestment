@@ -66,7 +66,7 @@ class Adzuna:
         count = int(r['count'])
         number_pages = math.ceil(count / 50)
 
-        for i in range(2, number_pages):
+        for i in range(2, 5):
             page_number = i
             url = self.API_URL + str(page_number)
 
