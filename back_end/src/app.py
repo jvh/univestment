@@ -235,6 +235,17 @@ def populate_seen_tables(results, large_images, query_id, params):
     DatabaseHandler.insert_to_db(add_query, args)
 
 
+def get_all_listings():
+    """
+    Currently, Adzuna only allows for up to 50 results per 'page'. The issue is that the results can be far, far more
+    than only 50 properties. This leads to an issue whereby properties are lost and unaccounted for when searching.
+
+    This method rectifies this issue by looping through these pages and obtaining all results (not just a subset)
+
+    :return:
+    """
+    pass
+
 @app.route('/search')
 def query_property_listing():
     """
@@ -276,6 +287,8 @@ def query_property_listing():
             else:
                 # If the user hasn't specified they are exclusively looking for student homes
                 params = format_params(params)
+
+                # Getting the results from Adzuna
                 property_listing = adzuna.get_property_listing(params)
                 results = property_listing.get("results")
 
