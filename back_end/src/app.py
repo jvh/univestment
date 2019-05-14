@@ -200,12 +200,15 @@ def get_property_args(p, large_images):
     """
     uni = None
     lrg = False
+    p_type = 'N/A'
     if 'university' in p:
         uni = p['university']
     if p in large_images:
         lrg = True
+    if 'property_type' in p:
+        p_type = p['property_type']
     params = (p['id'], p['beds'], p['description'], p['image_url'], p['is_furnished'], p['latitude'], p['longitude'],
-              p['postcode'], p['property_type'], p['redirect_url'], p['sale_price'], p['title'], uni, lrg)
+              p['postcode'], p_type, p['redirect_url'], p['sale_price'], p['title'], uni, lrg)
     return params
 
 
