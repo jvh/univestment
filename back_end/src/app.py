@@ -150,6 +150,15 @@ def get_properties_near_unis(params):
     :param params: The parameters passed
     :return: The list of properties near the universities
     """
+    if "where" not in params:
+        raise Exception("Please enter a postcode.")
+    elif "radius_from" not in params:
+        raise Exception("Please enter a radius away from the location you have specified in which to search "
+                        "against.")
+    elif "km_away_from_uni" not in params:
+        raise Exception("Please enter the distance from any given university (in km) that you would like to "
+                        "search houses for.")
+
     nearby_unis = geo_locations.get_universities_near_location(params['where'], params['radius_from'])
 
     if not nearby_unis:
@@ -233,74 +242,6 @@ def populate_seen_tables(results, large_images, query_id, params):
     add_query = "INSERT INTO seen_queries VALUES (%s, %s, %s, DEFAULT);"
     args = (query_id, str(params), ' '.join(str(e) for e in property_id_list))
     DatabaseHandler.insert_to_db(add_query, args)
-
-
-@app.route('/search')
-def query_property_listing():
-    """
-    Query the Adzuna API for property listings using the received parameters
-
-    :return: Property listing
-    """
-    params = request.args.to_dict()
-
-    # Converting the parameters to a hash (that is deterministic)
-    string_to_hash = []
-    for p in sorted(params):
-        string_to_hash.append(p + '&' + params[p])
-    string_to_hash = ';'.join(string_to_hash)
-    query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
-    query_id = psql_extras.UUID_adapter(query_id)
-
-    # If query has already been processed, get results
-    already_processed = query_already_processed(query_id)
-
-    if already_processed:
-        # The final results after processing
-        final_result = already_processed
-    else:
-        # Query has not been processed before and therefore must be processed as new
-        try:
-            # If the user has selected they're searching for student rental opportunities
-            if "search_student_lets" in params and params["search_student_lets"] == 'true':
-                if "where" not in params:
-                    raise Exception("Please enter a postcode.")
-                elif "radius_from" not in params:
-                    raise Exception("Please enter a radius away from the location you have specified in which to search "
-                                    "against.")
-                elif "km_away_from_uni" not in params:
-                    raise Exception("Please enter the distance from any given university (in km) that you would like to "
-                                    "search houses for.")
-
-                results = get_properties_near_unis(params)
-            else:
-                # If the user hasn't specified they are exclusively looking for student homes
-                params = format_params(params)
-                property_listing = adzuna.get_property_listing(params)
-                results = property_listing.get("results")
-
-            if not results:
-                return jsonify({"error": "No results returned"})
-            else:
-                # Obtain all of those results which have large images available
-                large_images = large_images_only(results)
-
-                # Populates seen_queries and seen_adverts tables with results of query
-                populate_seen_tables(results, large_images, query_id, params)
-
-                # The final results after processing
-                final_result = large_images
-
-        except AdzunaAuthorisationException:
-            return jsonify({"error": 410})
-        except AdzunaRequestFormatException:
-            return jsonify({"error": 400})
-        except AdzunaAPIException:
-            return jsonify({"error": 500})
-
-    # Builds the results with other metadata into a format to be consumed by frontend
-    property_dict = build_property_dict(final_result)
-    return jsonify(property_dict)
 
 
 def build_property_dict(results):
@@ -388,6 +329,80 @@ def get_existing_outcode_processing(results):
         historic_prices[outcode] = (historic_months, historic_averages)
         predicted_prices[outcode] = (predicted_months, predicted_averages)
     return historic_prices, predicted_prices
+
+
+def get_all_listings(params):
+    """
+    Currently, Adzuna only allows for up to 50 results per 'page'. The issue is that the results can be far, far more
+    than only 50 properties. This leads to an issue whereby properties are lost and unaccounted for when searching.
+
+    This method rectifies this issue by looping through these pages and obtaining all results (not just a subset)
+
+    :return:
+    """
+    property_listing = adzuna.get_property_listing(params)
+
+    return property_listing
+
+
+@app.route('/search')
+def query_property_listing():
+    """
+    Query the Adzuna API for property listings using the received parameters
+
+    :return: Property listing
+    """
+    params = request.args.to_dict()
+
+    # Converting the parameters to a hash (that is deterministic)
+    string_to_hash = []
+    for p in sorted(params):
+        string_to_hash.append(p + '&' + params[p])
+    string_to_hash = ';'.join(string_to_hash)
+    query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
+    query_id = psql_extras.UUID_adapter(query_id)
+
+    # If query has already been processed, get results
+    already_processed = query_already_processed(query_id)
+
+    if already_processed:
+        # The final results after processing
+        final_result = already_processed
+    else:
+        # Query has not been processed before and therefore must be processed as new
+        try:
+            # If the user has selected they're searching for student rental opportunities
+            if "search_student_lets" in params and params["search_student_lets"] == 'true':
+                results = get_properties_near_unis(params)
+            else:
+                # If the user hasn't specified they are exclusively looking for student homes
+                params = format_params(params)
+
+                # Getting the results from Adzuna
+                results = get_all_listings(params)
+
+            if not results:
+                return jsonify({"error": "No results returned"})
+            else:
+                # Obtain all of those results which have large images available
+                large_images = large_images_only(results)
+
+                # Populates seen_queries and seen_adverts tables with results of query
+                populate_seen_tables(results, large_images, query_id, params)
+
+                # The final results after processing
+                final_result = large_images
+
+        except AdzunaAuthorisationException:
+            return jsonify({"error": 410})
+        except AdzunaRequestFormatException:
+            return jsonify({"error": 400})
+        except AdzunaAPIException:
+            return jsonify({"error": 500})
+
+    # Builds the results with other metadata into a format to be consumed by frontend
+    property_dict = build_property_dict(final_result)
+    return jsonify(property_dict)
 
 
 if __name__ == '__main__':
