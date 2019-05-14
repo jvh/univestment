@@ -4,17 +4,22 @@ from flask_cors import CORS
 from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
     AdzunaAuthorisationException, AdzunaRequestFormatException
 from back_end.src.database.import_data_to_db import DatabaseHandler
+from back_end.src.response_processing import AdzunaResponseProcessor
+
 from back_end.src import DEVELOPMENT
 from back_end.src import vision
 import uuid
 import psycopg2.extras as psql_extras
 from back_end.src import geo_locations
 from copy import deepcopy
+import time
+
 
 adzuna = Adzuna()
 app = Flask(__name__)
 CORS(app)
 db = DatabaseHandler()
+arp = AdzunaResponseProcessor()
 
 # Valid parameters for adzuna
 valid_adzuna_params = {'country', 'app_id', 'app_key', 'page', 'results_per_page', 'what', 'what_and', 'what_phrase',
@@ -286,9 +291,92 @@ def query_property_listing():
         except AdzunaAPIException:
             return jsonify({"error": 500})
 
+    property_dict = build_property_dict(results)
 
-    # property_dict = build_property_dict(final_result)
-    # final_response = property_dict
+def build_property_dict(results):
+    historic_prices, predicted_prices = get_existing_outcode_processing(results)
+    estimates = {}
+    final_list = []
+    for property in results:
+        if "postcode" not in property:
+            continue
+
+        outcode = property["postcode"][:len(property["postcode"]) - 3]
+
+        current_estimate = get_current_estimate(historic_prices[outcode][1][-1], predicted_prices[outcode][1][0])
+        estimates[outcode] = current_estimate
+
+        property_dict = {"property": {"adzuna": property}}
+
+        # placeholder
+        property_dict["property"]["investment"] = {"market_value": current_estimate}
+
+        property_dict["historic_data"] = {"outcode": {"historic": {"x": historic_prices[outcode][0],
+                                                                   "y": historic_prices[outcode][1]}}}
+        property_dict["historic_data"]["outcode"]["predicted"] = {"x": predicted_prices[outcode][0],
+                                                                  "y": predicted_prices[outcode][1]}
+
+        property_dict["postcode"] = {"property": list(arp.query_by_postcode(property.get("postcode")))}
+        final_list.append(property_dict)
+    return final_list
+
+
+def get_current_estimate(historic_month, predicted_month):
+    """
+    estimate the current value of a property
+
+    :param historic_month: predicted value from previous month
+    :param predicted_month: predicted value for next month
+    :return: estimated value
+    """
+    today = int(time.strftime("%d"))
+    delta = (predicted_month - historic_month)/30
+    estimate = historic_month + (today * delta)
+    return estimate
+
+
+def get_existing_outcode_processing(results):
+    """
+    Given an outcode, determine if the outcode has already undergone preprocessing. If it has, return the result from
+    the database
+    """
+    outcodes = set()
+    for x in results:
+        postcode = x.get("postcode")
+        if postcode:
+            outcode = postcode[0:len(postcode)-3]
+            outcodes.add(outcode)
+
+    arp.query_by_outcode(outcodes)
+    historic_prices = {}
+    predicted_prices = {}
+    for outcode in outcodes:
+        query_results = arp.query_for_price_data(outcode)
+
+        historic_data = query_results[0][0].split(":")
+        historic_months = historic_data[0]
+        historic_averages = historic_data[1]
+
+        historic_months = historic_months[1:len(historic_months)-1].split(",")
+        historic_averages = historic_averages[1:len(historic_averages)-1].split(",")
+
+        historic_months = list(map(lambda x: int(x), historic_months))
+        historic_averages = list(map(lambda x: float(x), historic_averages))
+
+        predicted_data = query_results[0][1].split(":")
+        predicted_months = predicted_data[0]
+        predicted_averages = predicted_data[1]
+
+        predicted_months = predicted_months[1:len(predicted_months) - 1].split(",")
+        predicted_averages = predicted_averages[1:len(predicted_averages) - 1].split(",")
+
+        predicted_months = list(map(lambda x: int(x), predicted_months))
+        predicted_averages = list(map(lambda x: float(x), predicted_averages))
+
+        historic_prices[outcode] = (historic_months, historic_averages)
+        predicted_prices[outcode] = (predicted_months, predicted_averages)
+    return historic_prices, predicted_prices
+
 
 if __name__ == '__main__':
     if DEVELOPMENT:

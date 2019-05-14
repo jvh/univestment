@@ -8,14 +8,13 @@ const host = 'http://api.univestment.co.uk';
 
 // API endpoints
 const endpoints = {
-  test_data: { get: data => `${host}/test_data` },
-  search: { get: data => `${host}/search` }
+  search: { get: () => `${host}/search` }
 };
 
 // GET request function builder
-const fetch = endpoint => endPointParams =>
+const fetch = (endpoint, params) =>
   new Promise((resolve, reject) => {
-    axios.get(endpoint.get(endPointParams))
+    axios.get(endpoint)
       .then(response => {
         resolve(response.data);
       })
@@ -34,12 +33,12 @@ const post = (endpoint, params) =>
 
 // DELETE request function builder
 const del = (endpoint, params) =>
-    new Promise((resolve, reject) => {
-        axios.delete(endpoint, params)
-            .then(response => {
-                resolve(response.data)
-;            })
-            .catch(reject);
+  new Promise((resolve, reject) => {
+    axios.delete(endpoint, params)
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(reject);
     });
 
 // Add post POST request wrapper
@@ -48,8 +47,48 @@ const addPost = (societyId, content) =>
     content: content
   });
 
+const buildQuery = (params) => {
+  var query=`where=${params.where}`;
+
+  console.log("SEARCH PARAMS")
+  console.log(params);
+
+  query = params.price_min === undefined ? query : `${query}&price_min=${params.price_min}`;
+  query = params.price_max === undefined ? query : `${query}&price_max=${params.price_max}`;
+  query = params.beds === undefined ? query : `${query}&beds=${params.beds}`;
+  query = params.distance === undefined ? query : `${query}&distance=${params.distance}`;
+
+  query = query.replace(/,/gi, "");
+  query = query.replace(/ /gi, "");
+
+  console.log(query);
+
+  return query;
+}
+
+const coords = (params) => {
+  var url = `${host}/coords?${buildQuery(params)}`;
+  return new Promise((resolve, reject) => {
+    axios.get(url)
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(reject);
+    });
+}
+
+const search = (params) => {
+  var url = `${host}/search?${buildQuery(params)}`;
+  return new Promise((resolve, reject) => {
+    axios.get(url)
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(reject);
+    });
+}
+
 export default {
-    getData: fetch(endpoints.test_data),
-    search: fetch(endpoints.search),
-    addPost: addPost
-  };
+    search: search,
+    coords: coords,
+};

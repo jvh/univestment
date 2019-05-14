@@ -8,13 +8,18 @@ import { Link } from 'react-router-dom';
 
 const ResultCard = (props) => {
 
+  console.log("CARD PROPS");
   console.log(props);
 
-  const img_url = props.image_url;
+  const adzuna = props.property.adzuna;
+
+  const allResults = props.all_results;
+
+  const img_url = adzuna.image_url;
 
   const maxLength = 150;
 
-  var description = props.description;
+  var description = adzuna.description;
 
   if (description.length > maxLength) {
     description = description.substr(0,maxLength);
@@ -29,32 +34,39 @@ const ResultCard = (props) => {
     <div>
       <div className="spacer-sml">
       </div>
-      <div className="row row-pad result results-bg rounded">
+      <div className="row result results-bg rounded">
         <div className="col-sm-12 col-md-4">
-          <div>
+          <div className="result-card">
             <Link to={{pathname:'/property', state:{form: props}}}>
               <img className="result-image" src={img_url} alt=""/>
             </Link>
           </div>
-          <div>
-            <h1 className="align-center">£{props.sale_price}</h1>
-          </div>
         </div>
         <div className="col-sm-12 col-md-8">
-          <div>
-            <p style={{color:"gray", fontSize:"75%"}}>{props.location.display_name}</p>
-          </div>
-          <div className="description">
-            <p style={{fontSize:"85%"}}>{description}</p>
+          <div className="row pad-top">
+            <div className="col-9">
+              <h3 className="align-left">{adzuna.title}</h3>
+              <p style={{fontSize:"125%"}} className="align-left">{adzuna.location.display_name}</p>
+            </div>
+            <div className="col-3">
+              <h3 className="align-right">£{adzuna.sale_price}</h3>
+              <p className="align-right">guide price</p>
+            </div>
+            <div className="col-12 description" style={{display:"inline-block"}}>
+              <p style={{fontSize:"85%"}}>{description}
+                <Link to={{pathname:'/property', state:{form: props}}}>
+                  <a href={adzuna.redirect_url} target="_blank" rel="noopener noreferrer"> (Read more...)</a>
+                </Link>
+              </p>
+            </div>
           </div>
 
-          <div>
-            <div className="col-sm">
-              <a href={props.redirect_url} target="_blank" rel="noopener noreferrer">Properties by
+          <div className="row">
+            <div className="align-right adzuna-text pad-hor" style={{whiteSpace:"nowrap"}}>
+              <a href={adzuna.redirect_url} target="_blank" rel="noopener noreferrer" style={{position:"relative", top:"2px"}}>Properties by </a>
+              <a href={adzuna.redirect_url} target="_blank" rel="noopener noreferrer">
+                <img className="adzuna_logo" src={require("../img/adzuna_logo.jpg")} alt=""/>
               </a>
-            </div>
-            <div className="col-sm">
-              <img className="adzuna_logo" src="../img/adzuna_logo.jpg" alt=""/>
             </div>
           </div>
           <div>

@@ -1,10 +1,6 @@
-const LineData = [(0,0),(1,1),(2,2),(3,3),(4,4),(5,5),(6,6),(7,7),(8,8),(9,9)];
-
-const BarData = [12, 5, 6, 6, 9, 10, 15, 5, 3];
-
-const Filtered = [
+[
   {
-    "property" : {
+    "property": {
       "adzuna": {
         "__CLASS__": "Adzuna::API::Response::Property",
         "adref": "eyJhbGciOiJIUzI1NiJ9.eyJpIjoxMTE0ODQ2NzYxLCJzIjoiTDM2aWZzcHpULWU4QXRJVkpUN2ZIQSJ9.aSOZYQoAZoantJMeCJLmEm26mDl1IzVZufFSZlcE0Nw",
@@ -40,18 +36,26 @@ const Filtered = [
       "investment_type":"flip",
       "market_value": 130000
     },
-    "historic_data": {
+    "historic-data": {
       "outcode": {
-        "historic": {
-          "x":[0,1,3,4,5,7,8,9,10],
-          "y":[13,24,46,68,89,102,114]
-        },
-        "predicted": {
-          "x":[11,12,13,14,15,17,19],
-          "y":[123,124,146,168,189,202,214]
-        }
+        "historic": [
+          {"x":0,"y":1},
+          {"x":1,"y":2},
+          {"x":2,"y":3},
+          {"x":3,"y":4},
+          {"x":4,"y":5},
+          {"x":5,"y":6},
+          {"x":6,"y":7},
+          {"x":7,"y":8}
+        ],
+        "predicted": [
+          {"x":8,"y":9},
+          {"x":9,"y":10},
+          {"x":10,"y":11},
+          {"x":11,"y":12},
+          {"x":12,"y":13}
+        ]
       }
     }
-  }];
-
-export { LineData, BarData, Filtered };
+  }
+]

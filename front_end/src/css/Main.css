@@ -1,35 +1,116 @@
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
+
 .homebackground {
-  background-image: url('../img/background_2.png');
+  background-image: url('../img/background_2.jpg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  height: calc(100vh - 56px);
+  height: calc(100vh - 54px);
 }
 
+.grad {
+  background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0));
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  height: calc(100vh - 54px);
+}
+
+.loading {
+  padding-top: 30vh;
+  height: calc(100vh - 54px);
+}
+
+.title-logo {
+  width:100%;
+}
+
+.switch-pad {
+  padding-top: 5px;
+}
+
+.switch-inner {
+  width:50%;
+  margin: 0 auto;
+}
+
+.header-logo {
+  height: 360%;
+  position: relative;
+  top:-3px;
+}
+
+.header {
+  position: relative;
+  top: -22px;
+  height: 30px;
+  font-family: Pacifico, Baskerville, "Baskerville Old Face", "Goudy Old Style", Garamond, "Times New Roman", serif;
+}
+
+.logo-container {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
 
 .homeTitle {
   padding-left: 20vw;
   padding-right: 20vw;
-  padding-top: 10vh;
+  padding-top: 2vh;
+}
+
+.title {
+  font-size: 550%;
+  color: #ffffff;
+  font-weight: 800;
+  text-align: center;
+  font-family: Pacifico, Baskerville, "Baskerville Old Face", "Goudy Old Style", Garamond, "Times New Roman", serif;
 }
 
 .centre {
   padding-left: 20vw;
   padding-right: 20vw;
-  padding-top: 18vh;
+  padding-top: 12vh;
 }
 
 .background {
-  background-color:#192942;
+  background-color:#ff5a60;
 }
 
-.result-image {
-  height: 150px;
+
+.property-image {
+  width: 100%;
+  height: auto;
   display: block;
-  width: auto;
   margin-left: auto;
   margin-right: auto;
   padding-bottom: 15px;
+}
+
+.adzuna-text {
+  width: 100%;
+}
+
+.result-image {
+  height: 100%;
+  width: 110%;
+  object-fit: cover;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+  left: -15px;
+}
+
+.result-card {
+  height: 250px;
+  width: 100%;
+  line-height: 0;
+  float:left;
+  margin: 0 auto;
+}
+
+.border-rd {
+  border: 2px solid blue;
 }
 
 .scroll-with {
@@ -55,6 +136,15 @@
 
 .pad-hor {
   padding-right: 40px;
+}
+
+.value-green {
+  color: #39ba28;
+}
+
+.pad-hor-both {
+  padding-right: 80px;
+  padding-left: 80px;
 }
 
 .results-row {
@@ -93,27 +183,44 @@
 }
 
 .underline{
-  border-bottom: 3px solid #192942;
+  border-bottom: 3px solid #ff5a60;
   width: 100%;
   display: block;
 }
 
 .overline{
-  border-top: 3px solid #192942;
+  border-top: 3px solid #ff5a60;
   width: 100%;
   display: block;
 }
 
 .underline-small{
-  border-bottom: 2px solid #192942;
+  border-bottom: 2px solid #ff5a60;
   width: 100%;
   display: block;
 }
 
 .container-small{
   max-width: 855px;
+  min-width: 750px;
   width: 100%;
   margin: 0 auto;
+}
+
+.container-right {
+  max-width: 300px;
+  width: 100%;
+  max-height: 600px;
+  border: 1px solid black;
+  margin: 0 auto;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.pad-top-large {
+  padding-top: 100px;
 }
 
 .adv-btn {
@@ -144,6 +251,23 @@
 
 .spacer {
   height: 15vh
+}
+
+.marker {
+  height: 30px;
+  width: 30px;
+  transform: translate(-50%, -100%);
+}
+
+.graph {
+  display: block;
+  margin: auto;
+}
+
+.graph-outer {
+  min-height: 500px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .map {

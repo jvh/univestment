@@ -3,7 +3,7 @@ import Main from '../css/Main.css';
 
 import LineGraph from '../components/LineGraph.js';
 
-import { BarData } from '../mocks/MockData.js';
+import { Filtered } from '../mocks/MockData.js';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -12,13 +12,17 @@ import ResultsList from '../components/ResultsList.js';
 import FilterResults from '../components/FilterResults.js';
 import ResultsMap from '../components/ResultsMap.js';
 
+import LoadingSpinner from '../components/LoadingSpinner.js';
+
+const MOCK = false;
 
 class ResultsPage extends Component {
 
   constructor (props) {
     super(props);
     this.state = {
-      search_results: null,  width: 0, height: 0
+      width: 0, height: 0,
+      isLoading: true
     }
 
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
@@ -33,42 +37,82 @@ class ResultsPage extends Component {
   }
 
   componentDidMount () {
-      console.log(this.props.location.state);
+      this.setState({isLoading:true});
       console.log("RESULTS");
+      console.log(this.props.location.state);
+      console.log(this.props.location.state.search);
       this.updateWindowDimensions();
       window.addEventListener('resize', this.updateWindowDimensions);
-      this.handleSubmit();
+      if (this.props.location.state === undefined) {
+        window.location = '/';
+      }
+      if (this.props.location.state.search === undefined || this.props.location.state.search === null){
+        console.log("HANDLE SUBMIT");
+        this.handleSubmit();
+      } else {
+        console.log("SET STATE");
+        console.log(this.props.location.state.search.form);
+        this.setState({search:this.props.location.state.search, isLoading:false, form:this.props.location.state.search.form});
+      }
   }
 
   handleSubmit () {
 
     console.log("Submit")
 
-    const { location, min_price, max_price, min_beds } = this.props.location.state.form;
+    const { where, price_min, price_max, beds, distance, uni_search, km_away_from_uni } = this.props.location.state.form;
 
-    var search = { location };
+    this.setState({form:this.props.location.state.form});
 
-    search = (min_price === "No min" || min_price === undefined) ? search : { ...search, min_price };
-    search = (max_price === "No max" || max_price === undefined) ? search : { ...search, max_price };
-    search = (min_price === "No min" || min_beds === undefined) ? search : { ...search, min_beds };
+    var search = { where };
+
+    search = (price_min === "No min" || price_min === undefined) ? search : { ...search, price_min };
+    search = (price_max === "No max" || price_max === undefined) ? search : { ...search, price_max };
+    search = (beds === "No min" || beds === undefined) ? search : { ...search, beds };
+    search = (distance === undefined) ? search : { ...search, distance };
+    //search = (km_away_from_uni === undefined)
 
     console.log("search");
 
-    ApiUtils.search(search)
-    .then(this.handleSearchSuccess)
-    .catch(this.handleSearchFailure);
+
+    if (MOCK) {
+      this.setState({search: {
+          form:this.state.form,
+          search_results: Filtered
+        }
+      });
+      console.log()
+      this.setState({isLoading: false});
+    } else {
+      ApiUtils.search(search)
+      .then(this.handleSearchSuccess)
+      .catch(this.handleSearchFailure);
+    }
 
   }
 
   handleSearchSuccess = response => {
     console.log(response);
-    this.setState({search_results: response});
+    console.log(Filtered);
+    this.setState({search: {
+        form:this.state.form,
+        search_results: response
+      }
+    });
+    console.log()
+    this.setState({isLoading: false});
+  }
+
+  handleSearchFailure = response => {
+
   }
 
   render(){
 
-    if (this.state.search_results === null) {
-      return (<div></div>);
+    if(this.state.isLoading) {
+      return (
+        <LoadingSpinner/>
+      )
     } else {
       if (this.state.width < 1830) {
         return (
@@ -86,10 +130,10 @@ class ResultsPage extends Component {
               <div className="spacer-sml">
               </div>
               <div className="row result results-bg">
-                <ResultsMap results={this.state.search_results}/>
+                <ResultsMap results={this.state.search.search_results} where={this.state.form.where}/>
               </div>
             </div>
-            <ResultsList results={this.state.search_results}/>
+            <ResultsList search={this.state.search}/>
           </div>
         );
       } else {
@@ -97,7 +141,7 @@ class ResultsPage extends Component {
           <div className="container-large">
             <div className="row">
               <div className="col-6">
-                <ResultsList results={this.state.search_results}/>
+                <ResultsList search={this.state.search} s/>
               </div>
               <div className="col-6">
                 <div className="container-small">
@@ -113,7 +157,9 @@ class ResultsPage extends Component {
                   <div className="spacer-sml">
                   </div>
                   <div className="row result results-bg">
-                    <ResultsMap results={this.state.search_results}/>
+                    <ResultsMap results={this.state.search.search_results} where={this.state.form.where}/>
+                  </div>
+                  <div className="spacer-sml">
                   </div>
                 </div>
               </div>
