@@ -3,7 +3,9 @@ import React, { Component } from 'react';
 import GoogleMapReact from 'google-map-react';
 import ApiUtils from '../utils/ApiUtils.js';
 
-const Marker = () => <div><img className="marker" style={{cursor:"pointer"}} src={require('../img/marker.png')}/></div>;
+const Marker = () =>  <div>
+                        <img className="marker" style={{cursor:"pointer"}} src={require('../img/marker.png')}/>
+                      </div>;
 
 class ResultsMap extends Component {
 

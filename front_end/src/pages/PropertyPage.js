@@ -34,6 +34,10 @@ class PropertyPage extends Component {
 
   }
 
+  round(float) {
+    return Math.round(float/100)*100;
+  }
+
   render(){
     return (
       <div className="bg outer pad-top pad-bottom">
@@ -71,7 +75,7 @@ class PropertyPage extends Component {
           <div className="pad-hor-both pad-top">
             <div className="overline pad-top">
               <div>
-                <h1 className="align-center value-green" style={{fontSize:"350%"}}>£{this.state.data.property.investment.market_value - this.state.adzuna.sale_price}</h1>
+                <h1 className="align-center value-green" style={{fontSize:"350%"}}>£{this.round(this.state.data.property.investment.market_value - this.state.adzuna.sale_price)}</h1>
                 <h3 className="align-center">Below Estimated Market Value</h3>
               </div>
             </div>

@@ -16,6 +16,25 @@ class LineGraph extends Component {
   componentDidMount() {
     console.log("SERIES");
     console.log(this.props);
+
+    var average = []
+
+    var y = this.state.historic.y
+
+    for (var i=0; i<y.length; i++) {
+      if (i < 10) {
+        average.push(y[i]);
+      } else {
+        average.push((y[i-9]+y[i-8]+y[i-7]+y[i-6]+y[i-5]+y[i-4]+y[i-3]+y[i-2]+y[i-1]+y[i])/10);
+      }
+    }
+    console.log("MOVING");
+    console.log(this.state.historic)
+    console.log(y);
+    console.log(average);
+    this.setState({historic:{x:this.state.historic.x,
+      y:average}});
+
     this.drawChart();
   }
 
@@ -25,12 +44,14 @@ class LineGraph extends Component {
       {
         label:"historic",
         x: this.state.historic.x,
-        y: this.state.historic.y
+        y: this.state.historic.y,
+        c: "ff5a60"
       },
       {
         label:"predicted",
         x: this.state.predicted.x,
-        y: this.state.predicted.y
+        y: this.state.predicted.y,
+        c: "39ba28"
       }
     ];
 
@@ -52,7 +73,7 @@ class LineGraph extends Component {
 
     var xScale = d3.scaleLinear()
         .range([0, innerwidth])
-        .domain([ d3.min(data, function(d) { return d3.min(d.x); }),
+        .domain([ d3.min(data, function(d) { return d3.max(d.x) - 60; }),
                   d3.max(data, function(d) { return d3.max(d.x); }) ]) ;
 
     var yScale = d3.scaleLinear()
@@ -63,9 +84,12 @@ class LineGraph extends Component {
 
     // 7. d3's line generator
     var line = d3.line()
-        .x(function(d, i) { return xScale(d[0]); }) // set the x values for the line generator
-        .y(function(d) { return yScale(d[1]); }) // set the y values for the line generator
-        .curve(d3.curveMonotoneX) // apply smoothing to the line
+        .x(function(d, i) {
+          return xScale(d[0]);
+        })
+        .y(function(d) {
+          return yScale(d[1]);
+        });
 
     // 1. Add the SVG to the page and employ #2
     var svg = d3.select(node).append("svg")
@@ -86,15 +110,20 @@ class LineGraph extends Component {
         .attr("class", "y axis")
         .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
 
-        var data_lines = svg.selectAll(".d3_xy_chart_line")
-                        .data(data.map(function(d) {return d3.zip(d.x, d.y);}))
-                        .enter().append("g")
-                        .attr("class", "d3_xy_chart_line") ;
+    var data_lines = svg.selectAll(".d3_xy_chart_line")
+        .data(data)
+        .enter().append("g")
+        .attr("class", "d3_xy_chart_line") ;
 
-                    data_lines.append("path")
-                        .attr("class", "line")
-                        .attr("d", function(d) {return line(d); })
-                        .attr("stroke", "black") ;
+    data_lines.append("path")
+        .attr("class", "line")
+        .attr("d", function(d) { return line(d3.zip(d.x, d.y)); })
+        .style("stroke", function(d) {
+          console.log("D");
+          console.log(d);
+          return d.c
+        }) ;
+
     // 9. Append the path, bind the data, and call the line generator
     svg.append("path")
         .datum(data) // 10. Binds data to the line
