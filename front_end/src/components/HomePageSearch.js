@@ -25,7 +25,8 @@ class HomePageSearch extends Component {
       super(props);
       this.state = {
         form: {
-          where: ''
+          where: '',
+          uni_search: false
         },
         isOpened: props.isOpened,
         isSubmitEnabled: false,
@@ -49,7 +50,12 @@ class HomePageSearch extends Component {
   }
 
   handleSwitchChange = () => {
-    this.setState({uniSearch:!this.state.uniSearch});
+    this.setState({
+      uniSearch:!this.state.uniSearch,
+      form: {
+        ...this.state.form,
+        uni_search:!this.state.form.uni_search
+      }});
   }
 
   handleFormChange = event => {

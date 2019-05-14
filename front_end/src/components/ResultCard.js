@@ -27,7 +27,7 @@ const ResultCard = (props) => {
     description = description.substr(0,index) + " ...";
   }
 
-
+//<!---<p style={{fontSize:"125%"}} className="align-left">{adzuna.location.display_name}</p>--->
   console.log(img_url);
 
   return (
@@ -46,7 +46,6 @@ const ResultCard = (props) => {
           <div className="row pad-top">
             <div className="col-9">
               <h3 className="align-left">{adzuna.title}</h3>
-              <p style={{fontSize:"125%"}} className="align-left">{adzuna.location.display_name}</p>
             </div>
             <div className="col-3">
               <h3 className="align-right">£{adzuna.sale_price}</h3>

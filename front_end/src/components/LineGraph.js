@@ -11,29 +11,48 @@ class LineGraph extends Component {
       historic:props.data.historic,
       predicted:props.data.predicted
     }
-  }
-
-  componentDidMount() {
-    console.log("SERIES");
-    console.log(this.props);
 
     var average = []
 
-    var y = this.state.historic.y
+    var y = this.state.historic.y;
+    var x = this.state.historic.x;
 
-    for (var i=0; i<y.length; i++) {
+    for (var i=y.length-60; i<y.length; i++) {
       if (i < 10) {
         average.push(y[i]);
       } else {
         average.push((y[i-9]+y[i-8]+y[i-7]+y[i-6]+y[i-5]+y[i-4]+y[i-3]+y[i-2]+y[i-1]+y[i])/10);
       }
     }
+
+    var newX = []
+
+    for (var i=x.length-60; i<x.length; i++) {
+      newX.push(x[i]);
+    }
+
+    average.push(this.state.predicted.y[0])
+    newX.push(this.state.predicted.x[0])
+
     console.log("MOVING");
     console.log(this.state.historic)
     console.log(y);
     console.log(average);
-    this.setState({historic:{x:this.state.historic.x,
-      y:average}});
+
+    this.state = {
+      historic:{
+        x:newX,
+        y:average
+      },
+      predicted:props.data.predicted
+    }
+  }
+
+  componentDidMount() {
+    console.log("SERIES");
+    console.log(this.props);
+
+
 
     this.drawChart();
   }
@@ -73,7 +92,7 @@ class LineGraph extends Component {
 
     var xScale = d3.scaleLinear()
         .range([0, innerwidth])
-        .domain([ d3.min(data, function(d) { return d3.max(d.x) - 60; }),
+        .domain([ d3.min(data, function(d) { return d3.min(d.x); }),
                   d3.max(data, function(d) { return d3.max(d.x); }) ]) ;
 
     var yScale = d3.scaleLinear()
@@ -123,21 +142,19 @@ class LineGraph extends Component {
           console.log(d);
           return d.c
         }) ;
-
-    // 9. Append the path, bind the data, and call the line generator
+        
     svg.append("path")
-        .datum(data) // 10. Binds data to the line
-        .attr("class", "line") // Assign a class for styling
-        .attr("d", line); // 11. Calls the line generator
+        .datum(data)
+        .attr("class", "line")
+        .attr("d", line);
 
-    // // 12. Appends a circle for each datapoint
     // svg.selectAll(".dot")
-    //     .data(dataset)
+    //     .data(d3.zip(data.historic.x, data.historic.y))
     //   .enter().append("circle") // Uses the enter().append() method
     //     .attr("class", "dot") // Assign a class for styling
     //     .attr("cx", function(d, i) { return xScale(i) })
     //     .attr("cy", function(d) { return yScale(d.y) })
-    //     .attr("r", 5)
+    //     .attr("r", 1)
     //       .on("mouseover", function(a, b, c) {
     //   			console.log(a)
     // 		})

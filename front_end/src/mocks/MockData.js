@@ -37,8 +37,9 @@ const Filtered = [
         "sale_price": 100000,
         "title": "1 bed flat for sale in Wimpson Lane"
       },
-      "investment_type":"flip",
-      "market_value": 130000
+      "investment":{
+        "market_value": 130000
+      }
     },
     "historic_data": {
       "outcode": {
