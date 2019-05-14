@@ -244,47 +244,51 @@ def query_property_listing():
     # If query has already been processed, get results
     already_processed = query_already_processed(query_id)
     if already_processed:
-        return already_processed
+        # The final results after processing
+        final_result = already_processed
+    else:
+        # Query has not been processed before and therefore must be processed as new
+        try:
+            # If the user has selected they're searching for student rental opportunities
+            if "search_student_lets" in params and params["search_student_lets"] == 'true':
+                if "where" not in params:
+                    raise Exception("Please enter a postcode.")
+                elif "radius_from" not in params:
+                    raise Exception("Please enter a radius away from the location you have specified in which to search "
+                                    "against.")
+                elif "km_away_from_uni" not in params:
+                    raise Exception("Please enter the distance from any given university (in km) that you would like to "
+                                    "search houses for.")
 
-    # Query has not been processed before and therefore must be processed as new
-    try:
-        # If the user has selected they're searching for student rental opportunities
-        if "search_student_lets" in params and params["search_student_lets"] == 'true':
-            if "where" not in params:
-                raise Exception("Please enter a postcode.")
-            elif "radius_from" not in params:
-                raise Exception("Please enter a radius away from the location you have specified in which to search "
-                                "against.")
-            elif "km_away_from_uni" not in params:
-                raise Exception("Please enter the distance from any given university (in km) that you would like to "
-                                "search houses for.")
+                results = get_properties_near_unis(params)
+            else:
+                # If the user hasn't specified they are exclusively looking for student homes
+                params = format_params(params)
+                property_listing = adzuna.get_property_listing(params)
+                results = property_listing.get("results")
 
-            results = get_properties_near_unis(params)
-        else:
-            # If the user hasn't specified they are exclusively looking for student homes
-            params = format_params(params)
-            property_listing = adzuna.get_property_listing(params)
-            results = property_listing.get("results")
+            if not results:
+                return jsonify({"error": "No results returned"})
+            else:
+                # Obtain all of those results which have large images available
+                large_images = large_images_only(results)
 
-        if not results:
-            return jsonify({"error": "No results returned"})
-        else:
-            # Obtain all of those results which have large images available
-            large_images = large_images_only(results)
+                # Populates seen_queries and seen_adverts tables with results of query
+                populate_seen_tables(results, large_images, query_id, params)
 
-            # Populates seen_queries and seen_adverts tables with results of query
-            populate_seen_tables(results, large_images, query_id, params)
+                # The final results after processing
+                final_result = large_images
 
-            results = large_images
+        except AdzunaAuthorisationException:
+            return jsonify({"error": 410})
+        except AdzunaRequestFormatException:
+            return jsonify({"error": 400})
+        except AdzunaAPIException:
+            return jsonify({"error": 500})
 
-        return jsonify(results)
-    except AdzunaAuthorisationException:
-        return jsonify({"error": 410})
-    except AdzunaRequestFormatException:
-        return jsonify({"error": 400})
-    except AdzunaAPIException:
-        return jsonify({"error": 500})
 
+    # property_dict = build_property_dict(final_result)
+    # final_response = property_dict
 
 if __name__ == '__main__':
     if DEVELOPMENT:
