@@ -63,6 +63,9 @@ def large_images_only(results):
 
     for i in range(len(results)):
         r = results[i]
+        if 'image_url' not in r:
+            continue
+
         img = r['image_url']
         query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
         result = DatabaseHandler.query_database(query)
