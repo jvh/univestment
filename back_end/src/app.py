@@ -379,9 +379,11 @@ def query_property_listing():
     already_processed = query_already_processed(query_id)
 
     if already_processed:
+        print("Query already processed... Getting results")
         # The final results after processing
         final_result = already_processed
     else:
+        print("This query has not been seen before.")
         # Query has not been processed before and therefore must be processed as new
         try:
             # If the user has selected they're searching for student rental opportunities
@@ -391,15 +393,18 @@ def query_property_listing():
                 # If the user hasn't specified they are exclusively looking for student homes
                 params = format_params(params)
 
+                print("Getting listings from Adzuna...")
                 # Getting the results from Adzuna
                 results = get_all_listings(params)
 
             if not results:
                 return jsonify({"error": "No results returned"})
             else:
+                print("Getting large images...")
                 # Obtain all of those results which have large images available
                 large_images = large_images_only(results)
 
+                print("Populating seen_queries and seen_adverts tables...")
                 # Populates seen_queries and seen_adverts tables with results of query
                 populate_seen_tables(results, large_images, query_id, params)
 
@@ -413,8 +418,10 @@ def query_property_listing():
         except AdzunaAPIException:
             return jsonify({"error": 500})
 
+    print("Building the machine learning model for outcodes...")
     # Builds the results with other metadata into a format to be consumed by frontend
     property_dict = build_property_dict(final_result)
+    print("Finished.")
     return jsonify(property_dict)
 
 
