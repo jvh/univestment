@@ -140,7 +140,7 @@ def query_already_processed(query_id):
 
             results_from_db_lrg.append(record)
 
-        return jsonify(results_from_db_lrg)
+        return results_from_db_lrg
 
 
 def get_properties_near_unis(params):
@@ -243,11 +243,18 @@ def query_property_listing():
     :return: Property listing
     """
     params = request.args.to_dict()
-    query_id = uuid.uuid3(uuid.NAMESPACE_DNS, str(sorted(params)))
+
+    # Converting the parameters to a hash (that is deterministic)
+    string_to_hash = []
+    for p in sorted(params):
+        string_to_hash.append(p + '&' + params[p])
+    string_to_hash = ';'.join(string_to_hash)
+    query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
     query_id = psql_extras.UUID_adapter(query_id)
 
     # If query has already been processed, get results
     already_processed = query_already_processed(query_id)
+
     if already_processed:
         # The final results after processing
         final_result = already_processed
@@ -291,7 +298,10 @@ def query_property_listing():
         except AdzunaAPIException:
             return jsonify({"error": 500})
 
-    property_dict = build_property_dict(results)
+    # Builds the results with other metadata into a format to be consumed by frontend
+    property_dict = build_property_dict(final_result)
+    return jsonify(property_dict)
+
 
 def build_property_dict(results):
     historic_prices, predicted_prices = get_existing_outcode_processing(results)
@@ -341,6 +351,7 @@ def get_existing_outcode_processing(results):
     the database
     """
     outcodes = set()
+
     for x in results:
         postcode = x.get("postcode")
         if postcode:
@@ -350,6 +361,7 @@ def get_existing_outcode_processing(results):
     arp.query_by_outcode(outcodes)
     historic_prices = {}
     predicted_prices = {}
+
     for outcode in outcodes:
         query_results = arp.query_for_price_data(outcode)
 
