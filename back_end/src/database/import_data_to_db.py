@@ -80,34 +80,35 @@ class DatabaseHandler:
             'CREATE TABLE IF NOT EXISTS seen_queries (' \
             '   id UUID PRIMARY KEY, ' \
             '   query TEXT NOT NULL,' \
-            '   properties TEXT' \
+            '   properties TEXT,' \
+            '   date_of_insertion DATE NOT NULL DEFAULT NOW()' \
             ');'
         return seen_queries
 
-    @staticmethod
-    def create_query_table():
-        """
-        Schema for processed_queries
-
-        :return: string representing table field commands
-        """
-        seen_adverts = \
-            'CREATE TABLE IF NOT EXISTS seen_adverts (' \
-            '   id INTEGER PRIMARY KEY, ' \
-            '   beds INTEGER,' \
-            '   description TEXT,' \
-            '   image_url TEXT,' \
-            '   is_furnished BOOLEAN,' \
-            '   latitude FLOAT,' \
-            '   longitude FLOAT,' \
-            '   postcode TEXT,' \
-            '   property_type TEXT,' \
-            '   redirect_url TEXT,' \
-            '   sale_price FLOAT,' \
-            '   title TEXT,' \
-            '   university TEXT' \
-            ');'
-        return seen_adverts
+    # @staticmethod
+    # def create_query_table():
+    #     """
+    #     Schema for processed_queries
+    #
+    #     :return: string representing table field commands
+    #     """
+    #     seen_adverts = \
+    #         'CREATE TABLE IF NOT EXISTS seen_adverts (' \
+    #         '   id INTEGER PRIMARY KEY, ' \
+    #         '   beds INTEGER,' \
+    #         '   description TEXT,' \
+    #         '   image_url TEXT,' \
+    #         '   is_furnished BOOLEAN,' \
+    #         '   latitude FLOAT,' \
+    #         '   longitude FLOAT,' \
+    #         '   postcode TEXT,' \
+    #         '   property_type TEXT,' \
+    #         '   redirect_url TEXT,' \
+    #         '   sale_price FLOAT,' \
+    #         '   title TEXT,' \
+    #         '   university TEXT' \
+    #         ');'
+    #     return seen_adverts
 
 
     @staticmethod

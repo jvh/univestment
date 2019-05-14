@@ -10,7 +10,6 @@ import uuid
 import psycopg2.extras as psql_extras
 from back_end.src import geo_locations
 from copy import deepcopy
-import datetime
 
 adzuna = Adzuna()
 app = Flask(__name__)
@@ -93,13 +92,23 @@ def format_params(params):
     return params
 
 
-def get_property_args(p):
+def get_property_args(p, large_images):
+    """
+    For a given advertisement, get the property parameters for table insertion
+    :param p: The property
+    :param large_images: The large image results
+    :return: The parameters for insertion into table
+    """
     uni = None
+    lrg = False
     if 'university' in p:
         uni = p['university']
+    if p in large_images:
+        lrg = True
     params = (p['id'], p['beds'], p['description'], p['image_url'], p['is_furnished'], p['latitude'], p['longitude'],
-              p['postcode'], p['property_type'], p['redirect_url'], p['sale_price'], p['title'], uni, True)
+              p['postcode'], p['property_type'], p['redirect_url'], p['sale_price'], p['title'], uni, lrg)
     return params
+
 
 @app.route('/search')
 def query_property_listing():
@@ -108,22 +117,47 @@ def query_property_listing():
 
     :return: Property listing
     """
+    results = []
     params = request.args.to_dict()
-    id = uuid.uuid3(uuid.NAMESPACE_DNS, str(sorted(params)))
-
-    query = "SELECT properties FROM seen_queries WHERE id={}".format(id)
-
+    query_id = uuid.uuid3(uuid.NAMESPACE_DNS, str(sorted(params)))
+    query_id = psql_extras.UUID_adapter(query_id)
+    query = "SELECT properties FROM seen_queries WHERE id={}".format(query_id)
     if_processed = DatabaseHandler.query_database(query)
 
     # If the query has been processed beforehand
     if if_processed:
-        pass
+        [[unpacked]] = list(if_processed)
+        # Get IDs of those advertisements part of this query
+        results = unpacked.split(' ')
 
-    print(if_processed)
+        results_from_db_lrg = []
+        for r in results:
+            query = "SELECT * FROM seen_adverts WHERE id={}".format(r)
+            [db_res] = DatabaseHandler.query_database(query)
 
-    print(id)
-    # return 's'
-    results = []
+            record = dict()
+            record['has_large_img'] = db_res[14]
+            # Don't include
+            if not record['has_large_img']:
+                continue
+            record['id'] = db_res[0]
+            record['beds'] = db_res[1]
+            record['description'] = db_res[2]
+            record['image_url'] = db_res[3]
+            record['is_furnished'] = db_res[4]
+            record['latitude'] = db_res[5]
+            record['longitude'] = db_res[6]
+            record['postcode'] = db_res[7]
+            record['property_type'] = db_res[8]
+            record['redirect_url'] = db_res[9]
+            record['sale_price'] = db_res[10]
+            record['title'] = db_res[11]
+            record['university'] = db_res[12]
+            record['date_of_insertion'] = db_res[13]
+
+            results_from_db_lrg.append(record)
+
+        return jsonify(results_from_db_lrg)
     try:
         # If the user has selected they're searching for student rental opportunities
         if "search_student_lets" in params and params["search_student_lets"] == 'true':
@@ -164,6 +198,7 @@ def query_property_listing():
 
                 results = properties
         else:
+            # If the user hasn't specified they are exclusively looking for student homes
             params = format_params(params)
             property_listing = adzuna.get_property_listing(params)
             results = property_listing.get("results")
@@ -171,8 +206,9 @@ def query_property_listing():
         if not results:
             return jsonify({"error": "No results returned"})
         else:
+            # Obtain all of those results which have large images available
             large_images = large_images_only(results)
-            query_id = uuid.uuid3(uuid.NAMESPACE_DNS, str(params))
+
             property_id_list = []
 
             # Adding advertisements to seen_adverts table
@@ -192,14 +228,15 @@ def query_property_listing():
                     # Add it to the table
                     add_property_query = "INSERT INTO seen_adverts VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
                                          "%s, %s, %s, DEFAULT, %s);"
-                    args = get_property_args(r)
+                    args = get_property_args(r, large_images)
                     DatabaseHandler.insert_to_db(add_property_query, args)
 
-            # # Add it to the table
-            # add_property_query = "INSERT INTO seen_adverts VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
-            #                      "%s, %s, %s, DEFAULT, %s);"
-            # args = get_property_args(r)
+            # Add it to the table seen_queries
+            add_query = "INSERT INTO seen_queries VALUES (%s, %s, %s, DEFAULT);"
+            args = (query_id, str(params), ' '.join(str(e) for e in property_id_list))
+            DatabaseHandler.insert_to_db(add_query, args)
 
+            results = large_images
 
         return jsonify(results)
     except AdzunaAuthorisationException:
