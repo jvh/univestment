@@ -179,8 +179,8 @@ def get_properties_near_unis(params):
 
         # Formatting parameters for use by adzuna
         uni_params = format_params(uni_params)
-        property_listing = adzuna.get_property_listing(uni_params)
-        results = property_listing.get("results")
+        results = adzuna.get_property_listing(uni_params)
+        # results = property_listing.get("results")
 
         for r in results:
             # Assigning that property to a particular university
