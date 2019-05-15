@@ -163,6 +163,16 @@ class DatabaseHandler:
         return img_thumbnail_to_lrg
 
     @staticmethod
+    def create_predicted_admissions_table():
+        predicted_admissions_data = \
+            'CREATE TABLE IF NOT EXISTS predicted_admissions_table (' \
+            '   university TEXT NOT NULL,' \
+            '   historic_admissions TEXT NOT NULL,' \
+            '   predicted_admissions TEXT NOT NULL' \
+            ');'
+        return predicted_admissions_data
+
+    @staticmethod
     def create_tables():
         """
         return SQL statements for creating tables
@@ -174,6 +184,7 @@ class DatabaseHandler:
         yield DatabaseHandler.create_uni_addresses_table()
         yield DatabaseHandler.create_img_thumbnail()
         yield DatabaseHandler.create_prediction_table()
+        yield DatabaseHandler.create_predicted_admissions_table()
         yield DatabaseHandler.create_property_table()
         yield DatabaseHandler.create_seen_queries()
 

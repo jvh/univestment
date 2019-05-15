@@ -4,7 +4,7 @@ from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE
     DEVELOPMENT, POSTGRES_SUPER_PASSWORD, POSTGRES_IP
 import psycopg2
 from back_end.src.database.import_data_to_db import DatabaseHandler
-
+from back_end.src.response_processing import AdzunaResponseProcessor
 
 def database_commands(load_data=False):
     """
@@ -42,6 +42,8 @@ def database_commands(load_data=False):
             DatabaseHandler.fill_uni_addresses(engine, import_files)
             DatabaseHandler.fill_admissions_data(engine, import_files)
             DatabaseHandler.fill_house_data(engine, import_files)
+            arp = AdzunaResponseProcessor()
+            arp.generate_admission_prediction()
 
         connection.commit()
         connection.close()
@@ -52,3 +54,4 @@ def database_commands(load_data=False):
 
 if __name__ == "__main__":
     database_commands()
+

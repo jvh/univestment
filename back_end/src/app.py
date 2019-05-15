@@ -34,6 +34,17 @@ def hello_world():
     return 'Hello, World!'
 
 
+@app.route('/testad')
+def test_admission():
+    params = request.args.to_dict()
+    university = params["university"]
+    result = arp.query_predicted_admission_data(university)
+    historic_data, predicted_data = parse_prediction_data_from_db(result)
+    return_data = {"historic": {"x": historic_data[0], "y": historic_data[1]},
+                   "predicted": {"x": predicted_data[0], "y": predicted_data[1]}}
+    return jsonify(return_data)
+
+
 @app.route('/coords')
 def coordinates_endpoint():
     """
@@ -177,6 +188,8 @@ def get_properties_near_unis(params):
         uni_params['where'] = post
         uni_params['distance'] = params['km_away_from_uni']
 
+        data = query_predicted_admissions(uni[0])
+
         # Formatting parameters for use by adzuna
         uni_params = format_params(uni_params)
         results = adzuna.get_property_listing(uni_params)
@@ -184,6 +197,8 @@ def get_properties_near_unis(params):
         for r in results:
             # Assigning that property to a particular university
             r['university'] = uni[0]
+            if data:
+                r["admissions"] = data
             if r not in properties:
                 properties.append(r)
 
@@ -249,7 +264,14 @@ def populate_seen_tables(results, large_images, query_id, params):
     DatabaseHandler.insert_to_db(add_query, args)
 
 
-def build_property_dict(results):
+def build_property_dict(results, university_admissions_data=None):
+    """
+    Build the structure of the return json file
+
+    :param results: list(properties) - list of property data
+    :param university_admissions_data: list(dict()) - list of predicted admissions data
+    :return: dict of data to return
+    """
     historic_prices, predicted_prices = get_existing_outcode_processing(results)
     estimates = {}
     final_list = []
@@ -273,6 +295,7 @@ def build_property_dict(results):
                                                                   "y": predicted_prices[outcode][1]}
 
         property_dict["postcode"] = {"property": list(arp.query_by_postcode(property.get("postcode")))}
+        property_dict["admissions"] = university_admissions_data
         final_list.append(property_dict)
     return final_list
 
@@ -311,17 +334,35 @@ def get_existing_outcode_processing(results):
     for outcode in outcodes:
         query_results = arp.query_for_price_data(outcode)
 
-        historic_data = query_results[0][0].split(":")
-        historic_months = historic_data[0]
-        historic_averages = historic_data[1]
+        historic_data, predicted_data = parse_prediction_data_from_db(query_results)
 
-        historic_months = historic_months[1:len(historic_months)-1].split(",")
-        historic_averages = historic_averages[1:len(historic_averages)-1].split(",")
+        historic_prices[outcode] = (historic_data[0], historic_data[1])
+        predicted_prices[outcode] = (predicted_data[0], predicted_data[1])
+    return historic_prices, predicted_prices
 
-        historic_months = list(map(lambda x: int(x), historic_months))
-        historic_averages = list(map(lambda x: float(x), historic_averages))
 
-        predicted_data = query_results[0][1].split(":")
+def parse_prediction_data_from_db(query_results):
+    """
+    parse prediction data from query to lists
+
+    :param query_results: list(tuple) - results of query
+    :return: Historic data, predicted data
+    """
+    print(query_results)
+    historic_data = query_results[0][0].split(":")
+    historic_months = historic_data[0]
+    historic_averages = historic_data[1]
+
+    historic_months = historic_months[1:len(historic_months) - 1].split(",")
+    historic_averages = historic_averages[1:len(historic_averages) - 1].split(",")
+
+    historic_months = list(map(lambda x: int(x), historic_months))
+    historic_averages = list(map(lambda x: float(x), historic_averages))
+
+    predicted_data = query_results[0][1]
+
+    if predicted_data:
+        predicted_data = predicted_data.split(":")
         predicted_months = predicted_data[0]
         predicted_averages = predicted_data[1]
 
@@ -330,10 +371,32 @@ def get_existing_outcode_processing(results):
 
         predicted_months = list(map(lambda x: int(x), predicted_months))
         predicted_averages = list(map(lambda x: float(x), predicted_averages))
+    else:
+        predicted_months = []
+        predicted_averages = []
 
-        historic_prices[outcode] = (historic_months, historic_averages)
-        predicted_prices[outcode] = (predicted_months, predicted_averages)
-    return historic_prices, predicted_prices
+    historic_data = (historic_months, historic_averages)
+    predicted_data = (predicted_months, predicted_averages)
+
+    return historic_data, predicted_data
+
+
+def query_predicted_admissions(university):
+    """
+    query predicted_admissions_table for one university's
+    prediction data
+
+    :param university: String - name of university
+    :return: dict
+    """
+    result = arp.query_predicted_admission_data(university)
+    if result:
+        historic_data, predicted_data = parse_prediction_data_from_db(result)
+        return_data = {"historic": {"x": historic_data[0], "y": historic_data[1]},
+                    "predicted": {"x": predicted_data[0], "y": predicted_data[1]}}
+        return return_data
+    else:
+        return None
 
 
 def get_all_listings(params):
