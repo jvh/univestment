@@ -54,14 +54,17 @@ const ResultCard = (props) => {
             <div className="col-12 description" style={{display:"inline-block"}}>
               <p style={{fontSize:"85%"}}>{description}
                 <Link to={{pathname:'/property', state:{form: props}}}>
-                  <a href={adzuna.redirect_url} target="_blank" rel="noopener noreferrer"> (Read more...)</a>
+                  <a href={adzuna.redirect_url} target="_blank" rel="noopener noreferrer">(Read more...)</a>
                 </Link>
               </p>
             </div>
           </div>
 
           <div className="row">
-            <div className="align-right adzuna-text pad-hor" style={{whiteSpace:"nowrap"}}>
+            <div className="align-right adzuna-text pad-hor pad-top col-6" style={{whiteSpace:"nowrap"}}>
+              <p>{adzuna.university}</p>
+            </div>
+            <div className="align-right adzuna-text pad-hor pad-top col-6" style={{whiteSpace:"nowrap"}}>
               <a href={adzuna.redirect_url} target="_blank" rel="noopener noreferrer" style={{position:"relative", top:"2px"}}>Properties by </a>
               <a href={adzuna.redirect_url} target="_blank" rel="noopener noreferrer">
                 <img className="adzuna_logo" src={require("../img/adzuna_logo.jpg")} alt=""/>

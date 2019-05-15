@@ -9,7 +9,7 @@ const ResultsList = (props) => {
 
   const renderResultsCard = result => {
       return (
-        <ResultCard {...result} search={props.search}/>
+        <ResultCard {...result} results_state={props.results_state}/>
       );
   }
 
