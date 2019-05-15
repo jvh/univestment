@@ -122,7 +122,7 @@ def query_property_listing():
                 test_params = dict()
                 test_params['where'] = params['where']
                 test_params['distance'] = params['distance']
-                results = app.adzuna.get_property_listing(test_params)
+                results = app.adzuna.get_property_listing(test_params, results_per_page=10)
             else:
                 results = seach_helper.get_properties_near_unis(params)
 
@@ -152,13 +152,12 @@ def query_property_listing():
 
     # formatted_results = format_results(final_result, params)
 
-    # Only performs these functions given that we are not testing
-    if 'testing' not in params:
-        print("Building the machine learning model for outcodes...")
-        # Builds the results with other metadata into a format to be consumed by frontend
-        property_dict = format_results.build_property_dict(final_result)
-        print("Finished.")
-        return jsonify(property_dict)
+
+    # print("Building the machine learning model for outcodes...")
+    # Builds the results with other metadata into a format to be consumed by frontend
+    property_dict = format_results.build_property_dict(final_result)
+    print("Finished.")
+    return jsonify(property_dict)
 
 
 if __name__ == '__main__':
