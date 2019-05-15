@@ -138,8 +138,7 @@ class DatabaseHandler:
         """
         uni_addresses_data = \
             'CREATE TABLE IF NOT EXISTS uni_addresses_data (' \
-            '   id UUID PRIMARY KEY,' \
-            '   establishmentname TEXT NOT NULL,' \
+            '   establishmentname TEXT PRIMARY KEY,' \
             '   street TEXT,' \
             '   town TEXT,' \
             '   postcode TEXT NOT NULL,' \
@@ -265,13 +264,12 @@ class DatabaseHandler:
 
         data = import_files.uni_addresses
         data.columns = map(str.lower, data.columns)
-        data['id'] = [uuid4() for _ in range(len(data.index))]
         longitude = []
         latitude = []
         data = data[pd.notnull(data['postcode'])]
         for row in data['postcode']:
-            long, lat = geo_locations.get_coords_from_postcode(row)
-            longitude.append(long)
+            long_, lat = geo_locations.get_coords_from_postcode(row)
+            longitude.append(long_)
             latitude.append(lat)
         data['longitude'] = longitude
         data['latitude'] = latitude
