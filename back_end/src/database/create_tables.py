@@ -142,6 +142,20 @@ def create_predicted_admissions_table():
     return predicted_admissions_data
 
 
+def create_distance_from_uni_table():
+    """
+    Schema for distance_from_uni_data
+
+    :return: string representing table field commands
+    """
+    distance_from_uni_data = \
+        '   university_name STRING NOT NULL,' \
+        '   distance_from INTEGER,' \
+        '   property_id_hash STRING' \
+        ');'
+    return distance_from_uni_data
+
+
 def create_tables():
     """
     return SQL statements for creating tables
@@ -156,3 +170,4 @@ def create_tables():
     yield create_predicted_admissions_table()
     yield create_property_table()
     yield create_seen_queries()
+    yield create_distance_from_uni_table()
