@@ -4,35 +4,56 @@ from statsmodels.tsa.ar_model import AR
 from back_end.src.database.import_data_to_db import DatabaseHandler
 from datetime import datetime
 
+
 class AdzunaResponseProcessor:
 
     def __init__(self):
         self.db = DatabaseHandler
 
-    def query_by_postcode(self, postcode):
+    @staticmethod
+    def query_by_postcode(postcode):
         """
         Query database for properties by postcode
 
-        :param response_data: response object containing parameters
+        :param postcode: String - a postcode
         :return:
         """
         query = "SELECT * FROM house_price_data WHERE postcode = '{}' ORDER BY date_of_transfer;".format(postcode)
         results = DatabaseHandler.query_database(query)
         return results
 
-    def query_for_price_data(self, outcode):
-        #print(outcode)
+    @staticmethod
+    def query_for_price_data(outcode):
+        """
+        Query database for predicted admissions by university
+
+        :param outcode: String - an outcode
+        :return: query result
+        """
         query = "SELECT historical_data, prediction_data FROM predictions_data WHERE outcode = '{}';".format(outcode)
         results = DatabaseHandler.query_database(query)
-        #print(results)
         return results
 
-    def query_admission(self, university):
+    @staticmethod
+    def query_admission(university):
+        """
+        Query database for admissions by university
+
+        :param university: String - name of university
+        :return: query result
+        """
         query = "SELECT * FROM admissions_data WHERE university = '{}'".format(university)
         results = DatabaseHandler.query_database(query)
         return results
 
-    def query_predicted_admission_data(self, university):
+    @staticmethod
+    def query_predicted_admission_data(university):
+        """
+        Query database for predicted admissions by university
+
+        :param university: String - name of university
+        :return: query result
+        """
         query = "SELECT historic_admissions, predicted_admissions FROM predicted_admissions_table WHERE " \
                 "university = '{}'".format(university)
         results = DatabaseHandler.query_database(query)
@@ -41,13 +62,10 @@ class AdzunaResponseProcessor:
 
     def query_by_outcode(self, outcodes):
         """
-        Query database for properties by outcode
+        Query database for properties by outcode and insert market value predictions into database
 
         :param response_data: response object containing parameters
-        :return:
         """
-        #returned_house_prices_street = []
-        #returned_house_prices_area = []
         for outcode in outcodes:
             query = "SELECT outcode FROM predictions_data WHERE outcode = '{}'".format(outcode)
             result = DatabaseHandler.query_database(query)
@@ -60,10 +78,7 @@ class AdzunaResponseProcessor:
                 # returned_house_prices_area = returned_house_prices_area + query_results_area
                 if query_results_area:
                     start_date, historic_data, predicted_data = self.generate_prediction(query_results_area)
-                    #print("{} {} {}".format(start_date, historic_data, predicted_data))
-                    #print("inserting: {} {} {} {}".format(outcode, start_date, historic_data, predicted_data))
                     self.insert_predictions(outcode, start_date, historic_data, predicted_data)
-                    #return points, price, query_results_area
 
     def generate_admission_prediction(self):
         """
@@ -100,8 +115,11 @@ class AdzunaResponseProcessor:
                 predicted_data = (prediction_points, predicted_admissions)
                 self.insert_predicted_admission(uni_name, historic_data, predicted_data)
             except ValueError:
-                predicted_data = None
-                self.insert_predicted_admission(uni_name, historic_data, predicted_data)
+                pass
+                # predicted_data = None
+                # self.insert_predicted_admission(uni_name, historic_data, predicted_data)
+            # index_query = "CREATE INDEX university ON predicted_admissions_table (university);"
+            # DatabaseHandler.insert_to_db(index_query)
 
 
     def generate_prediction(self, data):
@@ -130,8 +148,6 @@ class AdzunaResponseProcessor:
         predictions = model_fit.predict(len(pricing_data["price"]), len(pricing_data["price"]) + 23)
 
         start_date = pricing_data.index.to_series().tolist()[0]
-        #print('-----------------------')
-        #print(pricing_data.index)
 
         historic_points = pricing_data.index.to_series().apply(lambda x: pd.datetime.strftime(x, '%m:%Y'))\
             .tolist()
@@ -148,10 +164,17 @@ class AdzunaResponseProcessor:
 
     @staticmethod
     def insert_predictions(outcode, start_date, historic, predictions):
+        """
+        insert record for predicted price of properties in an outcode
+
+        :param outcode: String - an outocode
+        :param start_date: String - Month Year
+        :param historic: tuple(list(String),list(String)) - historic data
+        :param predictions: tuple(list(String),list(String)) - prediction data
+        """
         historic_data = str(historic[0]) + ":" + str(historic[1])
         predictions_data = str(predictions[0]) + ":" + str(predictions[1])
         params = (outcode, start_date, historic_data, predictions_data)
-        #print(params[2])
         query = "INSERT INTO predictions_data VALUES (%s, %s, %s, %s)"
         DatabaseHandler.insert_to_db(query, params)
 
@@ -165,8 +188,6 @@ class AdzunaResponseProcessor:
         params = (university, historic_data, predictions_data)
         query = "INSERT INTO predicted_admissions_table VALUES (%s, %s, %s)"
         DatabaseHandler.insert_to_db(query, params)
-        #query = "CREATE INDEX university ON predicted_admissions_table (university);"
-        #DatabaseHandler.insert_to_db(query)
 
     @staticmethod
     def generate_date_points(dates):
@@ -210,9 +231,6 @@ class AdzunaResponseProcessor:
         return full_data
 
 
-if __name__ == "__main__":
-    a = AdzunaResponseProcessor()
-    a.generate_admission_prediction()
-
-
-    # print(a.fill_none_admissions([245,2667,424]))
+# if __name__ == "__main__":
+#     a = AdzunaResponseProcessor()
+#     a.generate_admission_prediction()

@@ -33,6 +33,7 @@ valid_adzuna_params = {'country', 'app_id', 'app_key', 'page', 'results_per_page
 def hello_world():
     return 'Hello, World!'
 
+
 @app.route('/testad')
 def test_admission():
     params = request.args.to_dict()
@@ -42,6 +43,7 @@ def test_admission():
     return_data = {"historic": {"x": historic_data[0], "y": historic_data[1]},
                    "predicted": {"x": predicted_data[0], "y": predicted_data[1]}}
     return jsonify(return_data)
+
 
 @app.route('/coords')
 def coordinates_endpoint():
@@ -116,7 +118,7 @@ def query_property_listing():
     """
     params = request.args.to_dict()
     results = []
-    final_response = []
+    university_admission_data = {}
     try:
         # If the user has selected they're searching for student rental opportunities
         if "search_student_lets" in params and params["search_student_lets"] == 'true':
@@ -144,6 +146,10 @@ def query_property_listing():
                 uni_params['where'] = post
                 uni_params['distance'] = params['km_away_from_uni']
 
+                data = query_predicted_admissions(uni[0])
+                if data:
+                    university_admission_data[uni[0]] = data
+
                 # Formatting parameters for use by adzuna
                 uni_params = format_params(uni_params)
                 property_listing = adzuna.get_property_listing(uni_params)
@@ -159,15 +165,14 @@ def query_property_listing():
             params = format_params(params)
             property_listing = adzuna.get_property_listing(params)
             results = property_listing.get("results")
-            print()
 
         if not results:
             return jsonify({"error": "No results returned"})
         else:
-            #results = large_images_only(results)
-            property_dict = build_property_dict(results)
+            results = large_images_only(results)
+            property_dict = build_property_dict(results, university_admission_data)
             final_response = property_dict
-            return jsonify(final_response)
+
             for r in results:
                 img = r['image_url']
                 query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
@@ -196,7 +201,14 @@ def query_property_listing():
         return jsonify({"error": 500})
 
 
-def build_property_dict(results):
+def build_property_dict(results, university_admissions_data=None):
+    """
+    Build the structure of the return json file
+
+    :param results: list(properties) - list of property data
+    :param university_admissions_data: list(dict()) - list of predicted admissions data
+    :return: dict of data to return
+    """
     historic_prices, predicted_prices = get_existing_outcode_processing(results)
     estimates = {}
     final_list = []
@@ -220,6 +232,7 @@ def build_property_dict(results):
                                                                   "y": predicted_prices[outcode][1]}
 
         property_dict["postcode"] = {"property": list(arp.query_by_postcode(property.get("postcode")))}
+        property_dict["admissions"] = university_admissions_data
         final_list.append(property_dict)
     return final_list
 
@@ -264,6 +277,12 @@ def get_existing_outcode_processing(results):
 
 
 def parse_prediction_data_from_db(query_results):
+    """
+    parse prediction data from query to lists
+
+    :param query_results: list(tuple) - results of query
+    :return: Historic data, predicted data
+    """
     print(query_results)
     historic_data = query_results[0][0].split(":")
     historic_months = historic_data[0]
@@ -295,6 +314,24 @@ def parse_prediction_data_from_db(query_results):
     predicted_data = (predicted_months, predicted_averages)
 
     return historic_data, predicted_data
+
+
+def query_predicted_admissions(university):
+    """
+    query predicted_admissions_table for one university's
+    prediction data
+
+    :param university: String - name of university
+    :return: dict
+    """
+    result = arp.query_predicted_admission_data(university)
+    if result:
+        historic_data, predicted_data = parse_prediction_data_from_db(result)
+        return_data = {"historic": {"x": historic_data[0], "y": historic_data[1]},
+                    "predicted": {"x": predicted_data[0], "y": predicted_data[1]}}
+        return return_data
+    else:
+        return None
 
 
 if __name__ == '__main__':
