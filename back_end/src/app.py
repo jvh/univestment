@@ -106,7 +106,7 @@ def query_property_listing():
     # If query has already been processed, get results
     already_processed = db_func.query_already_processed(query_id)
 
-    if already_processed:
+    if already_processed and 'testing' not in params:
         print("Query already processed... Getting results")
         # The final results after processing
         final_result = already_processed
