@@ -149,9 +149,10 @@ def create_distance_from_uni_table():
     :return: string representing table field commands
     """
     distance_from_uni_data = \
-        '   university_name STRING NOT NULL,' \
+        'CREATE TABLE IF NOT EXISTS distance_from_uni (' \
+        '   university_name TEXT NOT NULL,' \
         '   distance_from INTEGER,' \
-        '   property_id_hash STRING' \
+        '   property_id_hash TEXT' \
         ');'
     return distance_from_uni_data
 

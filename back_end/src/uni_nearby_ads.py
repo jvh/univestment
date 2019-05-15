@@ -3,10 +3,10 @@ import requests
 
 
 def get_ads_near_uni(university):
-    url = "localhost:5005/search"
+    url = "http://localhost:5005/search"
 
-    query = "SELECT postcode FROM uni-addresses-data WHERE establishmentname = '{}';".format(university)
-    uni_postcode = query_database(query)
+    query = "SELECT postcode FROM uni_addresses_data WHERE establishmentname = '{}';".format(university)
+    uni_postcode = query_database(query)[0]
 
     if uni_postcode:
         distance = 2
@@ -25,3 +25,7 @@ def get_ads_near_uni(university):
             params = (response[university, distance, ids])
             query = "INSERT INTO distance_from_uni_data VALUES (%s, %s, %s)"
             insert_to_db(query, params)
+
+
+if __name__ == "__main__":
+    get_ads_near_uni("University of Southampton")
