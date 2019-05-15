@@ -5,7 +5,7 @@ from copy import deepcopy
 from flask import jsonify
 
 from back_end.src.api_usage import geo_locations
-from back_end.src.app import adzuna
+from back_end.src import app
 from back_end.src.database import database_functions as db_func
 from back_end.src import format_results
 
@@ -45,7 +45,7 @@ def get_properties_near_unis(params):
 
         # Formatting parameters for use by adzuna
         uni_params = format_results.format_params(uni_params)
-        results = adzuna.get_property_listing(uni_params)
+        results = app.adzuna.get_property_listing(uni_params)
 
         for r in results:
             # Assigning that property to a particular university
@@ -67,7 +67,7 @@ def get_all_listings(params):
 
     :return:
     """
-    property_listing = adzuna.get_property_listing(params)
+    property_listing = app.adzuna.get_property_listing(params)
 
     return property_listing
 

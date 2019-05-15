@@ -4,8 +4,7 @@ Endpoints for our Flask API
 from flask import Flask, jsonify, request
 from flask_restful.utils.cors import crossdomain
 from flask_cors import CORS
-from back_end.src.api_usage.adzuna_ingest import Adzuna, AdzunaAPIException, \
-    AdzunaAuthorisationException, AdzunaRequestFormatException
+from back_end.src.api_usage import adzuna_ingest
 import uuid
 import psycopg2.extras as psql_extras
 
@@ -16,7 +15,7 @@ from back_end.src import format_results
 from back_end.src import property_price_predictions_helper as ppp_helper
 from back_end.src import seach_helper
 
-adzuna = Adzuna()
+adzuna = adzuna_ingest.Adzuna()
 app = Flask(__name__)
 CORS(app)
 
@@ -131,11 +130,11 @@ def query_property_listing():
                 # The final results after processing
                 final_result = large_images
 
-        except AdzunaAuthorisationException:
+        except adzuna_ingest.AdzunaAuthorisationException:
             return jsonify({"error": 410})
-        except AdzunaRequestFormatException:
+        except adzuna_ingest.AdzunaRequestFormatException:
             return jsonify({"error": 400})
-        except AdzunaAPIException:
+        except adzuna_ingest.AdzunaAPIException:
             return jsonify({"error": 500})
 
     # formatted_results = format_results(final_result, params)
