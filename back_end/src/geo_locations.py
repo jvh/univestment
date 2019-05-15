@@ -17,7 +17,6 @@ def get_coords_from_postcode(postcode):
     :param postcode: The postcode (in the UK)
     :return: The (longitude, latitude)
     """
-    postcode = postcode
     # Insert space if one doesn't exist
     if postcode[-4] != ' ':
         postcode = list(postcode)
@@ -54,5 +53,5 @@ def get_universities_near_location(location, distance):
 
 
 if __name__ == '__main__':
-    print(get_coords_from_postcode('SO151DP'))
+    print(get_coords_from_postcode('LS18 5HD'))
     # print(get_universities_near_location('SO15 1DP', 50))
