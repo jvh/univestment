@@ -6,15 +6,16 @@ from flask import jsonify
 
 from back_end.src.api_usage import geo_locations
 from back_end.src import app
-from back_end.src.database import database_functions as db_func
 from back_end.src import format_results
 
 
-def get_properties_near_unis(params):
+def get_properties_near_unis(params, results_per_page=50):
     """
     Returns all those properties within the vicinity of a university
 
     :param params: The parameters passed
+    :param results_per_page: A query result is divided into 'pages' by Adzuna. The maximum number of results per
+                            page is 50. This specifies the number of results returned per page
     :return: The list of properties near the universities
     """
     if "where" not in params:
@@ -45,7 +46,7 @@ def get_properties_near_unis(params):
 
         # Formatting parameters for use by adzuna
         uni_params = format_results.format_params(uni_params)
-        results = app.adzuna.get_property_listing(uni_params)
+        results = app.adzuna.get_property_listing(uni_params, results_per_page=results_per_page)
 
         for r in results:
             # Assigning that property to a particular university
