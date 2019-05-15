@@ -1,9 +1,12 @@
+"""
+Uses geopy for geographical information
+"""
 from geopy import geocoders
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 import certifi
 import ssl
-from back_end.src.database.import_data_to_db import DatabaseHandler as db_handler
+from back_end.src.database import generic_db_functions as general_db_func
 
 ctx = ssl.create_default_context(cafile=certifi.where())
 geocoders.options.default_ssl_context = ctx
@@ -37,7 +40,7 @@ def get_universities_near_location(location, distance):
     """
     long, lat = get_coords_from_postcode(location)
     origin = (long, lat)
-    unis = db_handler.query_database("SELECT * FROM uni_addresses_data")
+    unis = general_db_func.query_database("SELECT * FROM uni_addresses_data")
 
     nearby_unis = []
 
@@ -50,8 +53,3 @@ def get_universities_near_location(location, distance):
             nearby_unis.append(uni)
 
     return nearby_unis
-
-
-if __name__ == '__main__':
-    print(get_coords_from_postcode('LS18 5HD'))
-    # print(get_universities_near_location('SO15 1DP', 50))

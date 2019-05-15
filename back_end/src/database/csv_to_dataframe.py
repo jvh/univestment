@@ -1,4 +1,8 @@
+"""
+Imports CSV files to a pandas dataframe for further processing
+"""
 import pandas as pd
+
 from back_end.src import ROOT_DIR
 
 
@@ -27,10 +31,12 @@ class ImportFiles:
         read a file and return a dataframe containing the contents of the file
 
         :param file_path: path to file from root data path
+        :param chunksize: How many records we insert into the database at a time
+        :param names: Defining the column names
         :return: dataframe
         """
         if self.check_file(file_path):
-            if chunksize is not None:
+            if chunksize:
                 data = pd.read_csv(self.root_data_path + file_path, chunksize=chunksize, names=names)
             else:
                 data = pd.read_csv(self.root_data_path + file_path)
@@ -77,22 +83,9 @@ class ImportFiles:
         :return: dataframe
         """
         chunksize = 20000
-        names = ["iden",
-                "price",
-               "date_of_transfer",
-               "postcode",
-               "property_type",
-               "is_newly_built",
-               "duration",
-               "primary_addressable_object_name",
-               "secondary_addressable_object_name",
-               "street",
-               "locality",
-               "town_city",
-               "district",
-               "county",
-               "price_paid_transaction_type",
-                "record status"]
+        names = ["iden", "price", "date_of_transfer", "postcode", "property_type", "is_newly_built", "duration",
+                 "primary_addressable_object_name", "secondary_addressable_object_name", "street", "locality",
+                 "town_city", "district", "county", "price_paid_transaction_type", "record status"]
         try:
             return self.read_file('price_paid_data/pp-complete.csv', chunksize=chunksize,
                                   names=names)

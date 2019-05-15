@@ -1,10 +1,16 @@
-from back_end.src.database.import_files import ImportFiles
+"""
+Connects to postgres, creating and populating tables where applicable
+"""
 from sqlalchemy import create_engine
+
+from back_end.src.database.csv_to_dataframe import ImportFiles
 from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, POSTGRES_PORT, \
     DEVELOPMENT, POSTGRES_SUPER_PASSWORD, POSTGRES_IP
 import psycopg2
-from back_end.src.database.import_data_to_db import DatabaseHandler
-from back_end.src.response_processing import AdzunaResponseProcessor
+from back_end.src.database import import_from_datasets as ifd
+from back_end.src.preprocess_data import preprocess_admission_predictions as pap
+from back_end.src.database import create_tables as ct
+
 
 def database_commands(load_data=False):
     """
@@ -30,7 +36,7 @@ def database_commands(load_data=False):
                                                                     POSTGRES_DATABASE))
 
         # Creating tables
-        for table_command in DatabaseHandler.create_tables():
+        for table_command in ct.create_tables():
             cursor.execute(table_command)
 
         connection.commit()
@@ -39,11 +45,10 @@ def database_commands(load_data=False):
         if load_data:
             # Populate databases if not already populated
             import_files = ImportFiles()
-            DatabaseHandler.fill_uni_addresses(engine, import_files)
-            DatabaseHandler.fill_admissions_data(engine, import_files)
-            DatabaseHandler.fill_house_data(engine, import_files)
-            arp = AdzunaResponseProcessor()
-            arp.generate_admission_prediction()
+            ifd.fill_uni_addresses(engine, import_files)
+            ifd.fill_admissions_data(engine, import_files)
+            ifd.fill_house_data(engine, import_files)
+            pap.generate_admission_prediction()
 
         connection.commit()
         connection.close()
@@ -54,4 +59,3 @@ def database_commands(load_data=False):
 
 if __name__ == "__main__":
     database_commands()
-
