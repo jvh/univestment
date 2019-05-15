@@ -3,7 +3,7 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 import certifi
 import ssl
-from back_end.src.database.import_data_to_db import DatabaseHandler as db_handler
+from back_end.src.database import database_functions as db_func
 
 ctx = ssl.create_default_context(cafile=certifi.where())
 geocoders.options.default_ssl_context = ctx
@@ -37,7 +37,7 @@ def get_universities_near_location(location, distance):
     """
     long, lat = get_coords_from_postcode(location)
     origin = (long, lat)
-    unis = db_handler.query_database("SELECT * FROM uni_addresses_data")
+    unis = db_func.query_database("SELECT * FROM uni_addresses_data")
 
     nearby_unis = []
 

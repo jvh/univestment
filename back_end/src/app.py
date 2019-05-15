@@ -3,8 +3,8 @@ from flask_restful.utils.cors import crossdomain
 from flask_cors import CORS
 from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
     AdzunaAuthorisationException, AdzunaRequestFormatException
-from back_end.src.database.import_data_to_db import DatabaseHandler
 from back_end.src.response_processing import AdzunaResponseProcessor
+from back_end.src.database import database_functions as db_func
 
 from back_end.src import DEVELOPMENT
 from back_end.src import vision
@@ -18,7 +18,6 @@ import time
 adzuna = Adzuna()
 app = Flask(__name__)
 CORS(app)
-db = DatabaseHandler()
 arp = AdzunaResponseProcessor()
 
 # Valid parameters for adzuna
@@ -79,7 +78,7 @@ def large_images_only(results):
 
         img = r['image_url']
         query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
-        result = DatabaseHandler.query_database(query)
+        result = db_func.query_database(query)
 
         if result:
             large = result[0][-1]
@@ -90,7 +89,7 @@ def large_images_only(results):
             gen_id = psql_extras.UUID_adapter(gen_id)
             params = (gen_id, img, large)
             query = "INSERT INTO img_thumbnail_to_lrg VALUES (%s, %s, %s);"
-            DatabaseHandler.insert_to_db(query, params)
+            db_func.insert_to_db(query, params)
         if large:
             r['image_url'] = large
             new_results.append(r)
@@ -119,7 +118,7 @@ def query_already_processed(query_id):
     :return: If it has been processed, return list of results
     """
     query = "SELECT properties FROM seen_queries WHERE id={}".format(query_id)
-    if_processed = DatabaseHandler.query_database(query)
+    if_processed = db_func.query_database(query)
 
     # If the query has been processed beforehand
     if if_processed:
@@ -130,7 +129,7 @@ def query_already_processed(query_id):
         results_from_db_lrg = []
         for r in results:
             query = "SELECT * FROM seen_adverts WHERE id={}".format(r)
-            [db_res] = DatabaseHandler.query_database(query)
+            [db_res] = db_func.query_database(query)
 
             record = dict()
             record['has_large_img'] = db_res[14]
@@ -245,23 +244,23 @@ def populate_seen_tables(results, large_images, query_id, params):
 
         # Identify if the property advertisement has already been seen by the table
         seen_property_listing = "SELECT id FROM seen_adverts WHERE id=%s;"
-        seen_before = DatabaseHandler.query_database(seen_property_listing, args)
+        seen_before = db_func.query_database(seen_property_listing, args)
 
         # If it has been seen, update date
         if seen_before:
             search_property_query = "UPDATE seen_adverts SET date_of_insertion=DEFAULT WHERE id=%s;"
-            DatabaseHandler.insert_to_db(search_property_query, args)
+            db_func.insert_to_db(search_property_query, args)
         else:
             # Add it to the table
             add_property_query = "INSERT INTO seen_adverts VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
                                  "%s, %s, %s, DEFAULT, %s);"
             args = get_property_args(r, large_images)
-            DatabaseHandler.insert_to_db(add_property_query, args)
+            db_func.insert_to_db(add_property_query, args)
 
     # Add it to the table seen_queries
     add_query = "INSERT INTO seen_queries VALUES (%s, %s, %s, DEFAULT);"
     args = (query_id, str(params), ' '.join(str(e) for e in property_id_list))
-    DatabaseHandler.insert_to_db(add_query, args)
+    db_func.insert_to_db(add_query, args)
 
 
 def build_property_dict(results, university_admissions_data=None):
