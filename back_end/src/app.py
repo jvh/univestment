@@ -152,6 +152,8 @@ def query_property_listing():
 
     # formatted_results = format_results(final_result, params)
 
+    if 'testing' in params and params['testing'] == 'uni_nearby_ads':
+        return jsonify(final_result)
 
     # print("Building the machine learning model for outcodes...")
     # Builds the results with other metadata into a format to be consumed by frontend
