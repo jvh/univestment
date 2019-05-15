@@ -106,7 +106,10 @@ def query_property_listing():
     # If query has already been processed, get results
     already_processed = db_func.query_already_processed(query_id)
 
-    if already_processed:
+    if 'testing' in params:
+        print("Testing has been enabled.")
+
+    if already_processed and 'testing' not in params:
         print("Query already processed... Getting results")
         # The final results after processing
         final_result = already_processed
@@ -126,13 +129,16 @@ def query_property_listing():
             if not results:
                 return jsonify({"error": "No results returned"})
             else:
-                print("Getting large images...")
-                # Obtain all of those results which have large images available
-                large_images = format_results.large_images_only(results)
+                if 'testing' not in params:
+                    print("Getting large images...")
+                    # Obtain all of those results which have large images available
+                    large_images = format_results.large_images_only(results)
 
-                print("Populating seen_queries and seen_adverts tables...")
-                # Populates seen_queries and seen_adverts tables with results of query
-                db_func.populate_seen_tables(results, large_images, query_id, preprocessing_params)
+                    print("Populating seen_queries and seen_adverts tables...")
+                    # Populates seen_queries and seen_adverts tables with results of query
+                    db_func.populate_seen_tables(results, large_images, query_id, preprocessing_params)
+                else:
+                    large_images = results
 
                 # The final results after processing
                 final_result = large_images
