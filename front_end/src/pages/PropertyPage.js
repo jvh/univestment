@@ -26,13 +26,19 @@ class PropertyPage extends Component {
   }
 
   componentDidMount () {
-    console.log("Property")
+    console.log("HISTORIC")
     console.log(this.state.data);
   }
 
   back() {
 
   }
+
+  round(float) {
+    return Math.round(float/100)*100;
+  }
+
+//<p style={{fontSize:"125%"}} className="align-left">{this.state.adzuna.location.display_name}</p>
 
   render(){
     return (
@@ -48,7 +54,6 @@ class PropertyPage extends Component {
               <div className="row pad-top">
                 <div className="col-10">
                   <h1 className="align-left">{this.state.adzuna.title}</h1>
-                  <p style={{fontSize:"125%"}} className="align-left">{this.state.adzuna.location.display_name}</p>
                 </div>
                 <div className="col-2">
                   <h3 className="align-right">£{this.state.adzuna.sale_price}</h3>
@@ -69,16 +74,16 @@ class PropertyPage extends Component {
             </div>
           </div>
           <div className="pad-hor-both pad-top">
-            <div className="overline pad-top-large">
+            <div className="overline pad-top">
               <div>
-                <h1 className="align-center value-green" style={{fontSize:"350%"}}>£{this.state.data.property.market_value - this.state.adzuna.sale_price}</h1>
+                <h1 className="align-center value-green" style={{fontSize:"350%"}}>£{this.round(this.state.data.property.investment.market_value - this.state.adzuna.sale_price)}</h1>
                 <h3 className="align-center">Below Estimated Market Value</h3>
               </div>
             </div>
           </div>
           <div className="pad-hor-both" style={{textAlign:"justify"}}>
-            <p className="align-center"> The market value for this area has been estimated at £{this.state.data.property.market_value} meaning that
-            this property has a potential return of investment of up to £{this.state.data.property.market_value - this.state.adzuna.sale_price}
+            <p className="align-center"> The market value for this area has been estimated at £{this.round(this.state.data.property.investment.market_value)} meaning that
+            this property has a potential return of investment of up to £{this.round(this.state.data.property.investment.market_value - this.state.adzuna.sale_price)}
             </p>
           </div>
 
@@ -89,12 +94,14 @@ class PropertyPage extends Component {
             </div>
           </div>
           <div className="pad-hor-both" style={{textAlign:"justify"}}>
-            <p className="align-center"> The market value for this area has been estimated at £{this.state.data.property.market_value} meaning that
-            this property has a potential return of investment of up to £{this.state.data.property.market_value - this.state.adzuna.sale_price}
+            <p className="align-center"> The average rental income for this area is approximately £650, £125 more than the monthly mortgage payments.
             </p>
           </div>
-          <div className="graph">
-            <LineGraph width="500" height="500"/>
+          <div className="pad-hor-both pad-top">
+            <div className="graph-outer overline pad-top">
+              <h1 className="align-center" style={{fontSize:"275%"}}>Market Value Prediction</h1>
+              <LineGraph width="700" height="500" data={this.state.data.historic_data.outcode}/>
+            </div>
           </div>
 
         </div>

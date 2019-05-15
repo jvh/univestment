@@ -50,12 +50,20 @@ const addPost = (societyId, content) =>
 const buildQuery = (params) => {
   var query=`where=${params.where}`;
 
+  console.log("SEARCH PARAMS")
   console.log(params);
 
   query = params.price_min === undefined ? query : `${query}&price_min=${params.price_min}`;
   query = params.price_max === undefined ? query : `${query}&price_max=${params.price_max}`;
   query = params.beds === undefined ? query : `${query}&beds=${params.beds}`;
   query = params.distance === undefined ? query : `${query}&distance=${params.distance}`;
+  // if (params.km_away_from_uni !== undefined) {
+  //   query = `${query}&search_student_lets=true`;
+  //   query = params.distance === undefined ?  `${query}&radius_from=10` : `${query}&radius_from=${params.distance}`;
+  //   query = `${query}&km_away_from_uni=${params.km_away_from_uni}`
+  // } else {
+  //   query = params.distance === undefined ? query : `${query}&distance=${params.distance}`;
+  // }
 
   query = query.replace(/,/gi, "");
   query = query.replace(/ /gi, "");

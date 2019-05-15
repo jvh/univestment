@@ -7,6 +7,8 @@ import {
   FormLabel
 } from 'react-bootstrap';
 
+import Switch from 'react-switch';
+
 import { Collapse } from 'react-collapse';
 
 import ApiUtils from '../utils/ApiUtils.js';
@@ -23,10 +25,12 @@ class HomePageSearch extends Component {
       super(props);
       this.state = {
         form: {
-          where: ''
+          where: '',
+          uni_search: false
         },
         isOpened: props.isOpened,
-        isSubmitEnabled: false
+        isSubmitEnabled: false,
+        uniSearch:false
       }
       this.handleFormChange = this.handleFormChange.bind(this);
     }
@@ -43,6 +47,15 @@ class HomePageSearch extends Component {
     var regex = /^[A-Z]{1,2}[0-9]{1,2}[A-Z]{0,1} ?[0-9][A-Z]{2}$/i;
     console.log(regex.test(postcode));
     return regex.test(postcode);
+  }
+
+  handleSwitchChange = () => {
+    this.setState({
+      uniSearch:!this.state.uniSearch,
+      form: {
+        ...this.state.form,
+        uni_search:!this.state.form.uni_search
+      }});
   }
 
   handleFormChange = event => {
@@ -220,9 +233,8 @@ class HomePageSearch extends Component {
            </FormGroup>
          </Row>
 
-         <Row>
-
-           <Collapse isOpened={this.state.isOpened}>
+           <Collapse isOpened={this.state.isOpened} hasNestedCollapse={true}>
+            <Row>
              <FormGroup as={Col} controlId="distance">
                <FormLabel style={{fontWeight:"bold"}}>Distance from Location</FormLabel>
                <InputGroup>
@@ -260,8 +272,39 @@ class HomePageSearch extends Component {
                  <option>Flats</option>
                </FormControl>
              </FormGroup>
+            </Row>
+            <Row>
+             <FormGroup as={Col} className="col-4" controlId="university_search">
+              <FormLabel style={{fontWeight:"bold"}}>University Search?</FormLabel>
+              <div className="switch-pad">
+                <div className="switch-inner">
+                  <Switch
+                    onChange={this.handleSwitchChange}
+                    checked={this.state.uniSearch}
+                    className="react-switch"
+                  />
+                </div>
+              </div>
+             </FormGroup>
+             <FormGroup as={Col} className="col-8" controlId="university_search">
+             <Collapse isOpened={this.state.uniSearch}>
+               <FormLabel style={{fontWeight:"bold"}}>Distance From University</FormLabel>
+               <FormControl
+                as="select"
+                 name="km_away_from_uni"
+                 value={this.state.form.km_away_from_uni}
+                 onChange={this.handleFormChange}>
+                 <option>1</option>
+                 <option>2</option>
+                 <option>3</option>
+                 <option>4</option>
+                 <option>5</option>
+               </FormControl>
+               </Collapse>
+             </FormGroup>
+            </Row>
+
            </Collapse>
-         </Row>
 
          <Row className="pad-top">
 
