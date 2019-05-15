@@ -180,7 +180,6 @@ def get_properties_near_unis(params):
         # Formatting parameters for use by adzuna
         uni_params = format_params(uni_params)
         results = adzuna.get_property_listing(uni_params)
-        # results = property_listing.get("results")
 
         for r in results:
             # Assigning that property to a particular university
@@ -391,8 +390,6 @@ def query_property_listing():
     if 'radius_from' in params:
         preprocessing_params['radius_from'] = params['radius_from']
 
-    print(preprocessing_params)
-
     # Converting the parameters to a hash (that is deterministic)
     string_to_hash = []
     for p in sorted(preprocessing_params):
@@ -412,16 +409,7 @@ def query_property_listing():
         print("This query has not been seen before.")
         # Query has not been processed before and therefore must be processed as new
         try:
-            # If the user has selected they're searching for student rental opportunities
-            if "search_student_lets" in params and params["search_student_lets"] == 'true':
-                results = get_properties_near_unis(params)
-            else:
-                # If the user hasn't specified they are exclusively looking for student homes
-                params = format_params(params)
-
-                print("Getting listings from Adzuna...")
-                # Getting the results from Adzuna
-                results = get_all_listings(params)
+            results = get_properties_near_unis(params)
 
             if not results:
                 return jsonify({"error": "No results returned"})
