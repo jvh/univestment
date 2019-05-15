@@ -33,6 +33,15 @@ valid_adzuna_params = {'country', 'app_id', 'app_key', 'page', 'results_per_page
 def hello_world():
     return 'Hello, World!'
 
+@app.route('/testad')
+def test_admission():
+    params = request.args.to_dict()
+    university = params["university"]
+    result = arp.query_predicted_admission_data(university)
+    historic_data, predicted_data = parse_prediction_data_from_db(result)
+    return_data = {"historic": {"x": historic_data[0], "y": historic_data[1]},
+                   "predicted": {"x": predicted_data[0], "y": predicted_data[1]}}
+    return jsonify(return_data)
 
 @app.route('/coords')
 def coordinates_endpoint():
@@ -155,10 +164,10 @@ def query_property_listing():
         if not results:
             return jsonify({"error": "No results returned"})
         else:
-            results = large_images_only(results)
+            #results = large_images_only(results)
             property_dict = build_property_dict(results)
             final_response = property_dict
-
+            return jsonify(final_response)
             for r in results:
                 img = r['image_url']
                 query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
@@ -247,17 +256,29 @@ def get_existing_outcode_processing(results):
     for outcode in outcodes:
         query_results = arp.query_for_price_data(outcode)
 
-        historic_data = query_results[0][0].split(":")
-        historic_months = historic_data[0]
-        historic_averages = historic_data[1]
+        historic_data, predicted_data = parse_prediction_data_from_db(query_results)
 
-        historic_months = historic_months[1:len(historic_months)-1].split(",")
-        historic_averages = historic_averages[1:len(historic_averages)-1].split(",")
+        historic_prices[outcode] = (historic_data[0], historic_data[1])
+        predicted_prices[outcode] = (predicted_data[0], predicted_data[1])
+    return historic_prices, predicted_prices
 
-        historic_months = list(map(lambda x: int(x), historic_months))
-        historic_averages = list(map(lambda x: float(x), historic_averages))
 
-        predicted_data = query_results[0][1].split(":")
+def parse_prediction_data_from_db(query_results):
+    print(query_results)
+    historic_data = query_results[0][0].split(":")
+    historic_months = historic_data[0]
+    historic_averages = historic_data[1]
+
+    historic_months = historic_months[1:len(historic_months) - 1].split(",")
+    historic_averages = historic_averages[1:len(historic_averages) - 1].split(",")
+
+    historic_months = list(map(lambda x: int(x), historic_months))
+    historic_averages = list(map(lambda x: float(x), historic_averages))
+
+    predicted_data = query_results[0][1]
+
+    if predicted_data:
+        predicted_data = predicted_data.split(":")
         predicted_months = predicted_data[0]
         predicted_averages = predicted_data[1]
 
@@ -266,10 +287,14 @@ def get_existing_outcode_processing(results):
 
         predicted_months = list(map(lambda x: int(x), predicted_months))
         predicted_averages = list(map(lambda x: float(x), predicted_averages))
+    else:
+        predicted_months = []
+        predicted_averages = []
 
-        historic_prices[outcode] = (historic_months, historic_averages)
-        predicted_prices[outcode] = (predicted_months, predicted_averages)
-    return historic_prices, predicted_prices
+    historic_data = (historic_months, historic_averages)
+    predicted_data = (predicted_months, predicted_averages)
+
+    return historic_data, predicted_data
 
 
 if __name__ == '__main__':
