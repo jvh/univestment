@@ -19,10 +19,12 @@ class AdzunaRequestFormatException(Exception):
 
 
 class Adzuna:
+
     def __init__(self):
         self.API_URL = 'http://api.adzuna.com/v1/api/property/gb/search/'
 
-    def get_properties_per_page(self, params, url):
+    @staticmethod
+    def get_properties_per_page(params, url):
         """
         Gets the properties existing from the given url
         :param params: The parameters passed
@@ -66,6 +68,7 @@ class Adzuna:
         count = int(r['count'])
         number_pages = math.ceil(count / 50)
 
+        # Collecting all those properties delivered by Adzuna (across all pages)
         # for i in range(2, 5):
         #     page_number = i
         #     url = self.API_URL + str(page_number)
@@ -76,15 +79,3 @@ class Adzuna:
         #         results.append(result)
 
         return results
-
-
-
-
-# if __name__ == "__main__":
-#     ad = Adzuna()
-#     result = ad.api_call(params={"location0": "UK",
-#                         "location1": "South East England"})
-#     a = result.get("results")
-#     b =
-#     print(result.get("results"))
-#     print(result)

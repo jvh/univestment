@@ -8,7 +8,7 @@ from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE
     DEVELOPMENT, POSTGRES_SUPER_PASSWORD, POSTGRES_IP
 import psycopg2
 from back_end.src.database import import_from_datasets as ifd
-from back_end.src import response_processing
+from back_end.src.preprocess_data import preprocess_admission_predictions as pap
 from back_end.src.database import create_tables as ct
 
 
@@ -48,7 +48,7 @@ def database_commands(load_data=False):
             ifd.fill_uni_addresses(engine, import_files)
             ifd.fill_admissions_data(engine, import_files)
             ifd.fill_house_data(engine, import_files)
-            response_processing.generate_admission_prediction()
+            pap.generate_admission_prediction()
 
         connection.commit()
         connection.close()
@@ -59,4 +59,3 @@ def database_commands(load_data=False):
 
 if __name__ == "__main__":
     database_commands()
-

@@ -3,8 +3,10 @@ Provides basic functionality for interaction with the database
 """
 
 import psycopg2
+
 from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, DEVELOPMENT, \
     POSTGRES_SUPER_PASSWORD
+from back_end.src import property_price_predictions as ppp
 
 
 def insert_to_db(query, params=""):
@@ -29,7 +31,7 @@ def insert_to_db(query, params=""):
         connection.commit()
         connection.close()
         cursor.close()
-    except (Exception, psycopg2.Error) as error :
+    except (Exception, psycopg2.Error) as error:
         print("Error connecting to postgres: ", error)
 
 
@@ -62,7 +64,7 @@ def query_database(query, params=""):
         connection.close()
         cursor.close()
         return result
-    except (Exception, psycopg2.Error) as error :
+    except (Exception, psycopg2.Error) as error:
         print("Error connecting to postgres: ", error)
 
 
@@ -133,5 +135,5 @@ def query_by_outcode(outcodes):
 
             # returned_house_prices_area = returned_house_prices_area + query_results_area
             if query_results_area:
-                start_date, historic_data, predicted_data = generate_prediction(query_results_area)
-                insert_predictions(outcode, start_date, historic_data, predicted_data)
+                start_date, historic_data, predicted_data = ppp.generate_prediction(query_results_area)
+                ppp.insert_predictions(outcode, start_date, historic_data, predicted_data)

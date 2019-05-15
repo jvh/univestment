@@ -61,7 +61,7 @@ def fill_house_data(engine, import_files):
                                                   "secondary_addressable_object_name",
                                                   "price_paid_transaction_type", "record status"])
         chunked_data = chunked_data[pd.notnull(chunked_data['postcode'])]
-        chunked_data['postcode'] = chunked_data['postcode'].apply(lambda x: x.replace(" ",""))
+        chunked_data['postcode'] = chunked_data['postcode'].apply(lambda x: x.replace(" ", ""))
         chunked_data['id'] = [uuid4() for _ in range(len(chunked_data.index))]
 
         chunked_data.to_sql('house_price_data', engine, if_exists="fail", index=False)

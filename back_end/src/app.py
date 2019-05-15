@@ -3,7 +3,6 @@ from flask_restful.utils.cors import crossdomain
 from flask_cors import CORS
 from back_end.src.adzuna_ingest import Adzuna, AdzunaAPIException, \
     AdzunaAuthorisationException, AdzunaRequestFormatException
-from back_end.src.response_processing import AdzunaResponseProcessor
 from back_end.src.database import database_functions as db_func
 
 from back_end.src import DEVELOPMENT
@@ -18,26 +17,33 @@ import time
 adzuna = Adzuna()
 app = Flask(__name__)
 CORS(app)
-arp = AdzunaResponseProcessor()
 
 # Valid parameters for adzuna
 valid_adzuna_params = {'country', 'app_id', 'app_key', 'page', 'results_per_page', 'what', 'what_and', 'what_phrase',
-                'what_or', 'what_exclude', 'title_only', 'location0', 'location1', 'location2', 'location3',
-                'location4', 'location5	', 'location6', 'location7', 'where', 'distance', 'max_days_old',
-                'category', 'sort_direction', 'sort_by', 'beds', 'is_furnished', 'price_min', 'price_max',
-                'price_include_unknown', 'property_type'}
+                       'what_or', 'what_exclude', 'title_only', 'location0', 'location1', 'location2', 'location3',
+                       'location4', 'location5	', 'location6', 'location7', 'where', 'distance', 'max_days_old',
+                       'category', 'sort_direction', 'sort_by', 'beds', 'is_furnished', 'price_min', 'price_max',
+                       'price_include_unknown', 'property_type'}
 
 
 @app.route('/')
 def hello_world():
+    """
+    First hello world thing
+    """
     return 'Hello, World!'
 
 
 @app.route('/testad')
 def test_admission():
+    """
+    An endpoint for returning historic and predicted admissions for a given university
+
+    :return: University admissions data
+    """
     params = request.args.to_dict()
     university = params["university"]
-    result = arp.query_predicted_admission_data(university)
+    result = db_func.query_predicted_admission_data(university)
     historic_data, predicted_data = parse_prediction_data_from_db(result)
     return_data = {"historic": {"x": historic_data[0], "y": historic_data[1]},
                    "predicted": {"x": predicted_data[0], "y": predicted_data[1]}}
@@ -48,6 +54,7 @@ def test_admission():
 def coordinates_endpoint():
     """
     Given a postcode, return coordinates
+
     :return: Coordinates (jsonified)
     """
     params = request.args.to_dict()
@@ -59,6 +66,9 @@ def coordinates_endpoint():
 @app.route('/test_data', methods=['GET', 'POST'])
 @crossdomain(origin='*')
 def test_data():
+    """
+    Jsonified test data
+    """
     if request.method == 'POST':
         return 'ok'
     elif request.method == 'GET':
@@ -274,16 +284,17 @@ def build_property_dict(results, university_admissions_data=None):
     historic_prices, predicted_prices = get_existing_outcode_processing(results)
     estimates = {}
     final_list = []
-    for property in results:
-        if "postcode" not in property:
+    for p in results:
+        if "postcode" not in p:
             continue
 
-        outcode = property["postcode"][:len(property["postcode"]) - 3]
+        outcode = p["postcode"][:len(p["postcode"]) - 3]
 
         current_estimate = get_current_estimate(historic_prices[outcode][1][-1], predicted_prices[outcode][1][0])
         estimates[outcode] = current_estimate
 
-        property_dict = {"property": {"adzuna": property}}
+        property_dict = dict()
+        property_dict["property"] = {"adzuna": p}
 
         # placeholder
         property_dict["property"]["investment"] = {"market_value": current_estimate}
@@ -293,7 +304,7 @@ def build_property_dict(results, university_admissions_data=None):
         property_dict["historic_data"]["outcode"]["predicted"] = {"x": predicted_prices[outcode][0],
                                                                   "y": predicted_prices[outcode][1]}
 
-        property_dict["postcode"] = {"property": list(arp.query_by_postcode(property.get("postcode")))}
+        property_dict["postcode"] = {"property": list(db_func.query_by_postcode(p.get("postcode")))}
         property_dict["admissions"] = university_admissions_data
         final_list.append(property_dict)
     return final_list
@@ -326,12 +337,12 @@ def get_existing_outcode_processing(results):
             outcode = postcode[0:len(postcode)-3]
             outcodes.add(outcode)
 
-    arp.query_by_outcode(outcodes)
+    db_func.query_by_outcode(outcodes)
     historic_prices = {}
     predicted_prices = {}
 
     for outcode in outcodes:
-        query_results = arp.query_for_price_data(outcode)
+        query_results = db_func.query_for_price_data(outcode)
 
         historic_data, predicted_data = parse_prediction_data_from_db(query_results)
 
@@ -388,11 +399,11 @@ def query_predicted_admissions(university):
     :param university: String - name of university
     :return: dict
     """
-    result = arp.query_predicted_admission_data(university)
+    result = db_func.query_predicted_admission_data(university)
     if result:
         historic_data, predicted_data = parse_prediction_data_from_db(result)
         return_data = {"historic": {"x": historic_data[0], "y": historic_data[1]},
-                    "predicted": {"x": predicted_data[0], "y": predicted_data[1]}}
+                       "predicted": {"x": predicted_data[0], "y": predicted_data[1]}}
         return return_data
     else:
         return None
@@ -411,26 +422,26 @@ def get_all_listings(params):
 
     return property_listing
 
-
-def format_results(results, params):
-    """
-    Formats results such that we only return ones which are appropriate
-    """
-    beds = None
-    min_price = None
-    max_price = None
-    if 'beds' in params:
-        beds = params['beds']
-    if 'price_min' in params:
-        min_price = params['price_min']
-    if 'price_max' in params:
-        max_price = params['price_max']
-
-    new_results = []
-    # for r in results:
-    #     if beds and
-
-    return results
+#
+# def format_results(results, params):
+#     """
+#     Formats results such that we only return ones which are appropriate
+#     """
+#     beds = None
+#     min_price = None
+#     max_price = None
+#     if 'beds' in params:
+#         beds = params['beds']
+#     if 'price_min' in params:
+#         min_price = params['price_min']
+#     if 'price_max' in params:
+#         max_price = params['price_max']
+#
+#     new_results = []
+#     # for r in results:
+#     #     if beds and
+#
+#     return results
 
 
 @app.route('/search')
@@ -494,11 +505,11 @@ def query_property_listing():
         except AdzunaAPIException:
             return jsonify({"error": 500})
 
-    formatted_results = format_results(final_result, params)
+    # formatted_results = format_results(final_result, params)
 
     print("Building the machine learning model for outcodes...")
     # Builds the results with other metadata into a format to be consumed by frontend
-    property_dict = build_property_dict(formatted_results)
+    property_dict = build_property_dict(final_result)
     print("Finished.")
     return jsonify(property_dict)
 
@@ -508,4 +519,3 @@ if __name__ == '__main__':
         app.run(host='0.0.0.0', port=5005, debug=True)
     else:
         app.run(debug=False)
-

@@ -54,4 +54,3 @@ def get_universities_near_location(location, distance):
 
 if __name__ == '__main__':
     print(get_coords_from_postcode('LS18 5HD'))
-    # print(get_universities_near_location('SO15 1DP', 50))
