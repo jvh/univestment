@@ -41,7 +41,7 @@ def get_properties_near_unis(params):
         uni_params['where'] = post
         uni_params['distance'] = params['km_away_from_uni']
 
-        data = db_func.query_predicted_admissions(uni[0])
+        # data = db_func.query_predicted_admissions(uni[0])
 
         # Formatting parameters for use by adzuna
         uni_params = format_results.format_params(uni_params)
@@ -50,8 +50,8 @@ def get_properties_near_unis(params):
         for r in results:
             # Assigning that property to a particular university
             r['university'] = uni[0]
-            if data:
-                r["admissions"] = data
+            # if data:
+            #     r["admissions"] = data
             if r not in properties:
                 properties.append(r)
 

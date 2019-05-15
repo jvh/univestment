@@ -71,7 +71,6 @@ class Adzuna:
         # Getting the total count in order to determine the number of pages necessary
         count = int(r['count'])
         number_pages = math.ceil(count / 50)
-        print(number_pages)
 
         # Collecting all those properties delivered by Adzuna (across all pages)
         # for i in range(2, 5):

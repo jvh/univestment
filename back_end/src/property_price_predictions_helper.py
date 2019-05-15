@@ -55,7 +55,6 @@ def parse_prediction_data_from_db(query_results):
     :param query_results: list(tuple) - results of query
     :return: Historic data, predicted data
     """
-    print(query_results)
     historic_data = query_results[0][0].split(":")
     historic_months = historic_data[0]
     historic_averages = historic_data[1]

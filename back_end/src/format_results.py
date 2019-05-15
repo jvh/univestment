@@ -89,6 +89,17 @@ def build_property_dict(results, university_admissions_data=None):
     historic_prices, predicted_prices = ppd_helper.get_existing_outcode_processing(results)
     estimates = {}
     final_list = []
+    # final_list = {}
+
+    # property_results = dict()
+    # 
+    # for r in results:
+    #     id = r['id']
+    #     del r['id']
+    #     property_results[id] = r
+    #
+    # final_list['properties'] = property_results
+
     for p in results:
         if "postcode" not in p:
             continue
