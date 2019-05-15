@@ -22,6 +22,18 @@ Admission data for U.K. universities.
 
 Connect to the deployment server using SSH: `ssh -p 9922 odi13@jacktarbox.co.uk`.
 
+### Server
+
+The application is currently running on our company's own server. This is due to the small nature of our application for the time being until our userbase becomes larger. The following are some commands to interact with the server.
+
+`sudo supervisorctl restart odi_flask`: Restarts the flask server.
+
+`sudo supervisorctl status`: Views the status of the services running.
+
+`cat /var/log/odi_server/odi-flask.err.log`: View error log for flask.
+
+`cat /var/log/odi_server/odi-flask.out.log`: View out log for flask.
+
 ### Back-end
 
 The back-end is written primarily in Python.
