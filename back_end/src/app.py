@@ -14,6 +14,7 @@ from back_end.src.api_usage import geo_locations
 from back_end.src import format_results
 from back_end.src import property_price_predictions_helper as ppp_helper
 from back_end.src import seach_helper
+from back_end.src import uni_nearby_ads
 
 adzuna = adzuna_ingest.Adzuna()
 app = Flask(__name__)
@@ -122,9 +123,11 @@ def query_property_listing():
                 test_params = dict()
                 test_params['where'] = params['where']
                 test_params['distance'] = params['distance']
-                results = app.adzuna.get_property_listing(test_params, results_per_page=10)
+                results = adzuna.get_property_listing(test_params, results_per_page=10)
             else:
                 results = seach_helper.get_properties_near_unis(params)
+
+            uni_nearby_ads.get_ads_near_uni("University of Southampton", results, params['distance'])
 
             if not results:
                 return jsonify({"error": "No results returned"})
