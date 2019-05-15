@@ -1,7 +1,9 @@
+"""
+ML model to predict future housing market value
+"""
 import pandas as pd
 import numpy as np
 from statsmodels.tsa.ar_model import AR
-from back_end.src.database import database_functions as db_func
 
 
 def generate_prediction(data):
@@ -43,22 +45,6 @@ def generate_prediction(data):
     predicted_data = (predicted_points, predicted_prices)
 
     return start_date, historic_data, predicted_data
-
-
-def insert_predictions(outcode, start_date, historic, predictions):
-    """
-    insert record for predicted price of properties in an outcode
-
-    :param outcode: String - an outocode
-    :param start_date: String - Month Year
-    :param historic: tuple(list(String),list(String)) - historic data
-    :param predictions: tuple(list(String),list(String)) - prediction data
-    """
-    historic_data = str(historic[0]) + ":" + str(historic[1])
-    predictions_data = str(predictions[0]) + ":" + str(predictions[1])
-    params = (outcode, start_date, historic_data, predictions_data)
-    query = "INSERT INTO predictions_data VALUES (%s, %s, %s, %s)"
-    db_func.insert_to_db(query, params)
 
 
 def generate_date_points(dates):

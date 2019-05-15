@@ -1,4 +1,8 @@
+"""
+Imports CSV files to a pandas dataframe for further processing
+"""
 import pandas as pd
+
 from back_end.src import ROOT_DIR
 
 

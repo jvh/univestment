@@ -1,9 +1,9 @@
 """
 Connects to postgres, creating and populating tables where applicable
 """
-
-from back_end.src.database.import_files import ImportFiles
 from sqlalchemy import create_engine
+
+from back_end.src.database.csv_to_dataframe import ImportFiles
 from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE, POSTGRES_SUPER, POSTGRES_PORT, \
     DEVELOPMENT, POSTGRES_SUPER_PASSWORD, POSTGRES_IP
 import psycopg2

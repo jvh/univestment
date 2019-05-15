@@ -1,5 +1,5 @@
 """
-Imports data from datasets into our database
+Imports data from pandas dataframes into our database
 """
 import pandas as pd
 from uuid import uuid4
@@ -25,7 +25,7 @@ def fill_uni_addresses(engine, import_files):
     :param engine: database engine object
     :param import_files: ImportFiles object
     """
-    from back_end.src import geo_locations
+    from back_end.src.api_usage import geo_locations
 
     data = import_files.uni_addresses
     data.columns = map(str.lower, data.columns)

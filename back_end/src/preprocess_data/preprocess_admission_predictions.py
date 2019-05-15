@@ -5,7 +5,7 @@ from datetime import datetime
 from statsmodels.tsa.ar_model import AR
 import pandas as pd
 
-from back_end.src.database import database_functions as db_func
+from back_end.src.database import generic_db_functions as general_db_func
 
 
 def generate_admission_year_points(future=False):
@@ -39,7 +39,7 @@ def generate_admission_prediction():
     forcast next year's admission statistics for universities
     """
     query = "SELECT * FROM admissions_data"
-    result = db_func.query_database(query)
+    result = general_db_func.query_database(query)
     admission_data = pd.DataFrame(result)
     admission_data.rename(columns={0: "year", 1: "university", 2: "admissions", 3: "id"}, inplace=True)
     admission_data = admission_data.sort_values(by=["university", "year"], ascending=True)
@@ -85,4 +85,4 @@ def insert_predicted_admission(university, historic, predictions):
         predictions_data = None
     params = (university, historic_data, predictions_data)
     query = "INSERT INTO predicted_admissions_table VALUES (%s, %s, %s)"
-    db_func.insert_to_db(query, params)
+    general_db_func.insert_to_db(query, params)
