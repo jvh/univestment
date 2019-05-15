@@ -355,12 +355,19 @@ def format_results(results, params):
     """
     Formats results such that we only return ones which are appropriate
     """
+    beds = None
+    min_price = None
+    max_price = None
     if 'beds' in params:
         beds = params['beds']
     if 'price_min' in params:
         min_price = params['price_min']
     if 'price_max' in params:
         max_price = params['price_max']
+
+    new_results = []
+    # for r in results:
+    #     if beds and
 
     return results
 
@@ -448,7 +455,7 @@ def query_property_listing():
 
 if __name__ == '__main__':
     if DEVELOPMENT:
-        app.run(host='0.0.0.0', port=5000, debug=True)
+        app.run(host='0.0.0.0', port=5005, debug=True)
     else:
         app.run(debug=False)
 
