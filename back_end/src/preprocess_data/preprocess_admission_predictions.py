@@ -41,14 +41,14 @@ def generate_admission_prediction():
     query = "SELECT * FROM admissions_data"
     result = general_db_func.query_database(query)
     admission_data = pd.DataFrame(result)
-    admission_data.rename(columns={0: "year", 1: "university", 2: "admissions", 3: "id"}, inplace=True)
+    admission_data.rename(columns={0: "year", 1: "university", 2: "admissions"}, inplace=True)
     admission_data = admission_data.sort_values(by=["university", "year"], ascending=True)
     admission_data = admission_data.groupby("university")
     admission_data = [admission_data.get_group(x) for x in admission_data.groups]
 
     for uni in admission_data:
         uni_name = list(uni["university"])[0]
-        uni = uni.drop(columns=["university", "id"])
+        uni = uni.drop(columns=["university"])
         uni.set_index(uni.year, inplace=True)
 
         historic_points = generate_admission_year_points()
