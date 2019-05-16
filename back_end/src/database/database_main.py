@@ -12,9 +12,12 @@ from back_end.src.preprocess_data import preprocess_admission_predictions as pap
 from back_end.src.database import create_tables as ct
 
 
-def database_commands(load_data=False):
+def database_commands(load_data=False, manual_import=False):
     """
     Create tables for all data sets if they do not already exist
+
+    :param load_data: True if data should be loaded automatically from CSV
+    :param manual_import: True if data should be loaded manually from CSV
     """
     try:
         if DEVELOPMENT:
@@ -40,6 +43,12 @@ def database_commands(load_data=False):
             cursor.execute(table_command)
 
         connection.commit()
+
+        # Manually populate table from CSV
+        if manual_import:
+            import_files = ImportFiles()
+            data = import_files.read_file(absolute_path='insert_abs_path')
+
 
         # If you need to load the data into the database
         if load_data:
