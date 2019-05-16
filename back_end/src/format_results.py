@@ -12,6 +12,7 @@ from back_end.src.predictions import property_price_predictions_helper as ppd_he
 from back_end.src.database import generic_db_functions as general_db_fun
 from back_end.src import average_rent
 
+
 def large_images_only(results):
     """
     Gets those properties with large images only (not only thumbnails)

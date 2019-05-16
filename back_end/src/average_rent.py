@@ -87,6 +87,6 @@ def calculate_average_total_rent_by_bed(outcode):
     return average_rents
 
 
-if __name__ == "__main__":
-    a = calculate_average_rent_by_bed("DA51ER")
-    print(a)
+# if __name__ == "__main__":
+#     a = calculate_average_rent_by_bed("DA51ER")
+#     print(a)
