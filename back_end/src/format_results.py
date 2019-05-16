@@ -126,6 +126,32 @@ def hash_params(params):
     return query_id
 
 
+def build_property_dict_universities(university):
+    """
+    Builds the universities section of property_dict containing data regarding properties which encompass the
+    universities
+
+    :param university: The university you would like to gather data for
+    :return: The data regarding that university
+    """
+    data = dict()
+    admissions = db_func.query_predicted_admissions(university)
+
+    # Getting logo if exists and putting into correct format
+    logo = db_func.query_uni_logos(university)
+    if logo:
+        [logo] = logo
+        logo = logo[0]
+    else:
+        logo = None
+
+    data['name'] = university
+    data['logo'] = logo
+    data['admissions'] = admissions
+
+    return data
+
+
 def build_property_dict(results):
     """
     Build the structure of the return json file
@@ -133,8 +159,7 @@ def build_property_dict(results):
     :param results: list(properties) - list of property data
     :return: dict of data to return
     """
-    # historic_prices, predicted_prices = ppd_helper.get_existing_outcode_processing(results)
-    # estimates = {}
+    # The returned JSON file formatted for the web
     formatted_json = {}
 
     # Unique set of universities connected to all houses in property_results
@@ -169,33 +194,25 @@ def build_property_dict(results):
 
     # University admissions data
     for u in universities:
-        property_by_university[u] = []
-        data = dict()
-        admissions = db_func.query_predicted_admissions(u)
-
-        # Getting logo if exists and putting into correct format
-        logo = db_func.query_uni_logos(u)
-        if logo:
-            [logo] = logo
-            logo = logo[0]
-        else:
-            logo = None
-
-        data['name'] = u
-        data['logo'] = logo
-        data['admissions'] = admissions
-
+        data = build_property_dict_universities(u)
         university_admissions_data.append(data)
 
     # Outcode price point predictions data
     for o in outcodes:
         db_func.insert_price_data_if_not_exist(o)
         ppd_outcode = db_func.get_property_price_data_for_outcode(o)
-        average_total_rent_by_bed = average_rent.calculate_average_total_rent_by_bed(o)
-        outcode_price_data.append(ppd_outcode)
         outcode_price_data_dict[o] = ppd_outcode
+
+        # Getting the average rent prices for current property listing in the outcode, divided by number of beds
+        average_total_rent_by_bed = average_rent.calculate_average_total_rent_by_bed(o)
         outcode_price_data_dict[o]["average_total_rent_by_bed"] = average_total_rent_by_bed
         outcode_rent[o] = average_total_rent_by_bed
+
+        outcode_price_data.append(ppd_outcode)
+
+    # Populating property_by_university with the universities
+    for u in universities:
+        property_by_university[u] = list()
 
     # Individual listing data
     for r in results:
@@ -206,13 +223,13 @@ def build_property_dict(results):
         sale_price = r['sale_price']
         p_data['data'] = r
         p_uni = r['university']
-        property_by_university[p_uni].append(r)
 
         # Getting the rent(s) for the outcode. Getting the average rent for the number of beds in this property.
         outcode_rent_data = outcode_rent[outcode]
         average_rent_for_beds = outcode_rent_data[beds]
-        if average_rent_for_beds == 0:
 
+        # In the case no properties in that postcode with x amount of beds exist
+        if average_rent_for_beds == 0:
             # Setting the starting point to look for beds
             if beds == 1:
                 start_beds = 2
@@ -232,7 +249,6 @@ def build_property_dict(results):
         # Calculate mortgage payments
         mortgage_return = mortgage_payment.calculate_mortgage_return(sale_price, average_rent_for_beds)
 
-
         # Getting outcode price data and finding an estimate of the predicted price (obtaining market_value)
         investment_dict = dict()
         outcode_pd = outcode_price_data_dict[outcode]
@@ -243,22 +259,45 @@ def build_property_dict(results):
         investment_dict['market_value'] = estimated_return
         # Add mortgage repayment to return json
         investment_dict["mortgage_return"] = mortgage_return
+        # investment_dict['mortgage_minus_market'] = mortgage_return - estimated_return
         p_data['investment'] = investment_dict
 
         # Properties existing within that postcode
         p_data["postcode"] = db_func.query_by_postcode(postcode)
+        property_by_university[p_uni].append(p_data)
+        # property_results.append(p_data)
 
-        property_results.append(p_data)
-
+    property_results = get_best_properties_per_uni(property_by_university)
     formatted_json['properties'] = property_results
     formatted_json["universities"] = university_admissions_data
     formatted_json["outcodes"] = outcode_price_data
-    print(property_by_university)
+    # print(property_by_university)
+
+
 
     return formatted_json
 
-def filter_for_best_results(property_by_university):
-    best_results = dict()
-    for university in property_by_university.keys():
-        # sorted_results = sorted(property_by_university[university], lambda x: x['investment']['mortgage_return ']
-        # ['mortgage_payment'])
+
+def get_best_properties_per_uni(property_by_uni, number_properties=100):
+    """
+    Returns the best number_properties for that university.
+
+    :param property_by_uni: Each university's properties
+    :parma number_properties: The number of properties returned
+    :return: The best properties for that university
+    """
+    for uni in property_by_uni:
+        uni_properties = property_by_uni[uni]
+        # uni_properties.sort()
+        # for property in uni_properties:
+        #
+        print(uni_properties)
+
+def get_best_results_for_uni(property_by_university):
+    pass
+
+# def filter_for_best_results(property_by_university):
+#     best_results = dict()
+#     for university in property_by_university.keys():
+#         # sorted_results = sorted(property_by_university[university], lambda x: x['investment']['mortgage_return ']
+#         # ['mortgage_payment'])
