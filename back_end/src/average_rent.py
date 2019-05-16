@@ -48,9 +48,9 @@ def get_rental_properties(outcode):
     return results
 
 
-def calculate_average_rent_by_bed(outcode):
+def calculate_average_total_rent_by_bed(outcode):
     """
-    Calculate average rent price for properties within outcode of property
+    Calculate average total rent price for properties within outcode of property
 
     :param postcode: postcode to search in
     :return: dict of average rent price by beds
