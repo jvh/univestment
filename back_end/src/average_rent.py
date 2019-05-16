@@ -3,7 +3,7 @@ from back_end.src.database import database_functions as db_func
 from back_end.src import format_results
 
 
-def get_rental_properties(postcode):
+def get_rental_properties(outcode):
     """
     Get rental properties from database or Adzuna
 
@@ -14,7 +14,7 @@ def get_rental_properties(postcode):
 
     # Search parameters
     params = dict()
-    params["where"] = postcode[:-3]
+    params["where"] = outcode
     params["category"] = "to-rent"
     params["distance"] = distance
 
@@ -45,7 +45,7 @@ def get_rental_properties(postcode):
     return results
 
 
-def calculate_average_rent_by_bed(postcode):
+def calculate_average_rent_by_bed(outcode):
     """
     Calculate average rent price for properties within outcode of property
 
@@ -60,7 +60,7 @@ def calculate_average_rent_by_bed(postcode):
     counts = {bed: 0 for bed in range(1, max_beds)}
 
     # Get rental property listings
-    results = get_rental_properties(postcode)
+    results = get_rental_properties(outcode)
 
     # Get running total and counts over results
     for r in results:
