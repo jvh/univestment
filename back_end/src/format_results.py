@@ -23,10 +23,11 @@ def large_images_only(results):
 
     for i in range(len(results)):
         r = results[i]
-        if 'image_url' not in r:
+        r_data = r['data']
+        if 'image_url' not in r_data:
             continue
 
-        img = r['image_url']
+        img = r_data['image_url']
         query = "SELECT * FROM img_thumbnail_to_lrg WHERE thumbnail_url='{}';".format(img)
         result = general_db_fun.query_database(query)
 
@@ -41,7 +42,7 @@ def large_images_only(results):
             query = "INSERT INTO img_thumbnail_to_lrg VALUES (%s, %s, %s);"
             general_db_fun.insert_to_db(query, params)
         if large:
-            r['image_url'] = large
+            r_data['image_url'] = large
             new_results.append(r)
 
     return new_results
@@ -258,8 +259,8 @@ def build_property_dict(results):
         estimated_return = ppd_helper.get_current_estimate(latest_historic_price, predicted_first)
         investment_dict['market_value'] = estimated_return
         # Add mortgage repayment to return json
+        mortgage_return['potential_rent_profit'] = mortgage_return["rent"] - mortgage_return["mortgage_payment"]
         investment_dict["mortgage_return"] = mortgage_return
-        # investment_dict['mortgage_minus_market'] = mortgage_return - estimated_return
         p_data['investment'] = investment_dict
 
         # Properties existing within that postcode
@@ -271,9 +272,6 @@ def build_property_dict(results):
     formatted_json['properties'] = property_results
     formatted_json["universities"] = university_admissions_data
     formatted_json["outcodes"] = outcode_price_data
-    # print(property_by_university)
-
-
 
     return formatted_json
 
@@ -283,21 +281,23 @@ def get_best_properties_per_uni(property_by_uni, number_properties=100):
     Returns the best number_properties for that university.
 
     :param property_by_uni: Each university's properties
-    :parma number_properties: The number of properties returned
+    :param number_properties: The number of properties returned
     :return: The best properties for that university
     """
+    best_properties = list()
     for uni in property_by_uni:
         uni_properties = property_by_uni[uni]
-        # uni_properties.sort()
-        # for property in uni_properties:
-        #
-        print(uni_properties)
+        # Getting the best potential_rent_profit ordered
+        uni_properties.sort(key=lambda k: (k['investment']['mortgage_return']['potential_rent_profit']), reverse=True)
+        # Only those with a profit
+        uni_properties = [x for x in uni_properties if x['investment']['mortgage_return']['potential_rent_profit'] > 0]
 
-def get_best_results_for_uni(property_by_university):
-    pass
+        best_properties.extend(uni_properties)
 
-# def filter_for_best_results(property_by_university):
-#     best_results = dict()
-#     for university in property_by_university.keys():
-#         # sorted_results = sorted(property_by_university[university], lambda x: x['investment']['mortgage_return ']
-#         # ['mortgage_payment'])
+    large_images = large_images_only(best_properties)
+    # Getting the best overall properties
+    large_images.sort(key=lambda k: (k['investment']['mortgage_return']['potential_rent_profit']), reverse=True)
+    # Getting top number_properties results
+    best_properties = large_images[:number_properties]
+
+    return best_properties
