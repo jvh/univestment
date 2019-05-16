@@ -13,6 +13,7 @@ class ImportFiles:
         self.root_data_path = '{}/open_datasets.nosync/'.format(path)
         self.admissions_data = self.read_admissions()
         self.uni_addresses = self.read_uni_addresses()
+        self.uni_logos = self.read_uni_logos()
 
     def check_file(self, file_path):
         """
@@ -57,6 +58,17 @@ class ImportFiles:
         """
         try:
             return self.read_file('admissions/admissions.csv')
+        except FileNotFoundError:
+            return None
+
+    def read_uni_logos(self):
+        """
+        Read data file containing university logos and return contents in dataframe
+
+        :return: dataframe
+        """
+        try:
+            return self.read_file('university_logos/logos.csv')
         except FileNotFoundError:
             return None
 

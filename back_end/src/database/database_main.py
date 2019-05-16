@@ -57,6 +57,7 @@ def database_commands(load_data, manual_import):
             ifd.fill_uni_addresses(engine, import_files=import_files)
             ifd.fill_admissions_data(engine, import_files)
             ifd.fill_house_data(engine, import_files)
+            ifd.fill_uni_logos_data(engine, import_files)
             pap.generate_admission_prediction()
 
         connection.commit()
