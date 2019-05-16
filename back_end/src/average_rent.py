@@ -22,7 +22,7 @@ def calculate_average_rent(postcode):
     hash_params = dict()
     hash_params["where"] = params["where"]
     hash_params["category"] = params["category"]
-
+    
     for beds in range(2, max_beds):
         params["distance"] = distance
         params["beds"] = beds
