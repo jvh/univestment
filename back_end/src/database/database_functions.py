@@ -196,12 +196,13 @@ def get_property_price_data_for_outcode(outcode):
     historical_months, historical_price_data = result[1].split(':')[0], result[1].split(':')[1]
     predicted_months, predicted_price_data = result[2].split(':')[0], result[2].split(':')[1]
 
+    # Getting lists from string representations
     historical_months = historical_months[1:len(historical_months)-1].split(", ")
     historical_price_data = historical_price_data[1:len(historical_price_data)-1].split(", ")
     predicted_months = predicted_months[1:len(predicted_months)-1].split(", ")
     predicted_price_data = predicted_price_data[1:len(predicted_price_data)-1].split(", ")
 
-
+    # Formatting results into the correct JSON output
     formatted_result = dict()
     formatted_result['outcode'] = outcode
     formatted_result['start'] = date
