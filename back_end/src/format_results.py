@@ -149,6 +149,9 @@ def build_property_dict(results):
     outcode_price_data = []
     outcode_price_data_dict = dict()
 
+    # Stores properties by uni
+    property_by_university = dict()
+
     # Gathering outcodes
     for r in results:
         # Getting outcode of each property
@@ -163,6 +166,7 @@ def build_property_dict(results):
 
     # University admissions data
     for u in universities:
+        property_by_university[u] = []
         data = dict()
         admissions = db_func.query_predicted_admissions(u)
 
@@ -188,6 +192,7 @@ def build_property_dict(results):
         outcode_price_data.append(ppd_outcode)
         outcode_price_data_dict[o] = ppd_outcode
         outcode_price_data_dict[o]["average_total_rent_by_bed"] = average_total_rent_by_bed
+        outcode_rent[o] = average_total_rent_by_bed
 
     # Individual listing data
     for r in results:
@@ -197,6 +202,8 @@ def build_property_dict(results):
         beds = r['beds']
         sale_price = r['sale_price']
         p_data['data'] = r
+        p_uni = r['university']
+        property_by_university[p_uni].append(r)
 
         # Getting the rent(s) for the outcode. Getting the average rent for the number of beds in this property.
         outcode_rent_data = outcode_rent[outcode]
@@ -243,5 +250,12 @@ def build_property_dict(results):
     formatted_json['properties'] = property_results
     formatted_json["universities"] = university_admissions_data
     formatted_json["outcodes"] = outcode_price_data
+    print(property_by_university)
 
     return formatted_json
+
+def filter_for_best_results(property_by_university):
+    best_results = dict()
+    for university in property_by_university.keys():
+        # sorted_results = sorted(property_by_university[university], lambda x: x['investment']['mortgage_return ']
+        # ['mortgage_payment'])
