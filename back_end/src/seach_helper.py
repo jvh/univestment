@@ -28,6 +28,7 @@ def get_properties_near_unis(params, results_per_page=50):
         raise Exception("Please enter the distance from any given university (in km) that you would like to "
                         "search houses for.")
 
+    # Getting those nearby universities
     print("Getting universities within a radius of {} to {}...".format(params['radius_from'], params['where']))
     nearby_unis = geo_locations.get_universities_near_location(params['where'], params['radius_from'])
     print('These are the universities nearby: {}\n'.format(", ".join([x[0] for x in nearby_unis])))
@@ -48,7 +49,6 @@ def get_properties_near_unis(params, results_per_page=50):
 
         # Formatting parameters for use by adzuna
         uni_params = format_results.format_params(uni_params)
-        results = app.adzuna.get_property_listing(uni_params, results_per_page=results_per_page)
 
         # Ensuring that listings unseen and queries unseen are populated into the table. If they are, they should be
         # taken out for immediate access
@@ -64,6 +64,7 @@ def get_properties_near_unis(params, results_per_page=50):
             # Query has never been processed, process it
             print("This query has not been seen before. Processing results for {} with a radius of {}..."
                   .format(name, uni_params['distance']))
+            results = app.adzuna.get_property_listing(uni_params, results_per_page=results_per_page)
             large_images = format_results.large_images_only(results)
             db_func.populate_seen_tables(results, large_images, query_id, params)
 
