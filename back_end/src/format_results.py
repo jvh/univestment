@@ -139,8 +139,22 @@ def build_property_dict(results):
 
     # University admissions data
     for u in universities:
+        data = dict()
         admissions = db_func.query_predicted_admissions(u)
-        university_admissions_data.append(admissions)
+
+        # Getting logo if exists and putting into correct format
+        logo = db_func.query_uni_logos(u)
+        if logo:
+            [logo] = logo
+            logo = logo[0]
+        else:
+            logo = None
+
+        data['name'] = u
+        data['logo'] = logo
+        data['admissions'] = admissions
+
+        university_admissions_data.append(data)
 
     # Outcode price point predictions data
     for o in outcodes:

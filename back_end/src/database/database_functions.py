@@ -183,6 +183,18 @@ def query_predicted_admissions(university):
         return None
 
 
+def query_uni_logos(university):
+    """
+    query uni_logos for a given university's logo
+
+    :param university: String - name of university
+    :return: dict
+    """
+    query = "SELECT logo_url FROM uni_logos WHERE university=%s"
+    result = general_db_func.query_database(query, (university,))
+    return result
+
+
 def get_property_price_data_for_outcode(outcode):
     """
     Given an outcode, return data from predictions_data (which gives data regarding historic and predicted future

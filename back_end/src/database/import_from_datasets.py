@@ -24,7 +24,7 @@ def fill_uni_logos_data(engine, import_files):
     :param engine: database engine object
     :param import_files: ImportFiles object
     """
-    data = import_files.admissions_data
+    data = import_files.uni_logos
     data.columns = map(str.lower, data.columns)
     data.to_sql('uni_logos', engine, if_exists="fail", index=False)
 
