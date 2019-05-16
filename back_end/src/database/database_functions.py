@@ -108,10 +108,6 @@ def query_already_processed(query_id, outcode_rentals=False):
             [db_res] = general_db_func.query_database(query)
 
             record = dict()
-            record['has_large_img'] = db_res[14]
-            # Don't include (unless outcode rentals selected)
-            if not record['has_large_img'] and not outcode_rentals:
-                continue
             record['id'] = db_res[0]
             record['beds'] = db_res[1]
             record['description'] = db_res[2]
