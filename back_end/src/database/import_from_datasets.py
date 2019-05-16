@@ -17,6 +17,18 @@ def fill_admissions_data(engine, import_files):
     data.to_sql('admissions_data', engine, if_exists="fail", index=False)
 
 
+def fill_uni_logos_data(engine, import_files):
+    """
+    Store uni logos data in uni_logos table
+
+    :param engine: database engine object
+    :param import_files: ImportFiles object
+    """
+    data = import_files.uni_logos
+    data.columns = map(str.lower, data.columns)
+    data.to_sql('uni_logos', engine, if_exists="fail", index=False)
+
+
 def fill_uni_addresses(engine, import_files=None, import_straight_to_db=False, data=None):
     """
     Store university address data in uni_addresses_data table

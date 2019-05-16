@@ -8,7 +8,7 @@ from psycopg2 import extras as psql_extras
 from back_end.src.api_usage import google_vision
 from back_end.src import app
 from back_end.src.database import database_functions as db_func
-from back_end.src import property_price_predictions_helper as ppd_helper
+from back_end.src.predictions import property_price_predictions_helper as ppd_helper
 from back_end.src.database import generic_db_functions as general_db_fun
 from back_end.src import average_rent
 
@@ -159,8 +159,22 @@ def build_property_dict(results):
 
     # University admissions data
     for u in universities:
+        data = dict()
         admissions = db_func.query_predicted_admissions(u)
-        university_admissions_data.append(admissions)
+
+        # Getting logo if exists and putting into correct format
+        logo = db_func.query_uni_logos(u)
+        if logo:
+            [logo] = logo
+            logo = logo[0]
+        else:
+            logo = None
+
+        data['name'] = u
+        data['logo'] = logo
+        data['admissions'] = admissions
+
+        university_admissions_data.append(data)
 
     # Outcode price point predictions data
     for o in outcodes:
