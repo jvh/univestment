@@ -96,13 +96,15 @@ def query_property_listing():
     if 'radius_from' in params:
         preprocessing_params['radius_from'] = params['radius_from']
 
+    query_id = format_results.hash_params(preprocessing_params)
+
     # Converting the parameters to a hash (that is deterministic)
-    string_to_hash = []
-    for p in sorted(preprocessing_params):
-        string_to_hash.append(p + '&' + preprocessing_params[p])
-    string_to_hash = ';'.join(string_to_hash)
-    query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
-    query_id = psql_extras.UUID_adapter(query_id)
+    # string_to_hash = []
+    # for p in sorted(preprocessing_params):
+    #     string_to_hash.append(p + '&' + preprocessing_params[p])
+    # string_to_hash = ';'.join(string_to_hash)
+    # query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
+    # query_id = psql_extras.UUID_adapter(query_id)
 
     # If query has already been processed, get results
     already_processed = db_func.query_already_processed(query_id)

@@ -60,6 +60,7 @@ def format_params(params):
 def get_property_args(p, large_images):
     """
     For a given advertisement, get the property parameters for table insertion
+
     :param p: The property
     :param large_images: The large image results
     :return: The parameters for insertion into table
@@ -67,16 +68,34 @@ def get_property_args(p, large_images):
     uni = None
     lrg = False
     p_type = 'N/A'
+    img_url = None
     if 'university' in p:
         uni = p['university']
     if p in large_images:
         lrg = True
     if 'property_type' in p:
         p_type = p['property_type']
-    params = (p['id'], p['beds'], p['description'], p['image_url'], p['is_furnished'], p['latitude'], p['longitude'],
+    if 'image_url' in p:
+        img_url = p['image_url']
+    params = (p['id'], p['beds'], p['description'], img_url, p['is_furnished'], p['latitude'], p['longitude'],
               p['postcode'], p_type, p['redirect_url'], p['sale_price'], p['title'], uni, lrg)
     return params
 
+def hash_params(params):
+    """
+    Converts parameters into a unique hash
+
+    :param params: parameters to generate the hash for
+    :return: hash to use as query ID
+    """
+    # Converting the parameters to a hash (that is deterministic)
+    string_to_hash = []
+    for p in sorted(params):
+        string_to_hash.append(p + '&' + params[p])
+    string_to_hash = ';'.join(string_to_hash)
+    query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
+    query_id = psql_extras.UUID_adapter(query_id)
+    return query_id
 
 def build_property_dict(results):
     """
