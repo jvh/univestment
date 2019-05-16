@@ -11,6 +11,7 @@ from back_end.src.database import database_functions as db_func
 from back_end.src.predictions import property_price_predictions_helper as ppd_helper
 from back_end.src.database import generic_db_functions as general_db_fun
 from back_end.src import average_rent
+from back_end.src import mortgage_payment
 
 
 def large_images_only(results):
@@ -137,6 +138,8 @@ def build_property_dict(results):
     universities = set()
     # Set of outcodes encompassing the property listings
     outcodes = set()
+    # The average rent for a given outcode (by number of bed) {outcode: {number_beds: rent}}
+    outcode_rent = dict()
 
     # Stores the property results
     property_results = []
@@ -185,13 +188,41 @@ def build_property_dict(results):
         outcode_price_data.append(ppd_outcode)
         outcode_price_data_dict[o] = ppd_outcode
         outcode_price_data_dict[o]["average_total_rent_by_bed"] = average_total_rent_by_bed
+        outcode_rent[o] = average_total_rent_by_bed
 
     # Individual listing data
     for r in results:
         p_data = dict()
         postcode = r['postcode']
         outcode = r['outcode']
+        beds = r['beds']
+        sale_price = r['sale_price']
         p_data['data'] = r
+
+        # Getting the rent(s) for the outcode. Getting the average rent for the number of beds in this property.
+        outcode_rent_data = outcode_rent[outcode]
+        average_rent_for_beds = outcode_rent_data[beds]
+        if average_rent_for_beds == 0:
+
+            # Setting the starting point to look for beds
+            if beds == 1:
+                start_beds = 2
+            else:
+                start_beds = beds + 1
+
+            # Looking for properties with different beds in the same outcode for an approximation of average price
+            for key in range(start_beds, 7):
+                if outcode_rent_data[key] != 0:
+                    average_rent_for_beds = outcode_rent_data[key] * beds/key
+                    break
+
+            if beds > 1:
+                # If we still don't have average_rent, go to one below as last resort
+                average_rent_for_beds = outcode_rent_data[beds-1] * beds/(beds-1)
+
+        # Calculate mortgage payments
+        mortgage_return = mortgage_payment.calculate_mortgage_return(sale_price, average_rent_for_beds)
+
 
         # Getting outcode price data and finding an estimate of the predicted price (obtaining market_value)
         investment_dict = dict()
@@ -201,6 +232,8 @@ def build_property_dict(results):
         predicted_first = float(outcode_pd['predicted']['y'][0])
         estimated_return = ppd_helper.get_current_estimate(latest_historic_price, predicted_first)
         investment_dict['market_value'] = estimated_return
+        # Add mortgage repayment to return json
+        investment_dict["mortgage_return"] = mortgage_return
         p_data['investment'] = investment_dict
 
         # Properties existing within that postcode
