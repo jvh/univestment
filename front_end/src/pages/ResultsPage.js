@@ -13,6 +13,7 @@ import FilterResults from '../components/FilterResults.js';
 import ResultsMap from '../components/ResultsMap.js';
 import Filtering from '../components/Filtering.js';
 import LoadingSpinner from '../components/LoadingSpinner.js';
+import Admissions from '../components/Admissions.js';
 
 const MOCK = false;
 
@@ -128,7 +129,7 @@ class ResultsPage extends Component {
       } else {
         return (
           <div>
-          <Filtering/>
+          <Filtering {...this.props}/>
           <div className="container-large">
             <div className="row">
               <div className="col-6">
@@ -140,6 +141,13 @@ class ResultsPage extends Component {
                   </div>
                   <div className="row result results-bg">
                     <ResultsMap results={this.state.search.search_results} where={this.state.form.where} results_state={this.state}/>
+                  </div>
+                  <div className="spacer-sml">
+                  </div>
+                </div>
+                <div className="container-small">
+                  <div className="row result rounded results-bg">
+                    <Admissions />
                   </div>
                   <div className="spacer-sml">
                   </div>

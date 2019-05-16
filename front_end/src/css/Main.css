@@ -16,13 +16,35 @@
   height: calc(100vh - 54px);
 }
 
+.piechart {
+  margin: 0 auto;
+  width: 800px !important;
+  overflow: visible;
+}
+
+.sort-by {
+  max-width: 375px;
+}
+
 .graph_container {
   overflow-y: scroll;
 }
 
 .filter {
-  height:100px;
+  min-height: 60px;
   width:100%;
+}
+
+.filter-inner {
+  padding: 0px;
+  margin: 0 auto;
+}
+
+
+.btn-outline {
+    background-color: transparent;
+    color: inherit;
+    transition: all .5s;
 }
 
 .loading {

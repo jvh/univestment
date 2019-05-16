@@ -9,6 +9,9 @@ class HomePage extends Component {
 
   constructor(props) {
     super(props);
+
+    console.log("HOME");
+    console.log(this.props);
     this.state = {
       isOpened: false
     }

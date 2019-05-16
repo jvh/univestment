@@ -24,14 +24,27 @@ class HomePageSearch extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        form: {
-          where: '',
-          uni_search: false
-        },
         isOpened: props.isOpened,
         isSubmitEnabled: false,
         uniSearch:false
       }
+
+      // if (this.props !== undefined) {
+      //   if (this.props.location.state.form !== undefined) {
+      //     this.state = {
+      //       ...this.state,
+      //       form: this.props.location.state.form
+      //     }
+      //   }
+      // } else {
+        this.state = {
+          ...this.state,
+          form: {
+            where: ''
+          },
+        }
+      // }
+
       this.handleFormChange = this.handleFormChange.bind(this);
     }
 
