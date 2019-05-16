@@ -86,8 +86,3 @@ def calculate_average_total_rent_by_bed(outcode):
     average_rents = total_rents
     print("finished calculating average rent by bed for outcode: {}\n".format(outcode))
     return average_rents
-
-
-if __name__ == "__main__":
-    a = calculate_average_rent_by_bed("DA51ER")
-    print(a)
