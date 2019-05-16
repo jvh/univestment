@@ -13,9 +13,7 @@ const ResultsList = (props) => {
       );
   }
 
-  var results = Array.from(props.search.search_results)
-
-  console.log(results);
+  var results = Array.from(props.search.search_results.properties);
 
   if (results && results.length > 0) {
     return (

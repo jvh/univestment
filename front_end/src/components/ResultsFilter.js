@@ -15,11 +15,9 @@ const ResultsList = (props) => {
 
   var results = Array.from(props.results)
 
-  console.log(results);
-
   if (results && results.length > 0) {
     return (
-      <div className="container-small">  
+      <div className="container-small">
         {
           results
             .map(renderResultsCard)

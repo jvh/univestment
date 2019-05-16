@@ -11,7 +11,7 @@ import ApiUtils from '../utils/ApiUtils.js';
 import ResultsList from '../components/ResultsList.js';
 import FilterResults from '../components/FilterResults.js';
 import ResultsMap from '../components/ResultsMap.js';
-
+import Filtering from '../components/Filtering.js';
 import LoadingSpinner from '../components/LoadingSpinner.js';
 
 const MOCK = false;
@@ -28,9 +28,6 @@ class ResultsPage extends Component {
       }
     }
 
-    console.log("RESULTS PAGE PROPS");
-    console.log(props);
-
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
 
@@ -43,9 +40,6 @@ class ResultsPage extends Component {
   }
 
   componentDidMount () {
-      console.log("RESULTS");
-      console.log(this.props.location.state);
-      console.log(this.props.location.state.search);
       this.updateWindowDimensions();
       window.addEventListener('resize', this.updateWindowDimensions);
       if (this.props.location.state === undefined) {
@@ -53,16 +47,13 @@ class ResultsPage extends Component {
       }
       if (this.props.location.state.old_state === undefined || this.props.location.state.old_state === null){
         this.state={isLoading: true};
-        console.log("HANDLE SUBMIT");
         this.handleSubmit();
       }
   }
 
   handleSubmit () {
 
-    console.log("Submit")
-
-    const { where, price_min, price_max, beds, distance, uni_search, km_away_from_uni } = this.props.location.state.form;
+    const { where, price_min, price_max, beds, distance, km_away_from_uni } = this.props.location.state.form;
 
     this.setState({form:this.props.location.state.form});
 
@@ -75,16 +66,12 @@ class ResultsPage extends Component {
     search = (beds === "No min" || beds === undefined) ? search : { ...search, beds };
     search = (distance === undefined) ? search : { ...search, distance };
 
-    console.log("search");
-
-
     if (MOCK) {
       this.setState({search: {
           form:this.state.form,
           search_results: Filtered
         }
       });
-      console.log()
       this.setState({isLoading: false});
     } else {
       ApiUtils.search(search)
@@ -95,17 +82,12 @@ class ResultsPage extends Component {
   }
 
   handleSearchSuccess = response => {
-    console.log(response);
-    console.log(Filtered);
     this.setState({search: {
         form:this.state.form,
         search_results: response
       }
     });
-    console.log()
     this.setState({isLoading: false});
-    console.log("state")
-    console.log(this.state);
   }
 
   handleSearchFailure = response => {
@@ -119,6 +101,8 @@ class ResultsPage extends Component {
         <LoadingSpinner/>
       )
     } else {
+
+      console.log(this.state);
       if (this.state.width < 1830) {
         return (
           <div>
@@ -138,26 +122,19 @@ class ResultsPage extends Component {
                 <ResultsMap  results={this.state.search.search_results} where={this.state.form.where} results_state={this.state}/>
               </div>
             </div>
-            <ResultsList search={this.state.search}/>
+            <ResultsList search={this.state.search} results_state={this.state}/>
           </div>
         );
       } else {
         return (
+          <div>
+          <Filtering/>
           <div className="container-large">
             <div className="row">
               <div className="col-6">
                 <ResultsList search={this.state.search} results_state={this.state}/>
               </div>
               <div className="col-6">
-                <div className="container-small">
-                  <div className="spacer-sml">
-                  </div>
-                  <div className="row-pad row result rounded results-bg">
-                    <div className="col-12">
-                      <FilterResults {...this.props}/>
-                    </div>
-                  </div>
-                </div>
                 <div className="container-small">
                   <div className="spacer-sml">
                   </div>
@@ -169,6 +146,7 @@ class ResultsPage extends Component {
                 </div>
               </div>
             </div>
+          </div>
           </div>
         )
       }

@@ -12,7 +12,6 @@ export default class Marker extends Component {
     showInfoWindow: false
   };
   handleMouseOver = e => {
-    console.log("MOUSE OVER")
     this.setState({
       showInfoWindow: true
     });
@@ -30,7 +29,7 @@ export default class Marker extends Component {
 
   render () {
 
-    const adzuna = this.props.result.property.adzuna;
+    const adzuna = this.props.result.data;
     const allResults = this.props.result.all_results;
 
     const img_url = adzuna.image_url;
@@ -53,7 +52,7 @@ export default class Marker extends Component {
       <Modal show={showInfoWindow} onHide={this.handleClose} style={{paddingTop:"25vh"}}>
         <Modal.Body>
           <Link to={{pathname:'/property', state:{form: this.props.result}}}>
-            <img style={{width:"100%"}} src={this.props.result.property.adzuna.image_url}/>
+            <img style={{width:"100%"}} src={adzuna.image_url}/>
           </Link>
           <div className="row pad-hor">
             <div className="align-left adzuna-text pad-hor pad-top col-6" style={{whiteSpace:"nowrap"}}>

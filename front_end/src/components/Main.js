@@ -3,8 +3,6 @@ import { Switch, Route } from 'react-router-dom';
 import { Col } from 'react-bootstrap';
 
 import HomePage from '../pages/HomePage.js';
-import BarPage from '../pages/BarPage.js';
-import LinePage from '../pages/LinePage.js';
 import ResultsPage from '../pages/ResultsPage.js';
 import PropertyPage from '../pages/PropertyPage.js';
 
@@ -16,8 +14,6 @@ const Main = props => {
     <Component {...routerProps} {...props} />
 
   const homePageRenderer = setBaseProps(HomePage)(props);
-  const barPageRenderer = setBaseProps(BarPage)(props);
-  const linePageRenderer = setBaseProps(LinePage)(props);
   const resultsPageRenderer = setBaseProps(ResultsPage)(props);
   const propertyPageRenderer = setBaseProps(PropertyPage)(props);
 
@@ -26,7 +22,6 @@ const Main = props => {
       <Switch>
         <Route exact path='/' render={homePageRenderer} />
         <Route exact path='/property' render={propertyPageRenderer} />
-        <Route exact path='/bar' render={barPageRenderer} />
         <Route exact path='/search' render={resultsPageRenderer} />
         <Route exact path='/*' render={homePageRenderer} />
       </Switch>
