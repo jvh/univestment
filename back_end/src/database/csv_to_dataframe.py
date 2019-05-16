@@ -26,18 +26,18 @@ class ImportFiles:
         except FileNotFoundError:
             return False
 
-    def read_file(self, file_path, chunksize=None, names=None, absolute_path=''):
+    def read_file(self, file_path, chunksize=None, names=None, absolute_path=False):
         """
         read a file and return a dataframe containing the contents of the file
 
         :param file_path: path to file from root data path
         :param chunksize: How many records we insert into the database at a time
         :param names: Defining the column names
-        :param absolute_path: Defines the absolute path if necessary
+        :param absolute_path: True if 'file_path' describes the absolute path
         :return: dataframe
         """
         if absolute_path:
-            path = absolute_path
+            path = file_path
         else:
             path = self.root_data_path + file_path
         if self.check_file(path):

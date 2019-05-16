@@ -46,9 +46,12 @@ def get_properties_near_unis(params, results_per_page=50):
         uni_params = deepcopy(params)
         uni_params['where'] = post
         uni_params['distance'] = params['km_away_from_uni']
-
-        # Formatting parameters for use by adzuna
         uni_params = format_results.format_params(uni_params)
+
+        # Parameters which are heavily simplified for readability reasons
+        simplified_params = dict()
+        simplified_params['name'] = name
+        simplified_params['distance'] = uni_params['distance']
 
         # Ensuring that listings unseen and queries unseen are populated into the table. If they are, they should be
         # taken out for immediate access
@@ -66,7 +69,7 @@ def get_properties_near_unis(params, results_per_page=50):
                   .format(name, uni_params['distance']))
             results = app.adzuna.get_property_listing(uni_params, results_per_page=results_per_page)
             large_images = format_results.large_images_only(results)
-            db_func.populate_seen_tables(results, large_images, query_id, params)
+            db_func.populate_seen_tables(results, large_images, query_id, simplified_params)
 
         print("The number of properties listed in {} is {}.\n".format(name, len(results)))
 
