@@ -44,6 +44,23 @@ def large_images_only(results):
     return new_results
 
 
+def hashed_params(params):
+    """
+    Hashes parameters into a deterministic UUID3 format
+
+    :param params: The parameters
+    :return: The UUID3 representation of those params
+    """
+    string_to_hash = []
+    for p in sorted(params):
+        string_to_hash.append(p + '&' + params[p])
+    string_to_hash = ';'.join(string_to_hash)
+    query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
+    query_id = psql_extras.UUID_adapter(query_id)
+
+    return query_id
+
+
 def format_params(params):
     """
     Formats a set of given parameters for use by adzuna
