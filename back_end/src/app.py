@@ -5,8 +5,6 @@ from flask import Flask, jsonify, request
 from flask_restful.utils.cors import crossdomain
 from flask_cors import CORS
 from back_end.src.api_usage import adzuna_ingest
-import uuid
-import psycopg2.extras as psql_extras
 
 from back_end.src.database import database_functions as db_func
 from back_end.src import DEVELOPMENT
@@ -14,7 +12,6 @@ from back_end.src.api_usage import geo_locations
 from back_end.src import format_results
 from back_end.src import property_price_predictions_helper as ppp_helper
 from back_end.src import seach_helper
-from back_end.src import uni_nearby_ads
 
 adzuna = adzuna_ingest.Adzuna()
 app = Flask(__name__)
