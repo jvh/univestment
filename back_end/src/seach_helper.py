@@ -55,7 +55,7 @@ def get_properties_near_unis(params, results_per_page=50):
 
         # Ensuring that listings unseen and queries unseen are populated into the table. If they are, they should be
         # taken out for immediate access
-        query_id = format_results.hashed_params(uni_params)
+        query_id = format_results.hashed_params(simplified_params)
 
         # Checking if query has already been processed
         already_processed = db_func.query_already_processed(query_id)
