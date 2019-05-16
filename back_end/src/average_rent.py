@@ -2,6 +2,11 @@ from back_end.src.api_usage.adzuna_ingest import Adzuna
 
 
 def calculate_average_rent(postcode):
+    """
+    calculate the average rent for the outcode the postcode belongs to
+
+    :param postcode: postcode of the property
+    """
     adzuna = Adzuna()
     params = dict()
     params["where"] = postcode[:-3]

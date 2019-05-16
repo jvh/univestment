@@ -51,6 +51,7 @@ class Adzuna:
         Query the Adzuna API for property listings
 
         :param params: dict of query parameters
+        :param ad_type: "for-sale" to search for properties for sale, "for-rent" for rental properties
         :param results_per_page: A query result is divided into 'pages' by Adzuna. The maximum number of results per
                                  page is 50. This specifies the number of results returned per page.
         :return: dict of returned results
