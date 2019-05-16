@@ -91,7 +91,7 @@ def query_already_processed(query_id):
     if_processed = general_db_func.query_database(query)
 
     # If the query has been processed beforehand
-    if if_processed:
+    if if_processed and if_processed[0][0]:
         [[unpacked]] = list(if_processed)
         # Get IDs of those advertisements part of this query
         results = unpacked.split(' ')
@@ -212,5 +212,6 @@ def get_property_price_data_for_outcode(outcode):
     formatted_result['historic']['y'] = historical_price_data
     formatted_result['predicted']['x'] = predicted_months
     formatted_result['predicted']['y'] = predicted_price_data
+    # formatted_result['average_rent_by_bed'] = dict()
 
     return formatted_result

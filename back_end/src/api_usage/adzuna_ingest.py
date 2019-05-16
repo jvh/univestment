@@ -46,7 +46,7 @@ class Adzuna:
         elif response.status_code in [404, 500]:
             raise AdzunaAPIException
 
-    def get_property_listing(self, params, results_per_page=10):
+    def get_property_listing(self, params, category="for-sale", results_per_page=50):
         """
         Query the Adzuna API for property listings
 
@@ -61,6 +61,7 @@ class Adzuna:
             params = {}
         params.update({"app_id": ADZUNAAPIID})
         params.update({"app_key": ADZUNAAPIKEY})
+        params.update({"category": category})
         params.update({'results_per_page': results_per_page})
 
         results = []
