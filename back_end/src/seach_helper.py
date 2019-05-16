@@ -30,7 +30,7 @@ def get_properties_near_unis(params, results_per_page=50):
 
     print("Getting universities within a radius of {} to {}...".format(params['radius_from'], params['where']))
     nearby_unis = geo_locations.get_universities_near_location(params['where'], params['radius_from'])
-    print('These are the universities nearby: {}'.format(", ".join([x[0] for x in nearby_unis])))
+    print('These are the universities nearby: {}\n'.format(", ".join([x[0] for x in nearby_unis])))
 
     if not nearby_unis:
         return jsonify({"error": "No universities within area specified."})
@@ -67,12 +67,16 @@ def get_properties_near_unis(params, results_per_page=50):
             large_images = format_results.large_images_only(results)
             db_func.populate_seen_tables(results, large_images, query_id, params)
 
+        print("The number of properties listed in {} is {}.\n".format(name, len(results)))
+
         for r in results:
             # Assigning that property to a particular university
             r['university'] = uni[0]
 
             if r not in properties:
                 properties.append(r)
+
+    print("The total number of property listings is {}.".format(len(properties)))
 
     return properties
 

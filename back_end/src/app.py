@@ -87,22 +87,9 @@ def query_property_listing():
     # The arguments passed into /search endpoint (in the format /search?arg1=arg1_val&arg2=arg2_val&...)
     params = request.args.to_dict()
 
-    # Converting the parameters to a hash (that is deterministic)
-    # query_id = format_results.hashed_params(params)
-
-    # If query has already been processed, get results
-    # already_processed = db_func.query_already_processed(query_id)
-
     if 'testing' in params:
         print("Testing has been enabled.")
 
-    # if already_processed and 'testing' not in params:
-    #     print("Query already processed... Getting results")
-    #     # The final results after processing
-    #     final_result = already_processed
-    # else:
-    #     print("This query has not been seen before.")
-        # Query has not been processed before and therefore must be processed as new
     try:
         if 'testing' in params:
             results = seach_helper.get_properties_near_unis(params, 10)
@@ -111,20 +98,6 @@ def query_property_listing():
 
         if not results:
             return jsonify({"error": "No results returned"})
-        # else:
-            # if 'testing' not in params:
-            #     print("Getting large images...")
-            #     # Obtain all of those results which have large images available
-            #     large_images = format_results.large_images_only(results)
-            #
-            #     print("Populating seen_queries and seen_adverts tables...")
-            #     # Populates seen_queries and seen_adverts tables with results of query
-            #     db_func.populate_seen_tables(results, large_images, query_id, params)
-            # else:
-            #     large_images = results
-
-            # The final results after processing
-            # final_result = large_images
 
     except adzuna_ingest.AdzunaAuthorisationException:
         return jsonify({"error": 410})
@@ -133,9 +106,6 @@ def query_property_listing():
     except adzuna_ingest.AdzunaAPIException:
         return jsonify({"error": 500})
 
-    # formatted_results = format_results(final_result, params)
-
-    # print("Building the machine learning model for outcodes...")
     # Builds the results with other metadata into a format to be consumed by frontend
     property_dict = format_results.build_property_dict(results)
     print("Finished.")
