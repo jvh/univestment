@@ -12,6 +12,7 @@ from back_end.src.predictions import property_price_predictions_helper as ppd_he
 from back_end.src.database import generic_db_functions as general_db_fun
 from back_end.src import average_rent
 
+
 def large_images_only(results):
     """
     Gets those properties with large images only (not only thumbnails)
@@ -105,6 +106,7 @@ def get_property_args(p, large_images):
               p['postcode'], p_type, p['redirect_url'], sale_price, p['title'], uni, lrg)
     return params
 
+
 def hash_params(params):
     """
     Converts parameters into a unique hash
@@ -120,6 +122,7 @@ def hash_params(params):
     query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
     query_id = psql_extras.UUID_adapter(query_id)
     return query_id
+
 
 def build_property_dict(results):
     """

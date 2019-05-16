@@ -7,7 +7,7 @@ def get_rental_properties(outcode):
     """
     Get rental properties from database or Adzuna
 
-    :param postcode: postcode to search in
+    :param outcode: Outcode to search in
     """
     adzuna = app.adzuna
     distance = "0.5"
@@ -49,7 +49,7 @@ def calculate_average_total_rent_by_bed(outcode):
     """
     Calculate average total rent price for properties within outcode of property
 
-    :param postcode: postcode to search in
+    :param outcode: Outcode to search in
     :return: dict of average rent price by beds
     """
     print("\nBeginning calculation of average rent prices by bed for outcode: {}".format(outcode))
