@@ -39,7 +39,8 @@ def get_rental_properties(outcode):
             r["sale_price"] = r.pop("price_per_month")
 
     print("formatting for large images")
-    large_images = format_results.large_images_only(results)
+    # large_images = format_results.large_images_only(results)
+    large_images = []
 
     # Add results to database if new
     print("adding rental results to database")
