@@ -3,7 +3,7 @@ import {
   Label, LineChart, Legend, Line, CartesianGrid, XAxis, YAxis, Tooltip, ReferenceArea,
 } from 'recharts';
 
-export default class Example extends PureComponent {
+export default class LineGraph extends PureComponent {
 
   constructor(props) {
     super(props);

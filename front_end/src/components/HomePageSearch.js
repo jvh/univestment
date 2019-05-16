@@ -24,14 +24,26 @@ class HomePageSearch extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        form: {
-          where: '',
-          uni_search: false
-        },
         isOpened: props.isOpened,
-        isSubmitEnabled: false,
-        uniSearch:false
+        isSubmitEnabled: false
       }
+
+      // if (this.props !== undefined) {
+      //   if (this.props.location.state.form !== undefined) {
+      //     this.state = {
+      //       ...this.state,
+      //       form: this.props.location.state.form
+      //     }
+      //   }
+      // } else {
+        this.state = {
+          ...this.state,
+          form: {
+            where: ''
+          },
+        }
+      // }
+
       this.handleFormChange = this.handleFormChange.bind(this);
     }
 
@@ -48,14 +60,14 @@ class HomePageSearch extends Component {
     return regex.test(postcode);
   }
 
-  handleSwitchChange = () => {
-    this.setState({
-      uniSearch:!this.state.uniSearch,
-      form: {
-        ...this.state.form,
-        uni_search:!this.state.form.uni_search
-      }});
-  }
+  // handleSwitchChange = () => {
+  //   this.setState({
+  //     uniSearch:!this.state.uniSearch,
+  //     form: {
+  //       ...this.state.form,
+  //       uni_search:!this.state.form.uni_search
+  //     }});
+  // }
 
   handleSubmit = event => {
     this.props.history.push({
@@ -109,9 +121,6 @@ class HomePageSearch extends Component {
                   name="distance"
                   value={this.state.form.distance}
                   onChange={this.handleFormChange}>
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
                   <option>5</option>
                   <option>10</option>
                   <option>15</option>

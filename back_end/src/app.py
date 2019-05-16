@@ -4,8 +4,9 @@ Endpoints for our Flask API
 from flask import Flask, jsonify, request
 from flask_restful.utils.cors import crossdomain
 from flask_cors import CORS
-from back_end.src.api_usage import adzuna_ingest
+import datetime
 
+from back_end.src.api_usage import adzuna_ingest
 from back_end.src.database import database_functions as db_func
 from back_end.src import DEVELOPMENT
 from back_end.src.api_usage import geo_locations
@@ -81,6 +82,7 @@ def query_property_listing():
 
     :return: Property listing
     """
+    print('\nCurrent time: {}'.format(datetime.datetime.now()))
     # The arguments passed into /search endpoint (in the format /search?arg1=arg1_val&arg2=arg2_val&...)
     params = request.args.to_dict()
 
