@@ -137,8 +137,8 @@ def build_property_dict(results):
         investment_dict = dict()
         outcode_pd = outcode_price_data_dict[outcode]
         # Getting the latest historic data and earliest predicted for prediction of market return
-        latest_historic_price = float(outcode_pd['historic']['y'][1:len(outcode_pd['historic']['y'])-1].split(', ')[-1])
-        predicted_first = float(outcode_pd['predicted']['y'][1:len(outcode_pd['predicted']['y'])-1].split(', ')[0])
+        latest_historic_price = float(outcode_pd['historic']['y'][-1])
+        predicted_first = float(outcode_pd['predicted']['y'][0])
         estimated_return = ppd_helper.get_current_estimate(latest_historic_price, predicted_first)
         investment_dict['market_value'] = estimated_return
         p_data['investment'] = investment_dict
