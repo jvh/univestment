@@ -1,11 +1,11 @@
 """
 Specialised interaction with the database (serving specific purposes)
 """
-import back_end.src.property_price_predictions_helper
+import back_end.src.predictions.property_price_predictions_helper
 from back_end.src.database import generic_db_functions as general_db_func
-from back_end.src import property_price_predictions as ppp
+from back_end.src.predictions import property_price_predictions as ppp
+from back_end.src.predictions import property_price_predictions_helper as ppp_helper
 from back_end.src import format_results
-from back_end.src import property_price_predictions_helper as ppp_helper
 
 
 def query_by_postcode(postcode):
@@ -62,7 +62,8 @@ def insert_price_data_if_not_exist(outcode):
     """
     Query database for properties by outcode and insert market value predictions into database
 
-    :param outcodes:
+    :param outcode: For a given outcode, insert the price data (to determine the market value) if it doesn't already
+                    exist in the table
     """
     query = "SELECT outcode FROM predictions_data WHERE outcode = '{}'".format(outcode)
     result = general_db_func.query_database(query)
@@ -76,8 +77,8 @@ def insert_price_data_if_not_exist(outcode):
         # returned_house_prices_area = returned_house_prices_area + query_results_area
         if query_results_area:
             start_date, historic_data, predicted_data = ppp.generate_prediction(query_results_area)
-            back_end.src.property_price_predictions_helper.insert_predictions(outcode, start_date, historic_data,
-                                                                              predicted_data)
+            back_end.src.predictions.property_price_predictions_helper\
+                .insert_predictions(outcode, start_date, historic_data, predicted_data)
 
 
 def query_already_processed(query_id):

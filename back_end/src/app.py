@@ -11,7 +11,7 @@ from back_end.src.database import database_functions as db_func
 from back_end.src import DEVELOPMENT
 from back_end.src.api_usage import geo_locations
 from back_end.src import format_results
-from back_end.src import property_price_predictions_helper as ppp_helper
+from back_end.src.predictions import property_price_predictions_helper as ppp_helper
 from back_end.src import seach_helper
 
 adzuna = adzuna_ingest.Adzuna()

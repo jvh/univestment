@@ -8,7 +8,7 @@ from psycopg2 import extras as psql_extras
 from back_end.src.api_usage import google_vision
 from back_end.src import app
 from back_end.src.database import database_functions as db_func
-from back_end.src import property_price_predictions_helper as ppd_helper
+from back_end.src.predictions import property_price_predictions_helper as ppd_helper
 from back_end.src.database import generic_db_functions as general_db_fun
 
 

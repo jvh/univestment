@@ -8,7 +8,7 @@ from back_end.src import POSTGRES_USERNAME, POSTGRES_PASSWORD, POSTGRES_DATABASE
     DEVELOPMENT, POSTGRES_SUPER_PASSWORD, POSTGRES_IP
 import psycopg2
 from back_end.src.database import import_from_datasets as ifd
-from back_end.src.preprocess_data import preprocess_admission_predictions as pap
+from back_end.src.predictions import preprocess_admission_predictions as pap
 from back_end.src.database import create_tables as ct
 
 
