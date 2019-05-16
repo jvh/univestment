@@ -11,53 +11,88 @@ def calculate_average_rent(postcode):
     """
     adzuna = Adzuna()
     distance = "0.1"
-    max_beds = 5
+    max_beds = 7
 
     params = dict()
     params["where"] = postcode[:-3]
     params["category"] = "to-rent"
-
-    rental_values = dict()
+    params["distance"] = distance
 
     hash_params = dict()
     hash_params["where"] = params["where"]
     hash_params["category"] = params["category"]
-    
-    for beds in range(2, max_beds):
-        params["distance"] = distance
-        params["beds"] = beds
-        hash_params["distance"] = params["distance"]
+    hash_params["distance"] = params["distance"]
 
-        query_id = format_results.hash_params(hash_params)
-        results = db_func.query_already_processed(query_id)
+    average_rent = {bed: 0 for bed in range(1, max_beds)}
+    counts = {bed: 0 for bed in range(1, max_beds)}
 
-        if not results:
-            results = adzuna.get_property_listing(params)
+    query_id = format_results.hash_params(hash_params)
+    results = db_func.query_already_processed(query_id)
 
-        large_images = format_results.large_images_only(results)
+    if not results:
+        results = adzuna.get_property_listing(params)
 
-        total_rent = 0
-        count = 0
-        for r in results:
+    large_images = format_results.large_images_only(results)
+
+    for r in results:
+        if "beds" in r:
+            beds = r["beds"]
             if "price_per_month" in r:
-                total_rent += r["price_per_month"]
-                count += 1
+                average_rent[beds] += r["price_per_month"]
+                counts[beds] += 1
             elif "sale_price" in r:
-                total_rent += r["sale_price"]
-                count += 1
+                average_rent[beds] += r["sale_price"]
+                counts[beds] += 1
 
-        average_rent = total_rent/count
-        rental_values[str(beds)] = average_rent
+    for key in average_rent.keys():
+        if counts[key] != 0:
+            average_rent[key] /= counts[key]
 
-        for r in results:
-            if "price_per_month" in r:
-                r["sale_price"] = r.pop("price_per_month")
-            else:
-                r["sale_price"] = 0
+    for r in results:
+        if "price_per_month" in r:
+            r["sale_price"] = r.pop("price_per_month")
+        else:
+            r["sale_price"] = 0
 
-        db_func.populate_seen_tables(results, large_images, query_id, params)
+    db_func.populate_seen_tables(results, large_images, query_id, params)
 
-    return rental_values
+    return average_rent
+
+    # for beds in range(2, max_beds):
+    #     params["distance"] = distance
+    #     params["beds"] = beds
+    #     hash_params["distance"] = params["distance"]
+    #
+    #     query_id = format_results.hash_params(hash_params)
+    #     results = db_func.query_already_processed(query_id)
+    #
+    #     if not results:
+    #         results = adzuna.get_property_listing(params)
+    #
+    #     large_images = format_results.large_images_only(results)
+    #
+    #     total_rent = 0
+    #     count = 0
+    #     for r in results:
+    #         if "price_per_month" in r:
+    #             total_rent += r["price_per_month"]
+    #             count += 1
+    #         elif "sale_price" in r:
+    #             total_rent += r["sale_price"]
+    #             count += 1
+    #
+    #     average_rent = total_rent/count
+    #     rental_values[str(beds)] = average_rent
+    #
+    #     for r in results:
+    #         if "price_per_month" in r:
+    #             r["sale_price"] = r.pop("price_per_month")
+    #         else:
+    #             r["sale_price"] = 0
+    #
+    #     db_func.populate_seen_tables(results, large_images, query_id, params)
+
+    #return rental_values
 
 
 if __name__ == "__main__":
