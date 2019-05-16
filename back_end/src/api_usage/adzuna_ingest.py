@@ -81,13 +81,13 @@ class Adzuna:
         number_pages = math.ceil(count / results_per_page)
 
         # Collecting all those properties delivered by Adzuna (across all pages)
-        # for i in range(2, 5):
-        #     page_number = i
-        #     url = self.API_URL + str(page_number)
-        #
-        #     # Getting the response from this single place
-        #     r = self.get_properties_per_page(params, url)
-        #     for result in r['results']:
-        #         results.append(result)
+        for i in range(2, number_pages):
+            page_number = i
+            url = self.API_URL + str(page_number)
+
+            # Getting the response from this single place
+            r = self.get_properties_per_page(params, url)
+            for result in r['results']:
+                results.append(result)
 
         return results
