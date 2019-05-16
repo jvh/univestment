@@ -30,7 +30,8 @@ def get_rental_properties(outcode):
 
     if not results:
         print("Unseen query. Querying Adzuna for rental properties")
-        results = adzuna.get_property_listing(params, 50)
+        print(params)
+        results = adzuna.get_property_listing(params)
 
     # Replace price_per_month with sale_price for compatibility with table schema
     for r in results:
@@ -40,6 +41,7 @@ def get_rental_properties(outcode):
     large_images = format_results.large_images_only(results)
 
     # Add results to database if new
+    print("adding rental results to database")
     db_func.populate_seen_tables(results, large_images, query_id, params)
 
     return results
@@ -52,6 +54,7 @@ def calculate_average_rent_by_bed(outcode):
     :param postcode: postcode to search in
     :return: dict of average rent price by beds
     """
+    print("\nBeginning calculation of average rent prices by bed for outcode: {}".format(outcode))
     max_beds = 7
 
     # Keep track of a running total for rent prices by bed
@@ -63,8 +66,9 @@ def calculate_average_rent_by_bed(outcode):
     results = get_rental_properties(outcode)
 
     # Get running total and counts over results
+    print("calculating average rent prices by bed")
     for r in results:
-        if "beds" in r and r["beds"]:
+        if "beds" in r and r["beds"] in counts:
             beds = r["beds"]
             if "price_per_month" in r:
                 total_rents[int(beds)] += r["price_per_month"]
@@ -78,7 +82,7 @@ def calculate_average_rent_by_bed(outcode):
         if counts[key] != 0:
             total_rents[key] /= counts[key]
     average_rents = total_rents
-
+    print("finished calculating average rent by bed for outcode: {}\n".format(outcode))
     return average_rents
 
 
