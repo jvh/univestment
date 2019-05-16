@@ -93,14 +93,14 @@ def query_already_processed(query_id, outcode_rentals=False):
     if_processed = general_db_func.query_database(query)
 
     # If the query has been processed beforehand
-    if if_processed and if_processed[0][0]:
+    if if_processed:
+        # Empty entry, return "Nothing"
+        if not if_processed[0][0]:
+            return "Nothing"
+
         [[unpacked]] = list(if_processed)
         # Get IDs of those advertisements part of this query
         results = unpacked.split(' ')
-
-        # Empty entry, return "Nothing"
-        if not results:
-            return 'Nothing'
 
         results_from_db_lrg = []
         for r in results:
