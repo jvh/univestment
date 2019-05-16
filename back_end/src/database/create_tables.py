@@ -91,9 +91,8 @@ def create_admissions_table():
 
     admissions_data = \
         'CREATE TABLE IF NOT EXISTS admissions_data (' \
-        '   id UUID PRIMARY KEY,' \
         '   year INTEGER NOT NULL,' \
-        '   university TEXT NOT NULL,' \
+        '   university TEXT PRIMARY KEY,' \
         '   admissions INTEGER NOT NULL' \
         ');'
     return admissions_data
@@ -135,11 +134,26 @@ def create_img_thumbnail():
 def create_predicted_admissions_table():
     predicted_admissions_data = \
         'CREATE TABLE IF NOT EXISTS predicted_admissions_table (' \
-        '   university TEXT NOT NULL,' \
+        '   university TEXT PRIMARY KEY,' \
         '   historic_admissions TEXT NOT NULL,' \
         '   predicted_admissions TEXT NOT NULL' \
         ');'
     return predicted_admissions_data
+
+
+def create_distance_from_uni_table():
+    """
+    Schema for distance_from_uni_data
+
+    :return: string representing table field commands
+    """
+    distance_from_uni_data = \
+        'CREATE TABLE IF NOT EXISTS distance_from_uni (' \
+        '   university_name TEXT PRIMARY KEY,' \
+        '   distance_from INTEGER,' \
+        '   property_id_list TEXT' \
+        ');'
+    return distance_from_uni_data
 
 
 def create_tables():
@@ -156,3 +170,4 @@ def create_tables():
     yield create_predicted_admissions_table()
     yield create_property_table()
     yield create_seen_queries()
+    yield create_distance_from_uni_table()

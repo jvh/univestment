@@ -46,11 +46,12 @@ class Adzuna:
         elif response.status_code in [404, 500]:
             raise AdzunaAPIException
 
-    def get_property_listing(self, params, results_per_page=50):
+    def get_property_listing(self, params, ad_type="for-sale", results_per_page=50):
         """
         Query the Adzuna API for property listings
 
         :param params: dict of query parameters
+        :param ad_type: "for-sale" to search for properties for sale, "for-rent" for rental properties
         :param results_per_page: A query result is divided into 'pages' by Adzuna. The maximum number of results per
                                  page is 50. This specifies the number of results returned per page.
         :return: dict of returned results
@@ -60,7 +61,7 @@ class Adzuna:
             params = {}
         params.update({"app_id": ADZUNAAPIID})
         params.update({"app_key": ADZUNAAPIKEY})
-        params.update({"category": "for-sale"})
+        params.update({"category": ad_type})
         params.update({'results_per_page': results_per_page})
 
         results = []

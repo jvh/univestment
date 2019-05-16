@@ -14,6 +14,7 @@ from back_end.src.api_usage import geo_locations
 from back_end.src import format_results
 from back_end.src import property_price_predictions_helper as ppp_helper
 from back_end.src import seach_helper
+from back_end.src import uni_nearby_ads
 
 adzuna = adzuna_ingest.Adzuna()
 app = Flask(__name__)
@@ -96,12 +97,7 @@ def query_property_listing():
         preprocessing_params['radius_from'] = params['radius_from']
 
     # Converting the parameters to a hash (that is deterministic)
-    string_to_hash = []
-    for p in sorted(preprocessing_params):
-        string_to_hash.append(p + '&' + preprocessing_params[p])
-    string_to_hash = ';'.join(string_to_hash)
-    query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
-    query_id = psql_extras.UUID_adapter(query_id)
+    query_id = format_results.hashed_params(preprocessing_params)
 
     # If query has already been processed, get results
     already_processed = db_func.query_already_processed(query_id)
@@ -117,14 +113,7 @@ def query_property_listing():
         print("This query has not been seen before.")
         # Query has not been processed before and therefore must be processed as new
         try:
-            # If we are testing, we only want the distance and where in order to generate results
-            if 'testing' in params and params['testing'] == 'uni_nearby_ads':
-                test_params = dict()
-                test_params['where'] = params['where']
-                test_params['distance'] = params['distance']
-                results = adzuna.get_property_listing(test_params, results_per_page=10)
-            else:
-                results = seach_helper.get_properties_near_unis(params)
+            results = seach_helper.get_properties_near_unis(params)
 
             if not results:
                 return jsonify({"error": "No results returned"})
