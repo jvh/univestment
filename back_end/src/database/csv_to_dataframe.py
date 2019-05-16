@@ -21,25 +21,30 @@ class ImportFiles:
         :param file_path: path to the data file starting from root_data_path
         """
         try:
-            open(self.root_data_path + file_path, 'r')
+            open(file_path, 'r')
             return True
         except FileNotFoundError:
             return False
 
-    def read_file(self, file_path, chunksize=None, names=None):
+    def read_file(self, file_path, chunksize=None, names=None, absolute_path=False):
         """
         read a file and return a dataframe containing the contents of the file
 
         :param file_path: path to file from root data path
         :param chunksize: How many records we insert into the database at a time
         :param names: Defining the column names
+        :param absolute_path: True if 'file_path' describes the absolute path
         :return: dataframe
         """
-        if self.check_file(file_path):
+        if absolute_path:
+            path = file_path
+        else:
+            path = self.root_data_path + file_path
+        if self.check_file(path):
             if chunksize:
-                data = pd.read_csv(self.root_data_path + file_path, chunksize=chunksize, names=names)
+                data = pd.read_csv(path, chunksize=chunksize, names=names)
             else:
-                data = pd.read_csv(self.root_data_path + file_path)
+                data = pd.read_csv(path)
             return data
         else:
             raise FileNotFoundError('Please check that the filepath exists: {}'.format(file_path))

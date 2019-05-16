@@ -7,6 +7,7 @@ from flask import jsonify
 from back_end.src.api_usage import geo_locations
 from back_end.src import app
 from back_end.src import format_results
+from back_end.src.database import database_functions as db_func
 
 
 def get_properties_near_unis(params, results_per_page=50):
@@ -27,7 +28,10 @@ def get_properties_near_unis(params, results_per_page=50):
         raise Exception("Please enter the distance from any given university (in km) that you would like to "
                         "search houses for.")
 
+    # Getting those nearby universities
+    print("Getting universities within a radius of {} to {}...".format(params['radius_from'], params['where']))
     nearby_unis = geo_locations.get_universities_near_location(params['where'], params['radius_from'])
+    print('These are the universities nearby: {}\n'.format(", ".join([x[0] for x in nearby_unis])))
 
     if not nearby_unis:
         return jsonify({"error": "No universities within area specified."})
@@ -37,24 +41,46 @@ def get_properties_near_unis(params, results_per_page=50):
 
     # Searching for houses from each university
     for uni in nearby_unis:
+        name = uni[0]
         post = uni[3]
         uni_params = deepcopy(params)
         uni_params['where'] = post
         uni_params['distance'] = params['km_away_from_uni']
-
-        # data = db_func.query_predicted_admissions(uni[0])
-
-        # Formatting parameters for use by adzuna
         uni_params = format_results.format_params(uni_params)
-        results = app.adzuna.get_property_listing(uni_params, results_per_page=results_per_page)
+
+        # Parameters which are heavily simplified for readability reasons
+        simplified_params = dict()
+        simplified_params['name'] = name
+        simplified_params['distance'] = uni_params['distance']
+
+        # Ensuring that listings unseen and queries unseen are populated into the table. If they are, they should be
+        # taken out for immediate access
+        query_id = format_results.hashed_params(uni_params)
+
+        # Checking if query has already been processed
+        already_processed = db_func.query_already_processed(query_id)
+        if already_processed:
+            print("Query already processed for {} with a radius of {}km. Getting results..."
+                  .format(name, uni_params['distance']))
+            results = already_processed
+        else:
+            # Query has never been processed, process it
+            print("This query has not been seen before. Processing results for {} with a radius of {}..."
+                  .format(name, uni_params['distance']))
+            results = app.adzuna.get_property_listing(uni_params, results_per_page=results_per_page)
+            large_images = format_results.large_images_only(results)
+            db_func.populate_seen_tables(results, large_images, query_id, simplified_params)
+
+        print("The number of properties listed in {} is {}.\n".format(name, len(results)))
 
         for r in results:
             # Assigning that property to a particular university
             r['university'] = uni[0]
-            # if data:
-            #     r["admissions"] = data
+
             if r not in properties:
                 properties.append(r)
+
+    print("The total number of property listings is {}.".format(len(properties)))
 
     return properties
 

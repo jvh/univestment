@@ -17,26 +17,31 @@ def fill_admissions_data(engine, import_files):
     data.to_sql('admissions_data', engine, if_exists="fail", index=False)
 
 
-def fill_uni_addresses(engine, import_files):
+def fill_uni_addresses(engine, import_files=None, import_straight_to_db=False, data=None):
     """
     Store university address data in uni_addresses_data table
 
     :param engine: database engine object
     :param import_files: ImportFiles object
+    :param import_straight_to_db: Values have already been calculated. Just import the CSV as is.
+    :param data: The data to be imported straight away
     """
     from back_end.src.api_usage import geo_locations
 
-    data = import_files.uni_addresses
-    data.columns = map(str.lower, data.columns)
-    longitude = []
-    latitude = []
-    data = data[pd.notnull(data['postcode'])]
-    for row in data['postcode']:
-        long_, lat = geo_locations.get_coords_from_postcode(row)
-        longitude.append(long_)
-        latitude.append(lat)
-    data['longitude'] = longitude
-    data['latitude'] = latitude
+    if not import_straight_to_db:
+        data = import_files.uni_addresses
+        data.columns = map(str.lower, data.columns)
+        longitude = []
+        latitude = []
+        data = data[pd.notnull(data['postcode'])]
+        for row in data['postcode']:
+            long_, lat = geo_locations.get_coords_from_postcode(row)
+            longitude.append(long_)
+            latitude.append(lat)
+        data['longitude'] = longitude
+        data['latitude'] = latitude
+    else:
+        data.columns = map(str.lower, data.columns)
 
     data.to_sql('uni_addresses_data', engine, if_exists="replace", index=False)
 

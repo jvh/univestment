@@ -53,7 +53,7 @@ def hashed_params(params):
     """
     string_to_hash = []
     for p in sorted(params):
-        string_to_hash.append(p + '&' + params[p])
+        string_to_hash.append(p + '&' + str(params[p]))
     string_to_hash = ';'.join(string_to_hash)
     query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
     query_id = psql_extras.UUID_adapter(query_id)
@@ -84,13 +84,19 @@ def get_property_args(p, large_images):
     uni = None
     lrg = False
     p_type = 'N/A'
+    img_url = None
+    number_beds = None
     if 'university' in p:
         uni = p['university']
     if p in large_images:
         lrg = True
     if 'property_type' in p:
         p_type = p['property_type']
-    params = (p['id'], p['beds'], p['description'], p['image_url'], p['is_furnished'], p['latitude'], p['longitude'],
+    if 'image_url' in p:
+        img_url = p['image_url']
+    if 'beds' in p:
+        number_beds = p['beds']
+    params = (p['id'], number_beds, p['description'], img_url, p['is_furnished'], p['latitude'], p['longitude'],
               p['postcode'], p_type, p['redirect_url'], p['sale_price'], p['title'], uni, lrg)
     return params
 

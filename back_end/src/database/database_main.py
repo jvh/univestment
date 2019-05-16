@@ -12,9 +12,12 @@ from back_end.src.preprocess_data import preprocess_admission_predictions as pap
 from back_end.src.database import create_tables as ct
 
 
-def database_commands(load_data=False):
+def database_commands(load_data, manual_import):
     """
     Create tables for all data sets if they do not already exist
+
+    :param load_data: True if data should be loaded automatically from CSV
+    :param manual_import: True if data should be loaded manually from CSV
     """
     try:
         if DEVELOPMENT:
@@ -41,11 +44,17 @@ def database_commands(load_data=False):
 
         connection.commit()
 
+        # Manually populate table from CSV
+        if manual_import:
+            import_files = ImportFiles()
+            data = import_files.read_file('insert_abs_path.csv', absolute_path=True)
+            ifd.fill_uni_addresses(engine, import_straight_to_db=True, data=data)
+
         # If you need to load the data into the database
         if load_data:
             # Populate databases if not already populated
             import_files = ImportFiles()
-            ifd.fill_uni_addresses(engine, import_files)
+            ifd.fill_uni_addresses(engine, import_files=import_files)
             ifd.fill_admissions_data(engine, import_files)
             ifd.fill_house_data(engine, import_files)
             pap.generate_admission_prediction()
@@ -58,4 +67,4 @@ def database_commands(load_data=False):
 
 
 if __name__ == "__main__":
-    database_commands()
+    database_commands(load_data=False, manual_import=False)
