@@ -117,14 +117,7 @@ def query_property_listing():
         print("This query has not been seen before.")
         # Query has not been processed before and therefore must be processed as new
         try:
-            # If we are testing, we only want the distance and where in order to generate results
-            if 'testing' in params and params['testing'] == 'uni_nearby_ads':
-                test_params = dict()
-                test_params['where'] = params['where']
-                test_params['distance'] = params['distance']
-                results = adzuna.get_property_listing(test_params, results_per_page=10)
-            else:
-                results = seach_helper.get_properties_near_unis(params)
+            results = seach_helper.get_properties_near_unis(params)
 
             if not results:
                 return jsonify({"error": "No results returned"})
