@@ -1,10 +1,10 @@
-from back_end.src.database.generic_db_functions import query_database, insert_to_db
 from back_end.src.api_usage.adzuna_ingest import Adzuna
-from back_end.src.database.
+from back_end.src.database import generic_db_functions as general_db_func
+
 
 def get_ads_near_uni(university):
     query = "SELECT postcode FROM uni_addresses_data WHERE establishmentname = '{}';".format(university)
-    uni_postcode = query_database(query)[0]
+    uni_postcode = general_db_func.query_database(query)[0]
     adzuna = Adzuna()
 
     if uni_postcode:
@@ -20,5 +20,4 @@ def get_ads_near_uni(university):
 
             params = (university, distance, str(ids))
             query = "INSERT INTO distance_from_uni VALUES (%s, %s, %s)"
-            insert_to_db(query, params)
-
+            general_db_func.insert_to_db(query, params)
