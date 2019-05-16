@@ -39,7 +39,9 @@ class HomePageSearch extends Component {
         this.state = {
           ...this.state,
           form: {
-            where: ''
+            where: '',
+            distance: '10',
+            km_away_from_uni: '2'
           },
         }
       // }
@@ -137,17 +139,22 @@ class HomePageSearch extends Component {
 
             <FormGroup as={Col} controlId="university_search">
                 <FormLabel style={{fontWeight:"bold"}}>Distance From University</FormLabel>
-                <FormControl
-                 as="select"
-                  name="km_away_from_uni"
-                  value={this.state.form.km_away_from_uni}
-                  onChange={this.handleFormChange}>
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-                </FormControl>
+                <InputGroup>
+                  <FormControl
+                    as="select"
+                    name="km_away_from_uni"
+                    value={this.state.form.km_away_from_uni}
+                    onChange={this.handleFormChange}>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                  </FormControl>
+                <InputGroup.Append>
+                  <InputGroup.Text id="inputGroupAppend">km</InputGroup.Text>
+                </InputGroup.Append>
+              </InputGroup>
               </FormGroup>
             </Row>
            <Row>
@@ -271,6 +278,7 @@ class HomePageSearch extends Component {
                  name="beds"
                  value={this.state.form.beds}
                  onChange={this.handleFormChange}>
+                 <option>All</option>
                  <option>2</option>
                  <option>3</option>
                  <option>4</option>

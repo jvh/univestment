@@ -12,6 +12,8 @@ const Header = props => {
       <img className="header-logo" src={require('../img/logo_white.svg')}/>
       Univestment</a>
       <div className="collapse navbar-collapse text-center justify-content-end" id="mainNavbar">
+      <a className="btn navbar-btn background ml-2 text-white" href="/datasets">
+        <i className="fa d-inline fa-lg fa-user-circle-o"></i>Our Datasets</a>
       <a className="btn navbar-btn background ml-2 text-white" href="mailto:jt7g15@soton.ac.uk?Subject=Univestment Contact">
         <i className="fa d-inline fa-lg fa-user-circle-o"></i>Contact Us</a>
       </div>

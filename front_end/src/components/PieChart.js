@@ -64,7 +64,8 @@ export default class RePieChart extends PureComponent {
     super(props);
     this.state={
       data:props.data,
-      callback:props.callback
+      callback:props.callback,
+      activeIndex:0
     }
   }
 

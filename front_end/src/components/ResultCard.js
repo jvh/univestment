@@ -8,6 +8,35 @@ import { Link } from 'react-router-dom';
 
 const ResultCard = (props) => {
 
+
+
+  const findWithAttr = (array, attr, value) => {
+    for(var i = 0; i < array.length; i += 1) {
+        if(array[i][attr] === value) {
+            return i;
+        }
+    }
+    return -1;
+  }
+
+  const renderUniLogo = (university) => {
+    console.log(props.results_state.search.search_results.universities);
+    var unis = props.results_state.search.search_results.universities;
+    var uni = findWithAttr (unis, 'name', university);
+
+    console.log(unis[uni]);
+
+    if (unis[uni].logo !== null) {
+      return (
+        <img className="card-uni-logo" src={unis[uni].logo} alt={university}/>
+      );
+    }
+    return (
+      <p>{university}</p>
+    );
+
+  }
+
   const adzuna = props.data;
 
   const allResults = props.all_results;
@@ -55,8 +84,10 @@ const ResultCard = (props) => {
           </div>
 
           <div className="row">
-            <div className="align-left adzuna-text pad-hor pad-top col-6 border" style={{whiteSpace:"nowrap"}}>
-              <p>{adzuna.university}</p>
+            <div className="align-left adzuna-text pad-hor pad-top col-6" style={{whiteSpace:"nowrap"}}>
+              {
+                renderUniLogo(adzuna.university)
+              }
             </div>
             <div className="align-right adzuna-text pad-hor pad-top col-6" style={{whiteSpace:"nowrap"}}>
               <a href={adzuna.redirect_url} target="_blank" rel="noopener noreferrer" style={{position:"relative", top:"2px"}}>Properties by </a>

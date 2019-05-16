@@ -13,7 +13,7 @@ const ResultsList = (props) => {
       );
   }
 
-  var results = Array.from(props.search.search_results.properties);
+  var results = Array.from(props.filtered_results);
 
   if (results && results.length > 0) {
     return (

@@ -18,6 +18,7 @@ const LoadingSpinner = () => {
       </div>
       <div>
         <h3 className="align-center pad-top">Crunching the Numbers...</h3>
+        <p className="align-center pad-top">This can take up to 10 minutes</p>
       </div>
     </div>
 )};

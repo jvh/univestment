@@ -18,6 +18,10 @@ class ResultsMap extends Component {
 
   constructor(props) {
     super(props)
+
+    console.log("MAP PROPS")
+    console.log(props);
+
     this.state = {
       results: props.results,
       zoom:11,
@@ -44,6 +48,7 @@ class ResultsMap extends Component {
   }
 
   handleCoordsFailure = response => {
+    console.log(response);
   }
 
   static defaultProps = {
@@ -54,8 +59,10 @@ class ResultsMap extends Component {
     zoom: 11
   };
 
-  placePins(){
-    const resultPins = this.state.results.properties.map((result, index) => {
+  placePins(state){
+    console.log("PINS")
+    console.log(state);
+    const resultPins = state.results.map((result, index) => {
         if (result.data.latitude == null || result.data.longitude == null) {
           return null;
         } else {
@@ -84,7 +91,7 @@ class ResultsMap extends Component {
             defaultZoom={this.state.zoom}
           >
           {
-            this.placePins()
+            this.placePins(this.state)
           }
           </GoogleMapReact>
         </div>

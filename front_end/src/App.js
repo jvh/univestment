@@ -15,7 +15,6 @@ class App extends Component {
           <BrowserRouter>
             <Header/>
             <Main/>
-            <Footer/>
           </BrowserRouter>
         </div>
       );
@@ -23,3 +22,5 @@ class App extends Component {
 }
 
 export default App;
+
+//<Footer/>

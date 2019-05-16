@@ -107,7 +107,7 @@ class PropertyPage extends Component {
           <div className="pad-hor-both pad-top">
             <div className="graph-outer overline pad-top">
               <h1 className="align-center" style={{fontSize:"275%"}}>Market Value Prediction</h1>
-              <LineGraph width={700} height={500} data={data}/>
+              <LineGraph width={700} height={500} data={data} xTitle="Month" yTitle="Sale Price" zoom={true}/>
             </div>
           </div>
 
