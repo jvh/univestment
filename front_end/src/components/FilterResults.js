@@ -33,7 +33,6 @@ class FilterResults extends Component {
 
     advOptions = () => {
       this.setState({isOpened: !this.state.isOpened});
-      console.log(this.state.isOpened);
     }
 
     handleFormChange = event => {

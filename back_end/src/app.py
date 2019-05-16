@@ -84,76 +84,30 @@ def query_property_listing():
 
     :return: Property listing
     """
+    # The arguments passed into /search endpoint (in the format /search?arg1=arg1_val&arg2=arg2_val&...)
     params = request.args.to_dict()
-    # The params collected exclusively for preprocessing
-    preprocessing_params = {}
-    if 'where' in params:
-        preprocessing_params['where'] = params['where']
-    if 'distance' in params:
-        preprocessing_params['distance'] = params['distance']
-    if 'km_away_from_uni' in params:
-        preprocessing_params['km_away_from_uni'] = params['km_away_from_uni']
-    if 'radius_from' in params:
-        preprocessing_params['radius_from'] = params['radius_from']
-
-    query_id = format_results.hash_params(preprocessing_params)
-
-    # Converting the parameters to a hash (that is deterministic)
-    # string_to_hash = []
-    # for p in sorted(preprocessing_params):
-    #     string_to_hash.append(p + '&' + preprocessing_params[p])
-    # string_to_hash = ';'.join(string_to_hash)
-    # query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
-    # query_id = psql_extras.UUID_adapter(query_id)
-
-    # If query has already been processed, get results
-    already_processed = db_func.query_already_processed(query_id)
 
     if 'testing' in params:
         print("Testing has been enabled.")
 
-    if already_processed and 'testing' not in params:
-        print("Query already processed... Getting results")
-        # The final results after processing
-        final_result = already_processed
-    else:
-        print("This query has not been seen before.")
-        # Query has not been processed before and therefore must be processed as new
-        try:
+    try:
+        if 'testing' in params:
+            results = seach_helper.get_properties_near_unis(params, 10)
+        else:
             results = seach_helper.get_properties_near_unis(params)
 
-            if not results:
-                return jsonify({"error": "No results returned"})
-            else:
-                if 'testing' not in params:
-                    print("Getting large images...")
-                    # Obtain all of those results which have large images available
-                    large_images = format_results.large_images_only(results)
+        if not results:
+            return jsonify({"error": "No results returned"})
 
-                    print("Populating seen_queries and seen_adverts tables...")
-                    # Populates seen_queries and seen_adverts tables with results of query
-                    db_func.populate_seen_tables(results, large_images, query_id, preprocessing_params)
-                else:
-                    large_images = results
+    except adzuna_ingest.AdzunaAuthorisationException:
+        return jsonify({"error": 410})
+    except adzuna_ingest.AdzunaRequestFormatException:
+        return jsonify({"error": 400})
+    except adzuna_ingest.AdzunaAPIException:
+        return jsonify({"error": 500})
 
-                # The final results after processing
-                final_result = large_images
-
-        except adzuna_ingest.AdzunaAuthorisationException:
-            return jsonify({"error": 410})
-        except adzuna_ingest.AdzunaRequestFormatException:
-            return jsonify({"error": 400})
-        except adzuna_ingest.AdzunaAPIException:
-            return jsonify({"error": 500})
-
-    # formatted_results = format_results(final_result, params)
-
-    if 'testing' in params and params['testing'] == 'uni_nearby_ads':
-        return jsonify(final_result)
-
-    # print("Building the machine learning model for outcodes...")
     # Builds the results with other metadata into a format to be consumed by frontend
-    property_dict = format_results.build_property_dict(final_result)
+    property_dict = format_results.build_property_dict(results)
     print("Finished.")
     return jsonify(property_dict)
 

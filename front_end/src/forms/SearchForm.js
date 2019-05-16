@@ -16,7 +16,6 @@ var isOpened = false;
 
 const onClick = () => {
   isOpened = !isOpened;
-  console.log("Clicked");
 }
 
 const SearchForm = props => {
@@ -27,7 +26,6 @@ const SearchForm = props => {
 
   // const onClickAdvanced = () => {
   //   isOpened = !isOpened;
-  //   console.log(isOpened)
   // }
 
   return (

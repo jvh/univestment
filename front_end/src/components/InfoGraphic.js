@@ -26,16 +26,13 @@ class InfoGraphic extends Component {
   }
 
   handleGetDataSuccess = response => {
-    console.log(response);
     this.setState({data: response.result.data});
-    console.log(this.state);
   };
 
   getBarGraph(data) {
   }
 
   handleGetDataFailure = error => {
-    console.log(error);
   };
 
   fetchData = () => {

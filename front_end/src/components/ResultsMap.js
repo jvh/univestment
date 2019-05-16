@@ -27,7 +27,6 @@ class ResultsMap extends Component {
   }
 
   componentDidMount () {
-    console.log(this.props.where)
     var where = {where:this.props.where};
     ApiUtils.coords(where)
       .then(this.handleCoordSuccess)
@@ -35,8 +34,6 @@ class ResultsMap extends Component {
   }
 
   handleCoordSuccess = coords => {
-    console.log("COORDS");
-    console.log(coords);
     this.setState({
       center: {
         lng:coords[0],
@@ -47,7 +44,6 @@ class ResultsMap extends Component {
   }
 
   handleCoordsFailure = response => {
-    console.log("FAIL");
   }
 
   static defaultProps = {
@@ -59,15 +55,13 @@ class ResultsMap extends Component {
   };
 
   placePins(){
-    const resultPins = this.state.results.map((result, index) => {
-        console.log("RESULT");
-        console.log(result);
-        if (result.property.adzuna.latitude == null || result.property.adzuna.longitude == null) {
+    const resultPins = this.state.results.properties.map((result, index) => {
+        if (result.data.latitude == null || result.data.longitude == null) {
           return null;
         } else {
          result={...result, results_state:this.state.results_page_state};
           return (
-            <Marker result={result} lat={result.property.adzuna.latitude} lng={result.property.adzuna.longitude}/>
+            <Marker result={result} lat={result.data.latitude} lng={result.data.longitude}/>
           );
         }
     });
@@ -82,7 +76,8 @@ class ResultsMap extends Component {
       )
     } else {
       return (
-        <div className="map rounded">
+        <div className="map-outer rounded">
+        <div className="map">
           <GoogleMapReact
             bootstrapURLKeys={{ key:'AIzaSyCElo3BDmiGTGaF6E-Cq6aVwgiihfPPA7c'}}
             defaultCenter={this.state.center}
@@ -92,6 +87,7 @@ class ResultsMap extends Component {
             this.placePins()
           }
           </GoogleMapReact>
+        </div>
         </div>
       );
     }
