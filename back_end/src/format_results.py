@@ -225,6 +225,10 @@ def build_property_dict(results):
         p_data['data'] = r
         p_uni = r['university']
 
+        # Cannot deal with instances where there are >6 beds
+        if not beds or beds > 6:
+            continue
+
         # Getting the rent(s) for the outcode. Getting the average rent for the number of beds in this property.
         outcode_rent_data = outcode_rent[outcode]
         average_rent_for_beds = outcode_rent_data[beds]
@@ -284,6 +288,8 @@ def get_best_properties_per_uni(property_by_uni, number_properties=50):
     :param number_properties: The number of properties returned
     :return: The best properties for that university
     """
+    print("Getting best properties...")
+
     # number_properties * number of unis returned
     number_properties = number_properties * len(property_by_uni)
     best_properties = list()
@@ -296,10 +302,14 @@ def get_best_properties_per_uni(property_by_uni, number_properties=50):
 
         best_properties.extend(uni_properties)
 
+    # Getting top number_properties results
+    best_properties = best_properties[:number_properties]
+
+    print("Getting large images...")
+
+    # Getting large images
     large_images = large_images_only(best_properties)
     # Getting the best overall properties
     large_images.sort(key=lambda k: (k['investment']['mortgage_return']['potential_rent_profit']), reverse=True)
-    # Getting top number_properties results
-    best_properties = large_images[:number_properties]
 
-    return best_properties
+    return large_images
