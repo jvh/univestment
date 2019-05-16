@@ -7,14 +7,12 @@ export default class Example extends PureComponent {
 
   constructor(props) {
     super(props);
-    console.log(props);
     var data = this.handleData (props.data);
     this.state = {
       data:props.data,
       clickedLeft:data.length-84,
       clickedRight:data.length
     }
-    console.log(this.state);
 
   }
 
@@ -28,8 +26,6 @@ export default class Example extends PureComponent {
     var i = 0;
     var maxX = Math.max.apply(Math, data.predicted.x);
     var minX = Math.min.apply(Math, data.historic.x);
-    console.log(maxX);
-    console.log("MAX")
 
     for (var i = 0; i < maxX; i++) {
       if (data.historic.x[i] !== undefined) {
@@ -39,12 +35,9 @@ export default class Example extends PureComponent {
           out_data.push({month:data.historic.x[i], historic:Math.round(data.historic.y[i])});
         }
       } else if (data.predicted.x[i-data.historic.x.length] !== undefined){
-        console.log("predicted")
         out_data.push({month:data.predicted.x[i-data.historic.x.length], predicted:Math.round(data.predicted.y[i-data.historic.x.length])});
       }
     }
-    console.log("OUTDATA");
-    console.log(out_data);
     return out_data;
   }
 
@@ -58,28 +51,20 @@ export default class Example extends PureComponent {
     }
     var maxX = this.state.clickedRight;
     var minX = this.state.clickedLeft-1;
-    console.log(maxX);
-    console.log("MAX")
 
     this.setState({left: minX, right: maxX})
 
-    console.log(data.historic.x.length);
-
     for (var i = minX; i < maxX; i++) {
       if (data.historic.x[i] !== undefined) {
-        console.log({i:i, l:data.historic.x.length-1});
         if (i == data.historic.x.length-1) {
           out_data.push({month:data.historic.x[i], historic:Math.round(data.historic.y[i]), predicted:Math.round(data.historic.y[i])});
         } else {
           out_data.push({month:data.historic.x[i], historic:Math.round(data.historic.y[i])});
         }
       } else if (data.predicted.x[i-data.historic.x.length] !== undefined){
-        console.log("predicted")
         out_data.push({month:data.predicted.x[i-data.historic.x.length], predicted:Math.round(data.predicted.y[i-data.historic.x.length])});
       }
     }
-    console.log("OUTDATA");
-    console.log(out_data);
     this.setState({reduced_data:out_data, clickedLeft:'', clickedRight:''});
   }
 
@@ -111,7 +96,6 @@ export default class Example extends PureComponent {
     data.forEach (function(d) {
       if (d.predicted !== undefined) {
         predicted = true;
-        console.log("PREDICTED");
       }
     });
 

@@ -8,10 +8,7 @@ import { Link } from 'react-router-dom';
 
 const ResultCard = (props) => {
 
-  console.log("CARD PROPS");
-  console.log(props);
-
-  const adzuna = props.property.adzuna;
+  const adzuna = props.data;
 
   const allResults = props.all_results;
 
@@ -26,9 +23,6 @@ const ResultCard = (props) => {
     var index = description.lastIndexOf(" ");
     description = description.substr(0,index) + " ...";
   }
-
-//<!---<p style={{fontSize:"125%"}} className="align-left">{adzuna.location.display_name}</p>--->
-  console.log(img_url);
 
   return (
     <div>
@@ -61,7 +55,7 @@ const ResultCard = (props) => {
           </div>
 
           <div className="row">
-            <div className="align-right adzuna-text pad-hor pad-top col-6" style={{whiteSpace:"nowrap"}}>
+            <div className="align-left adzuna-text pad-hor pad-top col-6 border" style={{whiteSpace:"nowrap"}}>
               <p>{adzuna.university}</p>
             </div>
             <div className="align-right adzuna-text pad-hor pad-top col-6" style={{whiteSpace:"nowrap"}}>

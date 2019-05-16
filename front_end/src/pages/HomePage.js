@@ -31,7 +31,7 @@ class HomePage extends Component {
                 <div className="logo-container">
                   <img className="title-logo" src={require('../img/drawing.svg')}/>
                 </div>
-                <div className="homeTitle container align-center">
+                <div className="homeTitle container">
                   <h1 className="title">Univestment</h1>
                 </div>
               </Collapse>

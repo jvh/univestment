@@ -13,24 +13,23 @@ class PropertyPage extends Component {
 
   constructor (props) {
     super(props);
-    console.log("PROPERTY PROPS");
-    console.log(props);
     if (props.location.state === undefined){
       window.location = '/';
     }
     this.state = {
       data: props.location.state.form,
-      adzuna: props.location.state.form.property.adzuna,
+      adzuna: props.location.state.form.data,
+      old_state: props.location.state.form.results_state
     }
   }
 
-  componentDidMount () {
-    console.log("HISTORIC")
-    console.log(this.state.data);
-  }
-
-  back() {
-
+  findWithAttr(array, attr, value) {
+    for(var i = 0; i < array.length; i += 1) {
+        if(array[i][attr] === value) {
+            return i;
+        }
+    }
+    return -1;
   }
 
   round(float) {
@@ -40,6 +39,10 @@ class PropertyPage extends Component {
 //<p style={{fontSize:"125%"}} className="align-left">{this.state.adzuna.location.display_name}</p>
 
   render(){
+
+    const outcode = this.findWithAttr(this.state.old_state.search.search_results.outcodes, 'outcode', this.state.data.data.outcode);
+    const data = this.state.old_state.search.search_results.outcodes[outcode];
+
     return (
       <div className="bg outer pad-top pad-bottom">
         <div className="results-bg container-small">
@@ -80,14 +83,14 @@ class PropertyPage extends Component {
           <div className="pad-hor-both pad-top">
             <div className="overline pad-top">
               <div>
-                <h1 className="align-center value-green" style={{fontSize:"350%"}}>£{this.round(this.state.data.property.investment.market_value - this.state.adzuna.sale_price)}</h1>
+                <h1 className="align-center value-green" style={{fontSize:"350%"}}>£{this.round(this.state.data.investment.market_value - this.state.adzuna.sale_price)}</h1>
                 <h3 className="align-center">Below Estimated Market Value</h3>
               </div>
             </div>
           </div>
           <div className="pad-hor-both" style={{textAlign:"justify"}}>
-            <p className="align-center"> The market value for this area has been estimated at £{this.round(this.state.data.property.investment.market_value)} meaning that
-            this property has a potential return of investment of up to £{this.round(this.state.data.property.investment.market_value - this.state.adzuna.sale_price)}
+            <p className="align-center"> The market value for this area has been estimated at £{this.round(this.state.data.investment.market_value)} meaning that
+            this property has a potential return of investment of up to £{this.round(this.state.data.investment.market_value - this.state.adzuna.sale_price)}
             </p>
           </div>
 
@@ -104,8 +107,6 @@ class PropertyPage extends Component {
           <div className="pad-hor-both pad-top">
             <div className="graph-outer overline pad-top">
               <h1 className="align-center" style={{fontSize:"275%"}}>Market Value Prediction</h1>
-
-              <LineGraph width={700} height={500} data={this.state.data.historic_data.outcode}/>
             </div>
           </div>
 
@@ -116,3 +117,6 @@ class PropertyPage extends Component {
 }
 
 export default PropertyPage;
+
+// <LineGraph width={700} height={500} data={data}/>
+//             <LineGraph width={700} height={500} data={this.state.data.historic_data.outcode}/>

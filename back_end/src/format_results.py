@@ -44,6 +44,23 @@ def large_images_only(results):
     return new_results
 
 
+def hashed_params(params):
+    """
+    Hashes parameters into a deterministic UUID3 format
+
+    :param params: The parameters
+    :return: The UUID3 representation of those params
+    """
+    string_to_hash = []
+    for p in sorted(params):
+        string_to_hash.append(p + '&' + str(params[p]))
+    string_to_hash = ';'.join(string_to_hash)
+    query_id = uuid.uuid3(uuid.NAMESPACE_DNS, string_to_hash)
+    query_id = psql_extras.UUID_adapter(query_id)
+
+    return query_id
+
+
 def format_params(params):
     """
     Formats a set of given parameters for use by adzuna
@@ -69,6 +86,8 @@ def get_property_args(p, large_images):
     lrg = False
     p_type = 'N/A'
     img_url = None
+    number_beds = None
+
     if 'university' in p:
         uni = p['university']
     if p in large_images:
@@ -77,7 +96,9 @@ def get_property_args(p, large_images):
         p_type = p['property_type']
     if 'image_url' in p:
         img_url = p['image_url']
-    params = (p['id'], p['beds'], p['description'], img_url, p['is_furnished'], p['latitude'], p['longitude'],
+    if 'beds' in p:
+        number_beds = p['beds']
+    params = (p['id'], number_beds, p['description'], img_url, p['is_furnished'], p['latitude'], p['longitude'],
               p['postcode'], p_type, p['redirect_url'], p['sale_price'], p['title'], uni, lrg)
     return params
 

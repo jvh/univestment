@@ -45,7 +45,6 @@ class HomePageSearch extends Component {
   validatePostcode = postcode => {
     postcode = postcode.replace(/\s/g, "");
     var regex = /^[A-Z]{1,2}[0-9]{1,2}[A-Z]{0,1} ?[0-9][A-Z]{2}$/i;
-    console.log(regex.test(postcode));
     return regex.test(postcode);
   }
 
@@ -58,18 +57,20 @@ class HomePageSearch extends Component {
       }});
   }
 
-  handleFormChange = event => {
+  handleSubmit = event => {
+    this.props.history.push({
+      pathname: '/search',
+      state: {form: this.state.form}
+    })
+  }
 
-    console.log("CHANGE")
+  handleFormChange = event => {
 
      var value = event.target.value;
      const name = event.target.name;
 
-     console.log(name + " > " + value);
-
      if (name === "where"){
        var valid = this.validatePostcode(value);
-       console.log(valid);
        this.setState({isSubmitEnabled:valid});
      }
 
