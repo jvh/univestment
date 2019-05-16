@@ -47,14 +47,14 @@ def database_commands(load_data=False, manual_import=False):
         # Manually populate table from CSV
         if manual_import:
             import_files = ImportFiles()
-            data = import_files.read_file(absolute_path='insert_abs_path')
-
+            data = import_files.read_file('insert_abs_path.csv', absolute_path=True)
+            ifd.fill_uni_addresses(engine, import_straight_to_db=True, data=data)
 
         # If you need to load the data into the database
         if load_data:
             # Populate databases if not already populated
             import_files = ImportFiles()
-            ifd.fill_uni_addresses(engine, import_files)
+            ifd.fill_uni_addresses(engine, import_files=import_files)
             ifd.fill_admissions_data(engine, import_files)
             ifd.fill_house_data(engine, import_files)
             pap.generate_admission_prediction()
