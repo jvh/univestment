@@ -124,10 +124,9 @@ def query_property_listing():
                 test_params['where'] = params['where']
                 test_params['distance'] = params['distance']
                 results = adzuna.get_property_listing(test_params, results_per_page=10)
+                uni_nearby_ads.get_ads_near_uni("University of Southampton", results, params['distance'])
             else:
                 results = seach_helper.get_properties_near_unis(params)
-
-            uni_nearby_ads.get_ads_near_uni("University of Southampton", results, params['distance'])
 
             if not results:
                 return jsonify({"error": "No results returned"})
