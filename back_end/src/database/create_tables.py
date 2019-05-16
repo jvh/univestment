@@ -91,7 +91,6 @@ def create_admissions_table():
 
     admissions_data = \
         'CREATE TABLE IF NOT EXISTS admissions_data (' \
-        '   id UUID PRIMARY KEY,' \
         '   year INTEGER NOT NULL,' \
         '   university TEXT NOT NULL,' \
         '   admissions INTEGER NOT NULL' \
