@@ -12,7 +12,7 @@ from back_end.src.preprocess_data import preprocess_admission_predictions as pap
 from back_end.src.database import create_tables as ct
 
 
-def database_commands(load_data=False, manual_import=False):
+def database_commands(load_data, manual_import):
     """
     Create tables for all data sets if they do not already exist
 
@@ -67,4 +67,4 @@ def database_commands(load_data=False, manual_import=False):
 
 
 if __name__ == "__main__":
-    database_commands()
+    database_commands(load_data=False, manual_import=False)
