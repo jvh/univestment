@@ -1,31 +1,24 @@
 from back_end.src.database.generic_db_functions import query_database, insert_to_db
-import requests
-
+from back_end.src.api_usage.adzuna_ingest import Adzuna
+from back_end.src.database.
 
 def get_ads_near_uni(university):
-    url = "http://localhost:5005/search"
-
     query = "SELECT postcode FROM uni_addresses_data WHERE establishmentname = '{}';".format(university)
     uni_postcode = query_database(query)[0]
+    adzuna = Adzuna()
 
     if uni_postcode:
-        distance = 2
+        search_params = dict()
+        search_params['where'] = uni_postcode
+        max_distance = 4
 
-        params = dict()
-        params["where"] = uni_postcode
-        params["distance"] = distance
-        params["testing"] = "uni_nearby_ads"
+        for distance in range(1, max_distance):
+            search_params['distance'] = distance
+            results = adzuna.get_property_listing(search_params, results_per_page=10)
 
-        response = requests.get(url, params=params)
-        if response:
-            ids = []
-            for r in response:
-                ids.append(r[id])
+            ids = [r["id"] for r in results]
 
-            params = (response[university, distance, ids])
-            query = "INSERT INTO distance_from_uni_data VALUES (%s, %s, %s)"
+            params = (university, distance, str(ids))
+            query = "INSERT INTO distance_from_uni VALUES (%s, %s, %s)"
             insert_to_db(query, params)
 
-
-if __name__ == "__main__":
-    get_ads_near_uni("University of Southampton")

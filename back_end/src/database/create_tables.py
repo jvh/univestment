@@ -151,7 +151,7 @@ def create_distance_from_uni_table():
         'CREATE TABLE IF NOT EXISTS distance_from_uni (' \
         '   university_name TEXT PRIMARY KEY,' \
         '   distance_from INTEGER,' \
-        '   property_id_hash TEXT' \
+        '   property_id_list TEXT' \
         ');'
     return distance_from_uni_data
 
