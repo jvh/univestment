@@ -10,34 +10,35 @@ def get_rental_properties(outcode):
     :param postcode: postcode to search in
     """
     adzuna = Adzuna()
-    distance = "0.1"
+    distance = "0.5"
 
     # Search parameters
     params = dict()
     params["where"] = outcode
     params["category"] = "to-rent"
     params["distance"] = distance
+    params["results_per_page"] = 50
 
-    # Rarameters for calculating hash
+    # Parameters for calculating hash
     hash_params = dict()
     hash_params["where"] = params["where"]
     hash_params["category"] = params["category"]
     hash_params["distance"] = params["distance"]
 
-    print("Attempting to get queries for rental properties from database")
     query_id = format_results.hash_params(hash_params)
+    print("Attempting to get queries for rental properties from database")
     results = db_func.query_already_processed(query_id)
 
     if not results:
         print("Unseen query. Querying Adzuna for rental properties")
-        print(params)
-        results = adzuna.get_property_listing(params)
+        results = adzuna.get_property_listing(params, category="to-rent")
 
     # Replace price_per_month with sale_price for compatibility with table schema
     for r in results:
         if "price_per_month" in r:
             r["sale_price"] = r.pop("price_per_month")
 
+    print("formatting for large images")
     large_images = format_results.large_images_only(results)
 
     # Add results to database if new

@@ -169,7 +169,7 @@ def build_property_dict(results):
         average_rent_by_bed = average_rent.calculate_average_rent_by_bed(o)
         outcode_price_data.append(ppd_outcode)
         outcode_price_data_dict[o] = ppd_outcode
-        outcode_price_data_dict["average_rent_by_bed"] = average_rent_by_bed
+        outcode_price_data_dict[o]["average_rent_by_bed"] = average_rent_by_bed
 
     # Individual listing data
     for r in results:
