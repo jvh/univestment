@@ -6,9 +6,9 @@ from copy import deepcopy
 from psycopg2 import extras as psql_extras
 
 from back_end.src.api_usage import google_vision
-from back_end.src.app import valid_adzuna_params
-from back_end.src import property_price_predictions_helper as ppd_helper
+from back_end.src import app
 from back_end.src.database import database_functions as db_func
+from back_end.src import property_price_predictions_helper as ppd_helper
 from back_end.src.database import generic_db_functions as general_db_fun
 
 
@@ -52,7 +52,7 @@ def format_params(params):
     :return: Params which are now able to be used to adzuna
     """
     for p in deepcopy(params):
-        if p not in valid_adzuna_params:
+        if p not in app.valid_adzuna_params:
             del params[p]
     return params
 
@@ -78,50 +78,78 @@ def get_property_args(p, large_images):
     return params
 
 
-def build_property_dict(results, university_admissions_data=None):
+def build_property_dict(results):
     """
     Build the structure of the return json file
 
     :param results: list(properties) - list of property data
-    :param university_admissions_data: list(dict()) - list of predicted admissions data
     :return: dict of data to return
     """
-    historic_prices, predicted_prices = ppd_helper.get_existing_outcode_processing(results)
-    estimates = {}
-    final_list = []
-    # final_list = {}
+    # historic_prices, predicted_prices = ppd_helper.get_existing_outcode_processing(results)
+    # estimates = {}
+    formatted_json = {}
 
-    # property_results = dict()
-    # 
-    # for r in results:
-    #     id = r['id']
-    #     del r['id']
-    #     property_results[id] = r
-    #
-    # final_list['properties'] = property_results
+    # Unique set of universities connected to all houses in property_results
+    universities = set()
+    # Set of outcodes encompassing the property listings
+    outcodes = set()
 
-    for p in results:
-        if "postcode" not in p:
-            continue
+    # Stores the property results
+    property_results = []
+    # Contains information on the admissions data from each uni
+    university_admissions_data = []
+    # Outcode information
+    outcode_price_data = []
+    outcode_price_data_dict = dict()
 
-        outcode = p["postcode"][:len(p["postcode"]) - 3]
+    # Gathering outcodes
+    for r in results:
+        # Getting outcode of each property
+        postcode = r['postcode']
+        outcode = postcode[:len(postcode) - 3]
+        r['outcode'] = outcode
+        outcodes.add(outcode)
 
-        current_estimate = ppd_helper.get_current_estimate(historic_prices[outcode][1][-1],
-                                                           predicted_prices[outcode][1][0])
-        estimates[outcode] = current_estimate
+        # Getting all of the universities
+        uni = r['university']
+        universities.add(uni)
 
-        property_dict = dict()
-        property_dict["property"] = {"adzuna": p}
+    # University admissions data
+    for u in universities:
+        admissions = db_func.query_predicted_admissions(u)
+        university_admissions_data.append(admissions)
 
-        # placeholder
-        property_dict["property"]["investment"] = {"market_value": current_estimate}
+    # Outcode price point predictions data
+    for o in outcodes:
+        db_func.insert_price_data_if_not_exist(o)
+        ppd_outcode = db_func.get_property_price_data_for_outcode(o)
+        outcode_price_data.append(ppd_outcode)
+        outcode_price_data_dict[o] = ppd_outcode
 
-        property_dict["historic_data"] = {"outcode": {"historic": {"x": historic_prices[outcode][0],
-                                                                   "y": historic_prices[outcode][1]}}}
-        property_dict["historic_data"]["outcode"]["predicted"] = {"x": predicted_prices[outcode][0],
-                                                                  "y": predicted_prices[outcode][1]}
+    # Individual listing data
+    for r in results:
+        p_data = dict()
+        postcode = r['postcode']
+        outcode = r['outcode']
+        p_data['data'] = r
 
-        property_dict["postcode"] = {"property": list(db_func.query_by_postcode(p.get("postcode")))}
-        property_dict["admissions"] = university_admissions_data
-        final_list.append(property_dict)
-    return final_list
+        # Getting outcode price data and finding an estimate of the predicted price (obtaining market_value)
+        investment_dict = dict()
+        outcode_pd = outcode_price_data_dict[outcode]
+        # Getting the latest historic data and earliest predicted for prediction of market return
+        latest_historic_price = float(outcode_pd['historic']['y'][1:len(outcode_pd['historic']['y'])-1].split(', ')[-1])
+        predicted_first = float(outcode_pd['predicted']['y'][1:len(outcode_pd['predicted']['y'])-1].split(', ')[0])
+        estimated_return = ppd_helper.get_current_estimate(latest_historic_price, predicted_first)
+        investment_dict['market_value'] = estimated_return
+        p_data['investment'] = investment_dict
+
+        # Properties existing within that postcode
+        p_data["postcode"] = db_func.query_by_postcode(postcode)
+
+        property_results.append(p_data)
+
+    formatted_json['properties'] = property_results
+    formatted_json["universities"] = university_admissions_data
+    formatted_json["outcodes"] = outcode_price_data
+
+    return formatted_json

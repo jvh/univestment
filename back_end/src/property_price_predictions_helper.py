@@ -34,7 +34,7 @@ def get_existing_outcode_processing(results):
             outcode = postcode[0:len(postcode)-3]
             outcodes.add(outcode)
 
-    db_func.query_by_outcode(outcodes)
+    db_func.insert_price_data_if_not_exist(outcodes)
     historic_prices = {}
     predicted_prices = {}
 

@@ -58,27 +58,26 @@ def query_predicted_admission_data(university):
     return results
 
 
-def query_by_outcode(outcodes):
+def insert_price_data_if_not_exist(outcode):
     """
     Query database for properties by outcode and insert market value predictions into database
 
-    :param outcodes: A list of outcodes
+    :param outcodes:
     """
-    for outcode in outcodes:
-        query = "SELECT outcode FROM predictions_data WHERE outcode = '{}'".format(outcode)
-        result = general_db_func.query_database(query)
+    query = "SELECT outcode FROM predictions_data WHERE outcode = '{}'".format(outcode)
+    result = general_db_func.query_database(query)
 
-        if not result:
-            query_results_area = general_db_func.query_database("SELECT * FROM house_price_data "
-                                                                "WHERE substr(postcode,1,{}) = '{}' "
-                                                                "ORDER BY date_of_transfer;"
-                                                                .format(len(outcode), outcode))
+    if not result:
+        query_results_area = general_db_func.query_database("SELECT * FROM house_price_data "
+                                                            "WHERE substr(postcode,1,{}) = '{}' "
+                                                            "ORDER BY date_of_transfer;"
+                                                            .format(len(outcode), outcode))
 
-            # returned_house_prices_area = returned_house_prices_area + query_results_area
-            if query_results_area:
-                start_date, historic_data, predicted_data = ppp.generate_prediction(query_results_area)
-                back_end.src.property_price_predictions_helper.insert_predictions(outcode, start_date, historic_data,
-                                                                                  predicted_data)
+        # returned_house_prices_area = returned_house_prices_area + query_results_area
+        if query_results_area:
+            start_date, historic_data, predicted_data = ppp.generate_prediction(query_results_area)
+            back_end.src.property_price_predictions_helper.insert_predictions(outcode, start_date, historic_data,
+                                                                              predicted_data)
 
 
 def query_already_processed(query_id):
@@ -181,3 +180,30 @@ def query_predicted_admissions(university):
         return return_data
     else:
         return None
+
+
+def get_property_price_data_for_outcode(outcode):
+    """
+    Given an outcode, return data from predictions_data (which gives data regarding historic and predicted future
+    price point data.
+
+    :param outcode: The outcode in question
+    :return: Historic and predicted price point data for that outcode
+    """
+    query = "SELECT start_date, historical_data, prediction_data FROM predictions_data WHERE outcode=%s"
+    [result] = general_db_func.query_database(query, (outcode,))
+    date = result[0]
+    historical_months, historical_price_data = result[1].split(':')[0], result[1].split(':')[1]
+    predicted_months, predicted_price_data = result[2].split(':')[0], result[2].split(':')[1]
+
+    formatted_result = dict()
+    formatted_result['outcode'] = outcode
+    formatted_result['start'] = date
+    formatted_result['historic'] = dict()
+    formatted_result['predicted'] = dict()
+    formatted_result['historic']['x'] = historical_months
+    formatted_result['historic']['y'] = historical_price_data
+    formatted_result['predicted']['x'] = predicted_months
+    formatted_result['predicted']['y'] = predicted_price_data
+
+    return formatted_result

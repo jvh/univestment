@@ -14,7 +14,6 @@ def fill_admissions_data(engine, import_files):
     """
     data = import_files.admissions_data
     data.columns = map(str.lower, data.columns)
-    data['id'] = [uuid4() for _ in range(len(data.index))]
     data.to_sql('admissions_data', engine, if_exists="fail", index=False)
 
 

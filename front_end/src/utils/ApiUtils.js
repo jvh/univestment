@@ -53,10 +53,13 @@ const buildQuery = (params) => {
   console.log("SEARCH PARAMS")
   console.log(params);
 
-  query = params.price_min === undefined ? query : `${query}&price_min=${params.price_min}`;
-  query = params.price_max === undefined ? query : `${query}&price_max=${params.price_max}`;
-  query = params.beds === undefined ? query : `${query}&beds=${params.beds}`;
-  query = params.distance === undefined ? query : `${query}&distance=${params.distance}`;
+  //query = params.price_min === undefined ? query : `${query}&price_min=${params.price_min}`;
+  //query = params.price_max === undefined ? query : `${query}&price_max=${params.price_max}`;
+  //query = params.beds === undefined ? query : `${query}&beds=${params.beds}`;
+  //query = params.distance === undefined ? `${query}&from_radius=10` : `${query}&from_radius=${params.distance}`;
+  //query = params.km_away_from_uni === undefined ? `${query}&km_away_from_uni=1` : `${query}&km_away_from_uni=${params.distance}`;
+
+
   // if (params.km_away_from_uni !== undefined) {
   //   query = `${query}&search_student_lets=true`;
   //   query = params.distance === undefined ?  `${query}&radius_from=10` : `${query}&radius_from=${params.distance}`;

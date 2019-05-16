@@ -2,10 +2,17 @@
 import React, { Component } from 'react';
 import GoogleMapReact from 'google-map-react';
 import ApiUtils from '../utils/ApiUtils.js';
+import { Link } from 'react-router-dom';
+import Marker from './Marker.js';
 
-const Marker = () =>  <div>
-                        <img className="marker" style={{cursor:"pointer"}} src={require('../img/marker.png')}/>
-                      </div>;
+// const Marker = (props) =>  <div>
+//                         <Link to={{pathname:'/property', state:{form: props.result}}}>
+//                           <img className="marker " style={{cursor:"pointer"}} src={require('../img/marker.png')}/>
+//                         </Link>
+//                         <div>
+//                           <h1 className="tooltip">hello</h1>
+//                         </div>
+//                       </div>;
 
 class ResultsMap extends Component {
 
@@ -14,7 +21,8 @@ class ResultsMap extends Component {
     this.state = {
       results: props.results,
       zoom:11,
-      isLoading:true
+      isLoading:true,
+      results_page_state: props.results_state
     }
   }
 
@@ -57,8 +65,9 @@ class ResultsMap extends Component {
         if (result.property.adzuna.latitude == null || result.property.adzuna.longitude == null) {
           return null;
         } else {
+         result={...result, results_state:this.state.results_page_state};
           return (
-            <Marker lat={result.property.adzuna.latitude} lng={result.property.adzuna.longitude}/>
+            <Marker result={result} lat={result.property.adzuna.latitude} lng={result.property.adzuna.longitude}/>
           );
         }
     });

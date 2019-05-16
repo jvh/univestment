@@ -16,6 +16,10 @@
   height: calc(100vh - 54px);
 }
 
+.graph_container {
+  overflow-y: scroll;
+}
+
 .loading {
   padding-top: 30vh;
   height: calc(100vh - 54px);
@@ -28,6 +32,19 @@
 .switch-pad {
   padding-top: 5px;
 }
+
+.disable-select {
+    user-select: none; /* supported by Chrome and Opera */
+   -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+   -moz-user-select: none; /* Firefox */
+   -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+.property-marker {
+  transform: translate(00%, -400%);
+}
+
 
 .switch-inner {
   width:50%;
@@ -70,7 +87,8 @@
 .centre {
   padding-left: 20vw;
   padding-right: 20vw;
-  padding-top: 12vh;
+  padding-top: 4vh;
+  padding-bottom: 8vh;
 }
 
 .background {
