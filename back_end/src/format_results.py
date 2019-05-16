@@ -180,12 +180,12 @@ def build_property_dict(results):
     for o in outcodes:
         db_func.insert_price_data_if_not_exist(o)
         ppd_outcode = db_func.get_property_price_data_for_outcode(o)
-        # print('average')
-        # average_total_rent_by_bed = average_rent.calculate_average_total_rent_by_bed(o)
-        # outcode_price_data.append(ppd_outcode)
-        # outcode_price_data_dict[o] = ppd_outcode
-        # outcode_price_data_dict[o]["average_total_rent_by_bed"] = average_total_rent_by_bed
-        # print('average end')
+        print('average')
+        average_total_rent_by_bed = average_rent.calculate_average_total_rent_by_bed(o)
+        outcode_price_data.append(ppd_outcode)
+        outcode_price_data_dict[o] = ppd_outcode
+        outcode_price_data_dict[o]["average_total_rent_by_bed"] = average_total_rent_by_bed
+        print('average end')
 
     # Individual listing data
     for r in results:

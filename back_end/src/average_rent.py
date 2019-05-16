@@ -1,6 +1,6 @@
-from back_end.src.api_usage.adzuna_ingest import Adzuna
 from back_end.src.database import database_functions as db_func
 from back_end.src import format_results
+from back_end.src import app
 
 
 def get_rental_properties(outcode):
@@ -9,7 +9,7 @@ def get_rental_properties(outcode):
 
     :param postcode: postcode to search in
     """
-    adzuna = Adzuna()
+    adzuna = app.adzuna
     distance = "0.5"
 
     # Search parameters
@@ -27,24 +27,20 @@ def get_rental_properties(outcode):
 
     query_id = format_results.hash_params(hash_params)
     print("Attempting to get queries for rental properties from database")
-    results = db_func.query_already_processed(query_id)
+    results = db_func.query_already_processed(query_id, outcode_rentals=True)
 
     if not results:
         print("Unseen query. Querying Adzuna for rental properties")
         results = adzuna.get_property_listing(params, category="to-rent")
 
-    # Replace price_per_month with sale_price for compatibility with table schema
-    for r in results:
-        if "price_per_month" in r:
-            r["sale_price"] = r.pop("price_per_month")
+        # Replace price_per_month with sale_price for compatibility with table schema
+        for r in results:
+            if "price_per_month" in r:
+                r["sale_price"] = r.pop("price_per_month")
 
-    print("formatting for large images")
-    # large_images = format_results.large_images_only(results)
-    large_images = []
-
-    # Add results to database if new
-    print("adding rental results to database")
-    db_func.populate_seen_tables(results, large_images, query_id, params)
+        # Add results to database if new
+        print("adding rental results to database")
+        db_func.populate_seen_tables(results, [], query_id, hash_params)
 
     return results
 

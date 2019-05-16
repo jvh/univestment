@@ -81,11 +81,12 @@ def insert_price_data_if_not_exist(outcode):
                 .insert_predictions(outcode, start_date, historic_data, predicted_data)
 
 
-def query_already_processed(query_id):
+def query_already_processed(query_id, outcode_rentals=False):
     """
     If a query has already been processed, get its results
 
     :param query_id: ID of the query
+    :param outcode_rentals: If the property query is regarding rentals in a particular outcode, select True
     :return: If it has been processed, return list of results
     """
     query = "SELECT properties FROM seen_queries WHERE id={}".format(query_id)
@@ -97,6 +98,10 @@ def query_already_processed(query_id):
         # Get IDs of those advertisements part of this query
         results = unpacked.split(' ')
 
+        # Empty entry, return "Nothing"
+        if not results:
+            return 'Nothing'
+
         results_from_db_lrg = []
         for r in results:
             query = "SELECT * FROM seen_adverts WHERE id={}".format(r)
@@ -104,8 +109,8 @@ def query_already_processed(query_id):
 
             record = dict()
             record['has_large_img'] = db_res[14]
-            # Don't include
-            if not record['has_large_img']:
+            # Don't include (unless outcode rentals selected)
+            if not record['has_large_img'] and not outcode_rentals:
                 continue
             record['id'] = db_res[0]
             record['beds'] = db_res[1]
