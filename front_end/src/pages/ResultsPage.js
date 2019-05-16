@@ -20,10 +20,16 @@ class ResultsPage extends Component {
 
   constructor (props) {
     super(props);
-    this.state = {
-      width: 0, height: 0,
-      isLoading: true
+    this.state = props.location.state.old_state;
+    if (this.state === undefined) {
+      this.state = {
+        ...this.state,
+        isLoading:true
+      }
     }
+
+    console.log("RESULTS PAGE PROPS");
+    console.log(props);
 
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
@@ -37,7 +43,6 @@ class ResultsPage extends Component {
   }
 
   componentDidMount () {
-      this.setState({isLoading:true});
       console.log("RESULTS");
       console.log(this.props.location.state);
       console.log(this.props.location.state.search);
@@ -46,13 +51,10 @@ class ResultsPage extends Component {
       if (this.props.location.state === undefined) {
         window.location = '/';
       }
-      if (this.props.location.state.search === undefined || this.props.location.state.search === null){
+      if (this.props.location.state.old_state === undefined || this.props.location.state.old_state === null){
+        this.state={isLoading: true};
         console.log("HANDLE SUBMIT");
         this.handleSubmit();
-      } else {
-        console.log("SET STATE");
-        console.log(this.props.location.state.search.form);
-        this.setState({search:this.props.location.state.search, isLoading:false, form:this.props.location.state.search.form});
       }
   }
 
@@ -72,7 +74,6 @@ class ResultsPage extends Component {
     search = (price_max === "No max" || price_max === undefined) ? search : { ...search, price_max };
     search = (beds === "No min" || beds === undefined) ? search : { ...search, beds };
     search = (distance === undefined) ? search : { ...search, distance };
-    search = (km_away_from_uni === undefined) ? search : {...search, km_away_from_uni};
 
     console.log("search");
 
@@ -103,6 +104,8 @@ class ResultsPage extends Component {
     });
     console.log()
     this.setState({isLoading: false});
+    console.log("state")
+    console.log(this.state);
   }
 
   handleSearchFailure = response => {
@@ -132,7 +135,7 @@ class ResultsPage extends Component {
               <div className="spacer-sml">
               </div>
               <div className="row result results-bg">
-                <ResultsMap results={this.state.search.search_results} where={this.state.form.where}/>
+                <ResultsMap  results={this.state.search.search_results} where={this.state.form.where} results_state={this.state}/>
               </div>
             </div>
             <ResultsList search={this.state.search}/>
@@ -143,7 +146,7 @@ class ResultsPage extends Component {
           <div className="container-large">
             <div className="row">
               <div className="col-6">
-                <ResultsList search={this.state.search} s/>
+                <ResultsList search={this.state.search} results_state={this.state}/>
               </div>
               <div className="col-6">
                 <div className="container-small">
@@ -159,7 +162,7 @@ class ResultsPage extends Component {
                   <div className="spacer-sml">
                   </div>
                   <div className="row result results-bg">
-                    <ResultsMap results={this.state.search.search_results} where={this.state.form.where}/>
+                    <ResultsMap results={this.state.search.search_results} where={this.state.form.where} results_state={this.state}/>
                   </div>
                   <div className="spacer-sml">
                   </div>
