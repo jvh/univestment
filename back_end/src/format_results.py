@@ -10,7 +10,7 @@ from back_end.src import app
 from back_end.src.database import database_functions as db_func
 from back_end.src import property_price_predictions_helper as ppd_helper
 from back_end.src.database import generic_db_functions as general_db_fun
-
+from back_end.src import average_rent
 
 def large_images_only(results):
     """
@@ -166,8 +166,10 @@ def build_property_dict(results):
     for o in outcodes:
         db_func.insert_price_data_if_not_exist(o)
         ppd_outcode = db_func.get_property_price_data_for_outcode(o)
+        average_rent_by_bed = average_rent.calculate_average_rent_by_bed(o)
         outcode_price_data.append(ppd_outcode)
         outcode_price_data_dict[o] = ppd_outcode
+        outcode_price_data_dict["average_rent_by_bed"] = average_rent_by_bed
 
     # Individual listing data
     for r in results:
