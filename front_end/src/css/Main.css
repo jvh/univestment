@@ -22,8 +22,19 @@
   overflow: visible;
 }
 
+.filters-label {
+  padding-right: 30px;
+  padding-top: 5px;
+  padding-left: 40px;
+}
+
 .sort-by {
-  max-width: 375px;
+  max-width:800px;
+}
+
+.university-filters {
+  padding: 25px;
+  width: 100%;
 }
 
 .graph_container {
@@ -36,8 +47,7 @@
 }
 
 .filter-inner {
-  padding: 0px;
-  margin: 0 auto;
+  padding-top: 20px;
 }
 
 

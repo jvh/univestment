@@ -66,6 +66,7 @@ class ResultsPage extends Component {
     search = (price_max === "No max" || price_max === undefined) ? search : { ...search, price_max };
     search = (beds === "No min" || beds === undefined) ? search : { ...search, beds };
     search = (distance === undefined) ? search : { ...search, distance };
+    search = (km_away_from_uni === undefined) ? search : { ...search, km_away_from_uni };
 
     if (MOCK) {
       this.setState({search: {

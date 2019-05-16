@@ -67,13 +67,17 @@ class Filtering extends Component {
   return (
     <div className="filter results-bg">
       <div className="container-large">
-        <div className="justify-content-center">
-          <div className="row border">
-            <div className="col-4 border">
-              <div className="sort-by border">
+        <div className="justify-content-center filter-inner">
+          <div className="row">
+            <div className="col-6">
+              <div className="sort-by">
+
                 <Form onSubmit={this.handleSubmit}>
-                  <Row  className="border-rd">
-                    <FormGroup as={Col} controlId="sort_by" className="filter-inner">
+                  <Row>
+                    <FormGroup controlId="filter_label">
+                      <FormLabel style={{fontWeight:"bold"}} className="filters-label">Filters</FormLabel>
+                    </FormGroup>
+                    <FormGroup as={Col} controlId="sort_by">
                       <FormControl as="select"
                         name="sort"
                         value={this.state.form.sort}
@@ -81,8 +85,18 @@ class Filtering extends Component {
                         <option>Sort By.</option>
                         <option>Price high to low</option>
                         <option>Price low to high</option>
-                        <option>University</option>
                         <option>Relevance</option>
+                      </FormControl>
+                    </FormGroup>
+                    <FormGroup as={Col} controlId="universities">
+                      <FormControl as="select"
+                        name="universities"
+                        value={this.state.form.selected_universities}
+                        onChange={this.handleFormChange}>
+                        <option>Select University</option>
+                        <option>Uni of 1</option>
+                        <option>Uni of 2</option>
+                        <option>Uni of 3</option>
                       </FormControl>
                     </FormGroup>
                     <FormGroup as={Col} controlId="results_num">
@@ -100,27 +114,8 @@ class Filtering extends Component {
                 </Form>
               </div>
             </div>
-            <div className="col-8">
+            <div className="col-6">
             </div>
-          </div>
-          <div className="row">
-            <Collapse isOpened={this.state.showUniversityFilters}>
-              <Form onSubmit={this.handleSubmit}>
-                <Row>
-                  <FormGroup as={Col} controlId="results_num">
-                    <FormControl as="select"
-                      name="results_per_page"
-                      value={this.state.form.results_per_page}
-                      onChange={this.handleFormChange}>
-                      <option>Select University</option>
-                      <option>Uni of 1</option>
-                      <option>Uni of 2</option>
-                      <option>Uni of 3</option>
-                    </FormControl>
-                  </FormGroup>
-                </Row>
-              </Form>
-            </Collapse>
           </div>
         </div>
       </div>
@@ -153,6 +148,27 @@ export default Filtering;
   // </div>
 
 
+  // <div className="row">
+  //   <Collapse isOpened={this.state.showUniversityFilters}>
+  //     <div className="university-filters border">
+  //       <Form onSubmit={this.handleSubmit}>
+  //         <Row>
+  //           <FormGroup as={Col} controlId="results_num">
+  //             <FormControl as="select"
+  //               name="results_per_page"
+  //               value={this.state.form.results_per_page}
+  //               onChange={this.handleFormChange}>
+  //               <option>Select University</option>
+  //               <option>Uni of 1</option>
+  //               <option>Uni of 2</option>
+  //               <option>Uni of 3</option>
+  //             </FormControl>
+  //           </FormGroup>
+  //         </Row>
+  //       </Form>
+  //     </div>
+  //   </Collapse>
+  // </div>
 
   // <FormGroup as={Col} controlId="min_price">
   //   <FormControl as="select"
