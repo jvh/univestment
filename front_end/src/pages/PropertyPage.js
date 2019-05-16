@@ -13,16 +13,15 @@ class PropertyPage extends Component {
 
   constructor (props) {
     super(props);
+    console.log("PROPERTY PROPS");
+    console.log(props);
     if (props.location.state === undefined){
       window.location = '/';
     }
     this.state = {
       data: props.location.state.form,
       adzuna: props.location.state.form.property.adzuna,
-      search: props.location.state.form.search
     }
-    console.log("PROPERTY PROPS");
-    console.log(props);
   }
 
   componentDidMount () {
@@ -47,8 +46,8 @@ class PropertyPage extends Component {
           <div className="row-pad">
             <div>
 
-              <Link to={{pathname:'/search', state:{search:this.state.search}}}>
-              <a style={{cursor:"pointer"}} onClick={this.back}>&lt;&lt; Back to Search Results</a>
+              <Link to={{pathname:'/search', state:{old_state:this.state.data.results_state}}}>
+                <a style={{cursor:"pointer"}} onClick={this.back}>&lt;&lt; Back to Search Results</a>
               </Link>
               <br></br>
               <div className="row pad-top">
@@ -68,9 +67,14 @@ class PropertyPage extends Component {
             </a>
           </div>
           <div className="row row-pad">
-            <div className="description">
+            <div className="description pad-hor-both">
               <p>{this.state.adzuna.description}</p>
-              <a href={this.state.adzuna.redirect_url} target="_blank" rel="noopener noreferrer" style={{float:"right", display:"inline"}}>Read More...</a>
+              <div className="align-right adzuna-text pad-top" style={{whiteSpace:"nowrap"}}>
+                <a href={this.state.adzuna.redirect_url} target="_blank" rel="noopener noreferrer" style={{position:"relative", top:"4px"}}>Properties by &nbsp;</a>
+                <a href={this.state.adzuna.redirect_url} target="_blank" rel="noopener noreferrer">
+                  <img className="adzuna_logo" src={require("../img/adzuna_logo.jpg")} alt=""/>
+                </a>
+              </div>
             </div>
           </div>
           <div className="pad-hor-both pad-top">
@@ -100,7 +104,8 @@ class PropertyPage extends Component {
           <div className="pad-hor-both pad-top">
             <div className="graph-outer overline pad-top">
               <h1 className="align-center" style={{fontSize:"275%"}}>Market Value Prediction</h1>
-              <LineGraph width="700" height="500" data={this.state.data.historic_data.outcode}/>
+
+              <LineGraph width={700} height={500} data={this.state.data.historic_data.outcode}/>
             </div>
           </div>
 
