@@ -276,7 +276,7 @@ def build_property_dict(results):
     return formatted_json
 
 
-def get_best_properties_per_uni(property_by_uni, number_properties=100):
+def get_best_properties_per_uni(property_by_uni, number_properties=50):
     """
     Returns the best number_properties for that university.
 
@@ -284,6 +284,8 @@ def get_best_properties_per_uni(property_by_uni, number_properties=100):
     :param number_properties: The number of properties returned
     :return: The best properties for that university
     """
+    # number_properties * number of unis returned
+    number_properties = number_properties * len(property_by_uni)
     best_properties = list()
     for uni in property_by_uni:
         uni_properties = property_by_uni[uni]
