@@ -1,4 +1,5 @@
 from back_end.src.api_usage.adzuna_ingest import Adzuna
+from back_end.src.database import database_functions as db_func
 
 
 def calculate_average_rent(postcode):
@@ -17,6 +18,8 @@ def calculate_average_rent(postcode):
     for beds in range(2, max_beds):
         params["beds"] = beds
         results = adzuna.get_property_listing(params, ad_type="to-rent")
+        db_func.populate_seen_tables(results, large_images, query_id, preprocessing_params)
+
         total_rent = 0
         count = 0
 
