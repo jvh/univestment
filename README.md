@@ -1,6 +1,6 @@
 # Univestment
 
-Identifying good student let investment opportunities for property investors based on a user-defined filter.
+Identifying smart student let investment opportunities for property investors based on a user-defined filter.
 
 ## Datasets
 
