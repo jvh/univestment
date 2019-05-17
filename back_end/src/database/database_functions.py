@@ -205,7 +205,10 @@ def get_property_price_data_for_outcode(outcode):
     :return: Historic and predicted price point data for that outcode
     """
     query = "SELECT start_date, historical_data, prediction_data FROM predictions_data WHERE outcode=%s"
-    [result] = general_db_func.query_database(query, (outcode,))
+    result = general_db_func.query_database(query, (outcode,))
+    if not result:
+        return
+    [result] = result
     date = result[0]
     historical_months, historical_price_data = result[1].split(':')[0], result[1].split(':')[1]
     predicted_months, predicted_price_data = result[2].split(':')[0], result[2].split(':')[1]
