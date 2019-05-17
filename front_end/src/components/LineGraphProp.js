@@ -124,15 +124,15 @@ export default class LineGraph extends PureComponent {
 
   }
 
-  reset = () => {
-    if (this.props.zoom) {
-      return (
-        <div className="align-right">
-          <button onClick={this.reset.bind(this)}>Reset Zoom</button>
-        </div>
-      );
-    } else return
-  }
+  // reset = () => {
+  //   if (this.props.zoom) {
+  //     return (
+  //       <div className="align-right">
+  //         <button onClick={this.reset.bind(this)}>Reset Zoom</button>
+  //       </div>
+  //     );
+  //   } else return
+  // }
 
   render() {
 
@@ -183,12 +183,17 @@ export default class LineGraph extends PureComponent {
           }
           {
              (this.state.clickedLeft && this.state.clickedRight) ? (
-             <ReferenceArea x1={this.state.state_handled_data[this.state.clickedLeft+this.state.startX].month} x2={this.state.state_handled_data[this.state.clickedRight + this.state.startX].month}  strokeOpacity={0.3} /> ) : null
+             <ReferenceArea x1={this.state.reduced_data[this.state.clickedLeft].month} x2={this.state.reduced_data[this.state.clickedRight].month}  strokeOpacity={0.3} /> ) : null
           }
-        </LineChart>
-        </div>
+          </LineChart>
+          </div>
         </div>
       );
     }
   }
 }
+
+
+// <div className="align-right">
+//   <button onClick={this.reset.bind(this)}>Reset</button>
+// </div>
