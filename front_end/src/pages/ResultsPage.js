@@ -96,13 +96,15 @@ class ResultsPage extends Component {
       var university = this.state.filters.universities;
 
       results.properties.forEach(function(result) {
-        if(result.data.university === university) {
+        if(result.data.university === university && result.investment.mortgage_return.potential_rent_profit < 800) {
           filtered_results.push(result);
         }
       });
     } else {
       results.properties.forEach(function(result) {
-        filtered_results.push(result);
+        if(result.investment.mortgage_return.potential_rent_profit < 800) {
+          filtered_results.push(result);
+        }
       });
     }
 
