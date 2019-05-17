@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Main from '../css/Main.css';
-import LineGraph from '../components/LineGraph.js';
+import LineGraph from '../components/LineGraphProp.js';
 import { BarData } from '../mocks/MockData.js';
 import { Col, Row } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -34,6 +34,32 @@ class PropertyPage extends Component {
 
   round(float) {
     return Math.round(float/100)*100;
+  }
+
+
+  xToMonths (data) {
+    var i = 0;
+    var year = 1995;
+    var month = 3
+
+    data.historic = { ...data.historic, month:[] };
+    data.predicted = { ...data.predicted, month:[] };
+
+    while (i < data.historic.x.length + data.predicted.x.length -1) {
+      if (i < data.historic.x.length) {
+        data.historic.month[i] = ''+ year + '-' + month + '-' + '01';
+      } else {
+        data.predicted.month[i-data.historic.x.length] = ''+ year + '-' + month + '-' + '01';
+      }
+      month++;
+      if (month === 13) {
+        month = 1;
+        year++;
+      }
+      i++;
+    }
+
+    return data;
   }
 
   renderMarketValue = () => {
@@ -120,7 +146,7 @@ class PropertyPage extends Component {
           <div className="pad-hor-both pad-top">
             <div className="graph-outer overline pad-top">
               <h1 className="align-center" style={{fontSize:"275%"}}>Market Value Prediction</h1>
-              <LineGraph width={700} height={500} data={data} xTitle="Month" yTitle="Sale Price" zoom={true}/>
+              <LineGraph width={700} height={500} data={this.xToMonths(data)} xTitle="Month" yTitle="Sale Price" zoom={true}/>
             </div>
             <p className="pad-top pad-bottom" style={{fontSize:"67%"}}>*Average monthly payments based on 20 year mortgage at 3.9% with 25% deposit of displayed guide price.</p>
           </div>

@@ -10,8 +10,10 @@ export default class LineGraph extends PureComponent {
     var data = this.handleData (props.data);
     this.state = {
       data:props.data,
-      clickedLeft:data.length-84,
-      clickedRight:data.length
+      state_handled_data: data,
+      startX:data.length - 84,
+      clickedLeft:0,
+      clickedRight:84
     }
 
   }
@@ -30,14 +32,18 @@ export default class LineGraph extends PureComponent {
     for (var i = 0; i < maxX; i++) {
       if (data.historic.x[i] !== undefined) {
         if (i === data.historic.length-1) {
-          out_data.push({month:data.historic.x[i], historic:Math.round(data.historic.y[i]), predicted:Math.round(data.historic.y[i])});
+          out_data.push({x:data.historic.x[i], month:data.historic.month[i], historic:Math.round(data.historic.y[i]), predicted:Math.round(data.historic.y[i])});
         } else {
-          out_data.push({month:data.historic.x[i], historic:Math.round(data.historic.y[i])});
+          out_data.push({x:data.historic.x[i], month:data.historic.month[i], historic:Math.round(data.historic.y[i])});
         }
       } else if (data.predicted.x[i-data.historic.x.length] !== undefined){
-        out_data.push({month:data.predicted.x[i-data.historic.x.length], predicted:Math.round(data.predicted.y[i-data.historic.x.length])});
+        out_data.push({x:data.predicted.x[i-data.historic.x.length], month:data.predicted.month[i-data.historic.x.length], predicted:Math.round(data.predicted.y[i-data.historic.x.length])});
       }
     }
+
+    console.log("OUT DATA");
+    console.log(out_data)
+
     return out_data;
   }
 
@@ -59,20 +65,20 @@ export default class LineGraph extends PureComponent {
         this.setState({clickedLeft: this.state.clickedRight});
         this.setState({clickedRight: temp});
       }
-      var maxX = this.state.clickedRight;
-      var minX = this.state.clickedLeft-1;
+      var maxX = this.state.clickedRight + this.state.startX + 1;
+      var minX = this.state.clickedLeft  + this.state.startX;
 
       this.setState({left: minX, right: maxX})
 
       for (var i = minX; i < maxX; i++) {
         if (data.historic.x[i] !== undefined) {
           if (i == data.historic.x.length-1) {
-            out_data.push({month:data.historic.x[i], historic:Math.round(data.historic.y[i]), predicted:Math.round(data.historic.y[i])});
+            out_data.push({x:data.historic.x[i], month:data.historic.month[i], historic:Math.round(data.historic.y[i]), predicted:Math.round(data.historic.y[i])});
           } else {
-            out_data.push({month:data.historic.x[i], historic:Math.round(data.historic.y[i])});
+            out_data.push({x:data.historic.x[i], month:data.historic.month[i], historic:Math.round(data.historic.y[i])});
           }
         } else if (data.predicted.x[i-data.historic.x.length] !== undefined){
-          out_data.push({month:data.predicted.x[i-data.historic.x.length], predicted:Math.round(data.predicted.y[i-data.historic.x.length])});
+          out_data.push({x:data.predicted.x[i-data.historic.x.length], month:data.predicted.month[i-data.historic.x.length], predicted:Math.round(data.predicted.y[i-data.historic.x.length])});
         }
       }
       this.setState({reduced_data:out_data, clickedLeft:'', clickedRight:''});
@@ -142,18 +148,21 @@ export default class LineGraph extends PureComponent {
         <LineChart width={700} height={400}
           data={data.slice()}
           onMouseDown={e => {
+            console.log(e);
+            console.log(this.state);
             if (this.props.zoom === true){
               if (e != null ){
-                this.setState({ clickedLeft: e.activeLabel })
+                this.setState({ clickedLeft: e.activeTooltipIndex })
               } else {
                 this.setState({ clickedLeft: this.state.clickedLeft})
               }
             }
           }}
           onMouseMove={e => {
+          console.log(this.state);
             if (this.state.clickedLeft && e != null && this.props.zoom === true){
               if (e.activeLabel != this.state.clickedLeft){
-                this.setState({clickedRight: e.activeLabel });
+                this.setState({clickedRight: e.activeTooltipIndex }, () => {console.log(this.state)});
               }
             }
           }}
@@ -174,7 +183,7 @@ export default class LineGraph extends PureComponent {
           }
           {
              (this.state.clickedLeft && this.state.clickedRight) ? (
-             <ReferenceArea x1={this.state.clickedLeft} x2={this.state.clickedRight}  strokeOpacity={0.3} /> ) : null
+             <ReferenceArea x1={this.state.state_handled_data[this.state.clickedLeft+this.state.startX].month} x2={this.state.state_handled_data[this.state.clickedRight + this.state.startX].month}  strokeOpacity={0.3} /> ) : null
           }
         </LineChart>
         </div>
