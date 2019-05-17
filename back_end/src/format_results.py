@@ -213,6 +213,10 @@ def build_property_dict(results):
     for o in outcodes:
         db_func.insert_price_data_if_not_exist(o)
         ppd_outcode = db_func.get_property_price_data_for_outcode(o)
+
+        if not ppd_outcode:
+            continue
+
         outcode_price_data_dict[o] = ppd_outcode
 
         # Getting the average rent prices for current property listing in the outcode, divided by number of beds
