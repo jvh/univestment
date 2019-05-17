@@ -14,7 +14,6 @@ from back_end.src import average_rent
 from back_end.src import mortgage_payment
 
 
-
 def large_images_only(results):
     """
     Gets those properties with large images only (not only thumbnails)
@@ -92,6 +91,7 @@ def get_property_args(p, large_images):
     img_url = None
     number_beds = None
     sale_price = None
+    postcode = None
 
     if 'university' in p:
         uni = p['university']
@@ -105,8 +105,10 @@ def get_property_args(p, large_images):
         number_beds = p['beds']
     if 'sale_price' in p:
         sale_price = p['sale_price']
+    if 'postcode' in p:
+        postcode = p['postcode']
     params = (p['id'], number_beds, p['description'], img_url, p['is_furnished'], p['latitude'], p['longitude'],
-              p['postcode'], p_type, p['redirect_url'], sale_price, p['title'], uni, lrg)
+              postcode, p_type, p['redirect_url'], sale_price, p['title'], uni, lrg)
     return params
 
 
