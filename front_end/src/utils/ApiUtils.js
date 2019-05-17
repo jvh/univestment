@@ -52,9 +52,9 @@ const buildQuery = (params) => {
 
   console.log(params);
 
-  query = params.price_min === undefined ? query : `${query}&price_min=${params.price_min}`;
-  query = params.price_max === undefined ? query : `${query}&price_max=${params.price_max}`;
-  query = params.beds === undefined ? query : `${query}&beds=${params.beds}`;
+//  query = params.price_min === undefined ? query : `${query}&price_min=${params.price_min}`;
+//  query = params.price_max === undefined ? query : `${query}&price_max=${params.price_max}`;
+//  query = params.beds === undefined ? query : `${query}&beds=${params.beds}`;
   query = params.distance === undefined ? `${query}&radius_from=10` : `${query}&radius_from=${params.distance}`;
   query = params.km_away_from_uni === undefined ? `${query}&km_away_from_uni=2` : `${query}&km_away_from_uni=${params.km_away_from_uni}`;
 //  query = `${query}&testing`;
