@@ -41,6 +41,13 @@ export default class LineGraph extends PureComponent {
     return out_data;
   }
 
+  reset(){
+    const data = this.handleData (this.state.data);
+    this.setState({
+    clickedLeft:data.length-84,
+    clickedRight:data.length}, () => this.zoom());
+  }
+
   zoom(){
     if (this.state.reduced_data !== undefined && this.props.zoom === false) {
 
@@ -109,7 +116,16 @@ export default class LineGraph extends PureComponent {
         )
     }
 
+  }
 
+  reset = () => {
+    if (this.props.zoom) {
+      return (
+        <div className="align-right">
+          <button onClick={this.reset.bind(this)}>Reset Zoom</button>
+        </div>
+      );
+    } else return
   }
 
   render() {
@@ -121,7 +137,7 @@ export default class LineGraph extends PureComponent {
     } else {
 
       return (
-
+        <div>
         <div className="disable-select">
         <LineChart width={700} height={400}
           data={data.slice()}
@@ -161,6 +177,9 @@ export default class LineGraph extends PureComponent {
              <ReferenceArea x1={this.state.clickedLeft} x2={this.state.clickedRight}  strokeOpacity={0.3} /> ) : null
           }
         </LineChart>
+        </div>
+        {
+        }
         </div>
       );
     }

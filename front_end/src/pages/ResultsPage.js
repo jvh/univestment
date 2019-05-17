@@ -15,7 +15,7 @@ import Filtering from '../components/Filtering.js';
 import LoadingSpinner from '../components/LoadingSpinner.js';
 import Admissions from '../components/Admissions.js';
 
-const MOCK = true;
+const MOCK = false;
 
 class ResultsPage extends Component {
 

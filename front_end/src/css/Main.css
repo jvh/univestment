@@ -45,6 +45,14 @@
   max-height: 80%;
 }
 
+.tagline {
+  font-size: 225%;
+  color: #ffffff;
+  font-weight: 800;
+  text-align: center;
+  font-family: Pacifico, Baskerville, "Baskerville Old Face", "Goudy Old Style", Garamond, "Times New Roman", serif;
+}
+
 .sort-by {
   max-width:800px;
 }
@@ -140,7 +148,7 @@
   padding-left: 20vw;
   padding-right: 20vw;
   padding-top: 4vh;
-  padding-bottom: 8vh;
+  padding-bottom: 2vh;
 }
 
 .background {

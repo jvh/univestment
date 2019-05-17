@@ -74,12 +74,16 @@ const ResultCard = (props) => {
               <h3 className="align-right">£{adzuna.sale_price}</h3>
               <p className="align-right">guide price</p>
             </div>
-            <div className="col-12 description" style={{display:"inline-block"}}>
+            <div className="col-9 description" style={{display:"inline-block"}}>
               <p style={{fontSize:"85%"}}>{description}
                 <Link to={{pathname:'/property', state:{form: props}}}>
                   <a href={adzuna.redirect_url} target="_blank" rel="noopener noreferrer">(Read more...)</a>
                 </Link>
               </p>
+            </div>
+            <div className="col-3">
+              <h3 className="align-right">£{}</h3>
+              <p className="align-right">PCM Cash Flow</p>
             </div>
           </div>
 

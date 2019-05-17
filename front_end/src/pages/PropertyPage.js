@@ -36,6 +36,26 @@ class PropertyPage extends Component {
     return Math.round(float/100)*100;
   }
 
+  renderMarketValue = () => {
+    if (this.state.data.investment.market_value > this.state.adzuna.sale_price) {
+      return (
+        <div>
+          <div>
+            <h1 className="align-center value-green" style={{fontSize:"350%"}}>£{this.round(this.state.data.investment.market_value - this.state.adzuna.sale_price)}</h1>
+            <h3 className="align-center">Below Estimated Market Value</h3>
+          </div>
+          <div className="pad-hor-both" style={{textAlign:"justify"}}>
+            <p className="align-center"> The market value for this area has been estimated at £{this.round(this.state.data.investment.market_value)} meaning that
+              this property has a potential return of investment of up to £{this.round(this.state.data.investment.market_value - this.state.adzuna.sale_price)}
+            </p>
+          </div>
+        </div>
+      );
+    } else {
+      return
+    }
+  }
+
 //<p style={{fontSize:"125%"}} className="align-left">{this.state.adzuna.location.display_name}</p>
 
   render(){
@@ -73,42 +93,36 @@ class PropertyPage extends Component {
             <div className="description pad-hor-both">
               <p>{this.state.adzuna.description}</p>
               <div className="align-right adzuna-text pad-top" style={{whiteSpace:"nowrap"}}>
-                <a href={this.state.adzuna.redirect_url} target="_blank" rel="noopener noreferrer" style={{position:"relative", top:"4px"}}>Properties by &nbsp;</a>
+                <a href={this.state.adzuna.redirect_url} target="_blank" rel="noopener noreferrer" style={{position:"relative", top:"4px"}}>Read more on &nbsp;</a>
                 <a href={this.state.adzuna.redirect_url} target="_blank" rel="noopener noreferrer">
                   <img className="adzuna_logo" src={require("../img/adzuna_logo.jpg")} alt=""/>
                 </a>
               </div>
             </div>
           </div>
+
           <div className="pad-hor-both pad-top">
             <div className="overline pad-top">
               <div>
-                <h1 className="align-center value-green" style={{fontSize:"350%"}}>£{this.round(this.state.data.investment.market_value - this.state.adzuna.sale_price)}</h1>
-                <h3 className="align-center">Below Estimated Market Value</h3>
+                <h1 className="align-center value-green" style={{fontSize:"350%"}}>£{Math.round(this.state.data.investment.mortgage_return.potential_rent_profit)}</h1>
+                <h3 className="align-center">Potential Cash Flow PCM</h3>
               </div>
+              <div className="pad-hor-both" style={{textAlign:"justify"}}>
+                <p className="align-center"> The average rental income for this area is approximately £{Math.round(this.state.data.investment.mortgage_return.rent)}, £{Math.round(this.state.data.investment.mortgage_return.potential_rent_profit)} more than the monthly mortgage payments.*
+                </p>
+              </div>
+              {
+                this.renderMarketValue()
+              }
             </div>
-          </div>
-          <div className="pad-hor-both" style={{textAlign:"justify"}}>
-            <p className="align-center"> The market value for this area has been estimated at £{this.round(this.state.data.investment.market_value)} meaning that
-            this property has a potential return of investment of up to £{this.round(this.state.data.investment.market_value - this.state.adzuna.sale_price)}
-            </p>
           </div>
 
-          <div className="pad-hor-both pad-top">
-            <div>
-              <h1 className="align-center value-green" style={{fontSize:"350%"}}>£650 PCM</h1>
-              <h3 className="align-center">Average Rental in Local Area</h3>
-            </div>
-          </div>
-          <div className="pad-hor-both" style={{textAlign:"justify"}}>
-            <p className="align-center"> The average rental income for this area is approximately £650, £125 more than the monthly mortgage payments.
-            </p>
-          </div>
           <div className="pad-hor-both pad-top">
             <div className="graph-outer overline pad-top">
               <h1 className="align-center" style={{fontSize:"275%"}}>Market Value Prediction</h1>
               <LineGraph width={700} height={500} data={data} xTitle="Month" yTitle="Sale Price" zoom={true}/>
             </div>
+            <p className="pad-top pad-bottom" style={{fontSize:"67%"}}>*Average monthly payments based on 20 year mortgage at 3.9% with 25% deposit of displayed guide price.</p>
           </div>
 
         </div>

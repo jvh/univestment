@@ -100,9 +100,9 @@ class Filtering extends Component {
                 </FormGroup>
               </Form>
             </div>
-            <div className="col-2">
+            <div className="col-3">
             </div>
-            <div className="col-6">
+            <div className="col-5">
               <div className="sort-by">
 
                 <Form onSubmit={this.handleSubmit}>
@@ -131,17 +131,6 @@ class Filtering extends Component {
                         }
                       </FormControl>
                     </FormGroup>
-                    <FormGroup as={Col} controlId="results_num">
-                      <FormControl as="select"
-                        name="results_per_page"
-                        value={this.state.form.results_per_page}
-                        onChange={this.handleFormChange}>
-                        <option>Results per page</option>
-                        <option>10</option>
-                        <option>25</option>
-                        <option>50</option>
-                      </FormControl>
-                    </FormGroup>
                   </Row>
                 </Form>
               </div>
@@ -158,6 +147,19 @@ class Filtering extends Component {
 
 export default Filtering;
 
+
+
+// <FormGroup as={Col} controlId="results_num">
+//   <FormControl as="select"
+//     name="results_per_page"
+//     value={this.state.form.results_per_page}
+//     onChange={this.handleFormChange}>
+//     <option>Results per page</option>
+//     <option>10</option>
+//     <option>25</option>
+//     <option>50</option>
+//   </FormControl>
+// </FormGroup>
 
 // <div className="col-2">
 // </div>
