@@ -191,6 +191,8 @@ def build_property_dict(results):
         # Postcode in our case is compulsory
         if 'postcode' not in r or not r['postcode']:
             continue
+        if 'beds' not in r or not r['beds']:
+            continue
         # Getting outcode of each property
         postcode = r['postcode']
         outcode = postcode[:len(postcode) - 3]
@@ -307,6 +309,7 @@ def get_best_properties_per_uni(property_by_uni, number_properties=50):
 
     # number_properties * number of unis returned
     number_properties = number_properties * len(property_by_uni)
+
     best_properties = list()
     for uni in property_by_uni:
         uni_properties = property_by_uni[uni]
@@ -317,14 +320,14 @@ def get_best_properties_per_uni(property_by_uni, number_properties=50):
 
         best_properties.extend(uni_properties)
 
-    # Getting top number_properties results
+    # Getting the best overall properties
+    best_properties.sort(key=lambda k: (k['investment']['mortgage_return']['potential_rent_profit']), reverse=True)
     best_properties = best_properties[:number_properties]
 
     print("Getting large images...")
 
     # Getting large images
     large_images = large_images_only(best_properties)
-    # Getting the best overall properties
-    large_images.sort(key=lambda k: (k['investment']['mortgage_return']['potential_rent_profit']), reverse=True)
+
 
     return large_images
