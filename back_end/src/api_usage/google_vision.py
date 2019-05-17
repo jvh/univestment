@@ -12,6 +12,9 @@ def annotate(path):
 
     Taken from tutorial https://cloud.google.com/vision/docs/internet-detection
     """
+    if not path:
+        return
+    
     client = vision.ImageAnnotatorClient()
 
     if path.startswith('http') or path.startswith('gs:'):
