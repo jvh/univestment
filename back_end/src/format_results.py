@@ -189,7 +189,7 @@ def build_property_dict(results):
     # Gathering outcodes
     for r in results:
         # Postcode in our case is compulsory
-        if 'postcode' not in r:
+        if 'postcode' not in r or not r['postcode']:
             continue
         # Getting outcode of each property
         postcode = r['postcode']

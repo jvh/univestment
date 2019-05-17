@@ -80,6 +80,10 @@ class Adzuna:
 
         number_pages = math.ceil(count / results_per_page)
 
+        # 250 total results, not enough processing power for many more
+        if number_pages > 5:
+            number_pages = 5
+
         # Collecting all those properties delivered by Adzuna (across all pages)
         for i in range(2, number_pages):
             page_number = i
