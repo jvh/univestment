@@ -102,7 +102,7 @@ class ResultsPage extends Component {
       });
     } else {
       results.properties.forEach(function(result) {
-        filtered_results.push(result);
+         filtered_results.push(result);
       });
     }
 

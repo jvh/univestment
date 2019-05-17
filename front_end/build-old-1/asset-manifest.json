@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d78ed637.chunk.css",
+    "main.js": "/static/js/main.b525c92b.chunk.js",
+    "main.js.map": "/static/js/main.b525c92b.chunk.js.map",
+    "runtime~main.js": "/static/js/runtime~main.a8a9905a.js",
+    "runtime~main.js.map": "/static/js/runtime~main.a8a9905a.js.map",
+    "static/css/2.22a7d4ef.chunk.css": "/static/css/2.22a7d4ef.chunk.css",
+    "static/js/2.75c9b7a0.chunk.js": "/static/js/2.75c9b7a0.chunk.js",
+    "static/js/2.75c9b7a0.chunk.js.map": "/static/js/2.75c9b7a0.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.798629666f64d6a2847e63e421c4d38d.js": "/precache-manifest.798629666f64d6a2847e63e421c4d38d.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/2.22a7d4ef.chunk.css.map": "/static/css/2.22a7d4ef.chunk.css.map",
+    "static/css/main.d78ed637.chunk.css.map": "/static/css/main.d78ed637.chunk.css.map",
+    "static/media/adzuna_logo.jpg": "/static/media/adzuna_logo.4b0be1b4.jpg",
+    "static/media/Main.css": "/static/media/background_2.aedbad93.jpg",
+    "static/media/drawing.svg": "/static/media/drawing.a80c8e89.svg",
+    "static/media/logo_white.svg": "/static/media/logo_white.a794d802.svg",
+    "static/media/marker.png": "/static/media/marker.32d70ec7.png"
+  }
+}

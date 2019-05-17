@@ -36,7 +36,7 @@ class HomePage extends Component {
                 </div>
                 <div className="homeTitle container">
                   <h1 className="title">Univestment</h1>
-                  <h3 className="tagline">We make finding your next investment fast and easy</h3>
+                  <h3 className="tagline">We make finding your next student let investment fast and easy</h3>
                 </div>
               </Collapse>
               <div className="centre">
