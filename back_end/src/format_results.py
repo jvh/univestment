@@ -183,8 +183,14 @@ def build_property_dict(results):
     # Stores properties by uni
     property_by_university = dict()
 
+    # Results which contain all necessary args
+    legal_results = list()
+
     # Gathering outcodes
     for r in results:
+        # Postcode in our case is compulsory
+        if 'postcode' not in r:
+            continue
         # Getting outcode of each property
         postcode = r['postcode']
         outcode = postcode[:len(postcode) - 3]
@@ -194,6 +200,9 @@ def build_property_dict(results):
         # Getting all of the universities
         uni = r['university']
         universities.add(uni)
+        legal_results.append(r)
+
+    results = legal_results
 
     # University admissions data
     for u in universities:
