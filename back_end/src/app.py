@@ -86,27 +86,48 @@ def query_property_listing():
     # The arguments passed into /search endpoint (in the format /search?arg1=arg1_val&arg2=arg2_val&...)
     params = request.args.to_dict()
 
-    if 'testing' in params:
-        print("Testing has been enabled.")
+    # Simplified parameters of input parameters to better describe parameters input
+    simplified_params = dict()
+    simplified_params['where'] = params['where']
+    simplified_params['km_away_from_uni'] = params['km_away_from_uni']
+    simplified_params['radius_from'] = params['radius_from']
+    simplified_query_id = format_results.hash_params(simplified_params)
 
-    try:
+    # If the query has already been seen before, set results
+    already_processed = db_func.query_already_processed(simplified_query_id)
+    if already_processed:
+        print('This particular query, {}, has already been processed. Getting results...'.format(simplified_params))
+        results = already_processed
+    else:
         if 'testing' in params:
-            results = seach_helper.get_properties_near_unis(params, 10)
-        else:
-            results = seach_helper.get_properties_near_unis(params)
+            print("Testing has been enabled.")
 
-        if not results:
-            return jsonify({"error": "No results returned"})
+        try:
+            if 'testing' in params:
+                results = seach_helper.get_properties_near_unis(params, 10)
+            else:
+                results = seach_helper.get_properties_near_unis(params)
 
-    except adzuna_ingest.AdzunaAuthorisationException:
-        return jsonify({"error": 410})
-    except adzuna_ingest.AdzunaRequestFormatException:
-        return jsonify({"error": 400})
-    except adzuna_ingest.AdzunaAPIException:
-        return jsonify({"error": 500})
+            if not results:
+                return jsonify({"error": "No results returned"})
+
+        except adzuna_ingest.AdzunaAuthorisationException:
+            return jsonify({"error": 410})
+        except adzuna_ingest.AdzunaRequestFormatException:
+            return jsonify({"error": 400})
+        except adzuna_ingest.AdzunaAPIException:
+            return jsonify({"error": 500})
 
     # Builds the results with other metadata into a format to be consumed by frontend
-    property_dict = format_results.build_property_dict(results)
+    property_dict, property_results = format_results.build_property_dict(results)
+
+    # for r in property_results:
+    #     print(r)
+
+    if not already_processed:
+        print("Populating seen tables for this particular query: {}".format(simplified_params))
+        db_func.populate_seen_tables([x['data'] for x in property_results], [], simplified_query_id, simplified_params)
+
     print("Finished.")
     return jsonify(property_dict)
 

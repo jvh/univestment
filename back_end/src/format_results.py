@@ -216,6 +216,7 @@ def build_property_dict(results):
         db_func.insert_price_data_if_not_exist(o)
         ppd_outcode = db_func.get_property_price_data_for_outcode(o)
 
+        # Property outcode data doesn't exist
         if not ppd_outcode:
             continue
 
@@ -278,10 +279,11 @@ def build_property_dict(results):
         latest_historic_price = float(outcode_pd['historic']['y'][-1])
         predicted_first = float(outcode_pd['predicted']['y'][0])
         estimated_return = ppd_helper.get_current_estimate(latest_historic_price, predicted_first)
+
         investment_dict['market_value'] = estimated_return
-        # Add mortgage repayment to return json
         mortgage_return['potential_rent_profit'] = mortgage_return["rent"] - mortgage_return["mortgage_payment"]
         investment_dict["mortgage_return"] = mortgage_return
+
         p_data['investment'] = investment_dict
 
         # Properties existing within that postcode
@@ -294,7 +296,7 @@ def build_property_dict(results):
     formatted_json["universities"] = university_admissions_data
     formatted_json["outcodes"] = outcode_price_data
 
-    return formatted_json
+    return formatted_json, property_results
 
 
 def get_best_properties_per_uni(property_by_uni, number_properties=50):
@@ -328,6 +330,5 @@ def get_best_properties_per_uni(property_by_uni, number_properties=50):
 
     # Getting large images
     large_images = large_images_only(best_properties)
-
 
     return large_images
