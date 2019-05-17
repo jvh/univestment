@@ -14,7 +14,7 @@ def annotate(path):
     """
     if not path:
         return
-    
+
     client = vision.ImageAnnotatorClient()
 
     if path.startswith('http') or path.startswith('gs:'):
@@ -40,6 +40,8 @@ def get_large_from_thumbnail(url):
     :return: The URL of the large image
     """
     a = annotate(url)
+    if not a:
+        return
     r = return_large(a)
 
     # If there are no large equivalents, return None
