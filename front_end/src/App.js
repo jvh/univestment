@@ -7,7 +7,7 @@ import Footer from './components/Footer.js';
 
 class App extends Component {
   componentDidMount(){
-    document.title = "Jack Tarbox"
+    document.title = "Univestment"
   }
   render() {
       return(

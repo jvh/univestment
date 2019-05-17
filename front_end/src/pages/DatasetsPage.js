@@ -70,12 +70,28 @@ class DatasetsPage extends Component {
 
                 <td>
                   <a
-                    href="https://www.ucas.com/data-and-analysis/undergraduate-statistics-and-reports/ucas-undergraduate-end-cycle-data-resources/applicants-and-acceptances-universities-and-colleges-2018"
+                    href="https://www.hesa.ac.uk/data-and-analysis/students/where-study"
                     target="_blank" rel="noopener noreferrer">Link to dataset</a>
                 </td>
                 <td>
                   <a
-                    href=""
+                    href="https://creativecommons.org/licenses/by/4.0/"
+                    target="_blank" rel="noopener noreferrer">CC-BY-4.0</a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <h4>University Logos</h4>
+                </td>
+
+                <td>
+                  <a
+                    href="https://equipment.data.ac.uk/"
+                    target="_blank" rel="noopener noreferrer">Link to dataset</a>
+                </td>
+                <td>
+                  <a
+                    href="http://www.data.ac.uk/licenses/"
                     target="_blank" rel="noopener noreferrer">License</a>
                 </td>
               </tr>
@@ -93,6 +109,9 @@ class DatasetsPage extends Component {
 }
 
 export default DatasetsPage;
+
+//href="https://www.ucas.com/data-and-analysis/undergraduate-statistics-and-reports/ucas-undergraduate-end-cycle-data-resources/applicants-and-acceptances-universities-and-colleges-2018"
+
 
 // <LineGraph width={700} height={500} data={data}/>
 //             <LineGraph width={700} height={500} data={this.state.data.historic_data.outcode}/>

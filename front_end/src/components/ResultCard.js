@@ -53,6 +53,8 @@ const ResultCard = (props) => {
     description = description.substr(0,index) + " ...";
   }
 
+  console.log(props);
+
   return (
     <div>
       <div className="spacer-sml">
@@ -82,7 +84,7 @@ const ResultCard = (props) => {
               </p>
             </div>
             <div className="col-3">
-              <h3 className="align-right">£{}</h3>
+              <h3 className="align-right">£{Math.round(props.investment.mortgage_return.potential_rent_profit/10)*10}</h3>
               <p className="align-right">PCM Cash Flow</p>
             </div>
           </div>
