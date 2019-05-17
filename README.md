@@ -14,9 +14,39 @@ This single file contains information regarding property sales in the U.K. datin
 
 A file containing information on the geographical information of universities around the U.K.
 
-### [University Admissions](https://www.ucas.com/data-and-analysis/undergraduate-statistics-and-reports/ucas-undergraduate-end-cycle-data-resources/applicants-and-acceptances-universities-and-colleges-2018)
+### [University Admissions](https://www.hesa.ac.uk/data-and-analysis/students/where-study)
 
-Admission data for U.K. universities.
+University enrolment and graduation statistics for admission data.
+
+### [University Logos and Coordinates](https://equipment.data.ac.uk/)
+
+Logo URL's for university's and their (latitude, longitude) coordinates.
+
+## Quick Start
+
+You can either visit [univestment.co.uk](http://univestment.co.uk/) or attempt to deploy this locally. Keep in mind, deplying this project locally is not an easy undertaking given the number of requirements. Furthermore, price data is a large file which is unable to be stored on git, this must be stored locally under `/open_datasets.nosync/price_paid_data`. We highly recommend you visit our site for the easiest and best experience. Please note that this site may go down at any point due to being hosted on our own server, please email Jack Tarbox (jt7g15@soton.ac.uk) if you are experiencing any difficulties.
+
+### Installation on local machine
+
+You will need [Python3.7](https://www.python.org/downloads/release/python-370/), [NodeJS](https://nodejs.org/en/), [npm install](https://www.npmjs.com/), and [PostgreSQL](https://www.postgresql.org/).
+
+#### Database
+
+* Ensure postgres is running on port 5432 on localhost.
+* Create a postgres user using command `\createuser`. The user should be called postgres with the password the same as seen in `back_end/src/__init__.py` under the `POSTGRES_PASSWORD` constant.
+* Create a database called `housing_data`.
+
+#### Backend
+
+* Navigate to the top level directory and type `pip install -r back_end/requirements.txt` in order to install Python libraries.
+* (Ensure you have database setup first) Create relevant tables using `python back_end/src/database/database_main.py`.
+* Run python Flask (API service) using `python back_end/src/app.py`.
+
+#### Frontend 
+
+* Navigate to the `front_end/` directory.
+* Run command `npm ci`.
+* Run command `npm start`.
 
 ## Development
 
