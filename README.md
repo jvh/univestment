@@ -24,7 +24,7 @@ Logo URL's for university's and their (latitude, longitude) coordinates.
 
 ## Quick Start
 
-You can either visit [univestment.co.uk](http://univestment.co.uk/) or attempt to deploy this locally. Keep in mind, deplying this project locally is not an easy undertaking given the number of requirements. Furthermore, price data is a large file which is unable to be stored on git, this must be stored locally under `/open_datasets.nosync/price_paid_data`. We highly recommend you visit our site for the easiest and best experience. Please note that this site may go down at any point due to being hosted on our own server, please email Jack Tarbox (jt7g15@soton.ac.uk) if you are experiencing any difficulties.
+You can either visit [univestment.co.uk](http://univestment.co.uk/) or attempt to deploy this locally. Keep in mind, deplying this project locally is not an easy undertaking given the number of requirements. Furthermore, price data is a large file which is unable to be stored on git, this must be stored locally under `/open_datasets.nosync/price_paid_data`. We highly recommend you visit our site for the easiest and best experience. Although uptime is over 99%, this server is privately hosted so may be down at times due to internet outages, please contact Jack Tarbox (jt7g15@soton.ac.uk) if you are experiencing any difficulties.
 
 ### Installation on local machine
 
