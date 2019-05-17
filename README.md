@@ -1,6 +1,6 @@
 # Video Trend Data
 
-Identifying good opportunities for property investors based on a user-defined filter.
+Identifying good student let investment opportunities for property investors based on a user-defined filter.
 
 ## Datasets
 
