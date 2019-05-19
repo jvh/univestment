@@ -151,7 +151,14 @@ def populate_seen_tables(results, large_images, query_id, params):
 
         # If it has been seen, update date
         if seen_before:
-            search_property_query = "UPDATE seen_adverts SET date_of_insertion=DEFAULT WHERE id=%s;"
+            if 'university' in r:
+                uni = r['university']
+            else:
+                uni = None
+
+            # Updating date of insertion and university
+            search_property_query = "UPDATE seen_adverts SET date_of_insertion=DEFAULT, university='{}' WHERE id=%s;"\
+                .format(uni)
             general_db_func.insert_to_db(search_property_query, args)
         else:
             # Add it to the table
