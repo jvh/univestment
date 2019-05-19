@@ -68,6 +68,8 @@ def get_properties_near_unis(params, results_per_page=50):
             print("This query has not been seen before. Processing results for {} with a radius of {}..."
                   .format(name, uni_params['distance']))
             results = app.adzuna.get_property_listing(uni_params, results_per_page=results_per_page)
+            for r in results:
+                r['university'] = name
             # large_images = format_results.large_images_only(results)
             large_images = []
             db_func.populate_seen_tables(results, large_images, query_id, simplified_params)
