@@ -273,7 +273,7 @@ class HomePageSearch extends Component {
              </FormGroup>
 
              <FormGroup as={Col} controlId="min_price">
-               <FormLabel style={{fontWeight:"bold"}}>No. Beds</FormLabel>
+               <FormLabel style={{fontWeight:"bold"}}>Min No. Beds</FormLabel>
                <FormControl as="select"
                  name="beds"
                  value={this.state.form.beds}
