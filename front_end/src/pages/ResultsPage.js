@@ -86,6 +86,8 @@ class ResultsPage extends Component {
   filter (filters) {
 
 
+    console.log("FILTER 1");
+
     const results = this.state.search.search_results;
 
     var filtered_results = [];
@@ -118,7 +120,41 @@ class ResultsPage extends Component {
       }
     }
 
-    this.setState({filtered_results: filtered_results, isLoading:false}, () => this.setState({isLoading: true}, () => this.setState({isLoading: false})));
+    var out_results = [];
+
+    var maxPrice = this.state.search.form.price_max === undefined ? 10000000 : this.state.search.form.price_max;
+    var minPrice = this.state.search.form.price_min === undefined ? 0 : this.state.search.form.price_min;
+    var minBeds = this.state.search.form.beds === undefined ? 0 : this.state.search.form.beds;
+
+        maxPrice = "" + maxPrice;
+            minPrice = "" + minPrice;
+
+    maxPrice = maxPrice.replace(/,/gi, "");
+    minPrice = minPrice.replace(/,/gi, "");
+
+    console.log("FILTER");
+    console.log(typeof(maxPrice));
+    console.log(minPrice);
+    console.log(minBeds);
+    console.log(filtered_results);
+
+    filtered_results.forEach(function (result) {
+      console.log(result)
+      console.log(result.data.beds)
+      console.log(result.data.sale_price)
+      if (parseInt(result.data.beds) >= parseInt(minBeds) && parseInt(result.data.sale_price) >= parseInt(minPrice)) {
+        console.log("true");
+        console.log(maxPrice);
+        console.log(parseInt(maxPrice));
+        if (parseInt(result.data.sale_price) <= parseInt(maxPrice)){
+          out_results.push(result);
+        }
+      }
+    });
+
+    console.log(out_results);
+
+    this.setState({filtered_results: out_results, isLoading:false}, () => this.setState({isLoading: true}, () => this.setState({isLoading: false})));
 
   }
 

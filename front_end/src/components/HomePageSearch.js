@@ -278,11 +278,11 @@ class HomePageSearch extends Component {
                  name="beds"
                  value={this.state.form.beds}
                  onChange={this.handleFormChange}>
-                 <option>All</option>
+                 <option>1</option>
                  <option>2</option>
                  <option>3</option>
                  <option>4</option>
-                 <option>5+</option>
+                 <option>5</option>
                </FormControl>
              </FormGroup>
            </Row>
