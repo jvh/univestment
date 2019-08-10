@@ -8,7 +8,7 @@ Please place all the datasets in the `open_datasets` folder.
 
 ### [Housing Sales](https://www.gov.uk/government/collections/price-paid-data)
 
-This single file contains information regarding property sales in the U.K. dating from 1st January 1995; it is updated on a monthly basis. 
+This single file contains information regarding property sales in the U.K. dating from 1st January 1995; it is updated on a monthly basis. This is the only file _not_ present in the `open_datasets` folder, it is necessary to download this file and place it in yourself in order to run the application.
 
 ### [University Locations](https://get-information-schools.service.gov.uk/Establishments/Search?tok=8TMj138l)
 
